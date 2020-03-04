@@ -40,9 +40,9 @@ public class DownLoadUtil {
                 } catch (Exception e) {
                     e.printStackTrace( );
                 } finally {
-                    if(os != null){
+                    if (os != null) {
                         try {
-                            os.close();
+                            os.close( );
                         } catch (IOException e) {
                             e.printStackTrace( );
                         }
