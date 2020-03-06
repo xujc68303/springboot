@@ -48,12 +48,12 @@ public class CacheImpl implements CacheUtil {
         try {
             jedis = initJedis( );
             return jedis.exists(key);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             log.error("cache-get error" + stopWatch.getTotalTimeMillis( ), "key=" + key);
             return false;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -69,7 +69,7 @@ public class CacheImpl implements CacheUtil {
             return null;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -85,7 +85,7 @@ public class CacheImpl implements CacheUtil {
             return null;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -97,18 +97,18 @@ public class CacheImpl implements CacheUtil {
             jedis = initJedis( );
             String v = JSON.toJSONString(value);
             String result = jedis.setex(key, expire, v);
-            if(!OK.equals(result)){
-                log.error("cache-setexWithExpire failed" + stopWatch.getTotalTimeMillis() + "key=" + key);
+            if (!OK.equals(result)) {
+                log.error("cache-setexWithExpire failed" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
                 return false;
             }
-            log.info("cache-setexWithExpire success" + stopWatch.getTotalTimeMillis() + "key=" + key);
+            log.info("cache-setexWithExpire success" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
             return true;
         } catch (RuntimeException e) {
             log.error("cache-setexWithExpire error", e);
             return false;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -117,29 +117,68 @@ public class CacheImpl implements CacheUtil {
         StopWatch stopWatch = getWatch("cache-getKeyWithExpire");
         Jedis jedis = null;
         try {
-            jedis = initJedis();
+            jedis = initJedis( );
             Object value = jedis.get(key);
-            if(Objects.nonNull(value)){
-                if(1 == jedis.expire(key, expire)){
-                    log.info("cache-getKeyWithExpire success" + stopWatch.getTotalTimeMillis() + "key=" + key);
+            if (Objects.nonNull(value)) {
+                if (1 == jedis.expire(key, expire)) {
+                    log.info("cache-getKeyWithExpire success" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
                     return value;
                 }
             }
-            log.error("cache-getKeyWithExpire failed" + stopWatch.getTotalTimeMillis() + "key=" + key);
+            log.error("cache-getKeyWithExpire failed" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
             return null;
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             log.error("cache-getKeyWithExpire error", e);
             return null;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
+        }
+    }
+
+    @Override
+    public Boolean removeObject(String key) {
+        StopWatch stopWatch = getWatch("cache-removeObject");
+        Jedis jedis = null;
+        try {
+            jedis = initJedis( );
+            if (jedis.exists(key)) {
+                if (jedis.del(key) > 0) {
+                    log.info("cache-removeObject success" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
+                    return true;
+                }
+            }
+            log.error("cache-removeObject failed" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
+            return false;
+        } catch (RuntimeException e) {
+            log.error("cache-removeObject error", e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean renameByKey(String oldKey, String newKey) {
+        StopWatch stopWatch = getWatch("cache-renameByKey");
+        Jedis jedis = null;
+        try {
+            jedis = initJedis( );
+            if (jedis.exists(oldKey)) {
+                if (OK.equals(jedis.rename(oldKey, newKey))) {
+                    log.info("cache-removeObject success" + stopWatch.getTotalTimeMillis( ) +
+                            "oldKey=" + oldKey + "newKey=" + newKey);
+                    return true;
+                }
+            }
+            return false;
+        } catch (RuntimeException e) {
+            log.error("cache-renameByKey error", e);
+            return false;
         }
     }
 
     @Override
     public boolean distributedLock(String key, Object value) {
-        StopWatch stopWatch = new StopWatch("cache-distributedLock");
-        stopWatch.start( );
+        StopWatch stopWatch = getWatch("cache-distributedLock");
         try {
             final String v = JSON.toJSONString(value);
             RedisCallback<String> callback = (connection) -> {
@@ -164,8 +203,7 @@ public class CacheImpl implements CacheUtil {
 
     @Override
     public boolean distributedLock(String key, Object value, String expx, Long expire) {
-        StopWatch stopWatch = new StopWatch("cache-distributedLock");
-        stopWatch.start( );
+        StopWatch stopWatch = getWatch("cache-distributedLock");
         Jedis jedis = null;
         try {
             jedis = initJedis( );
@@ -187,7 +225,7 @@ public class CacheImpl implements CacheUtil {
             return false;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -228,8 +266,7 @@ public class CacheImpl implements CacheUtil {
 
     @Override
     public Boolean unlock(String key, Object value) {
-        StopWatch stopWatch = new StopWatch("cache-unlock");
-        stopWatch.start( );
+        StopWatch stopWatch = getWatch("cache-unlock");
         Jedis jedis = null;
         try {
             jedis = initJedis( );
@@ -252,7 +289,7 @@ public class CacheImpl implements CacheUtil {
             return false;
         } finally {
             returnToPool(jedis);
-            stopWatch();
+            stopWatch( );
         }
     }
 
@@ -266,8 +303,8 @@ public class CacheImpl implements CacheUtil {
         return stopWatch;
     }
 
-    private static void stopWatch(){
-        stopWatch.stop();
+    private static void stopWatch() {
+        stopWatch.stop( );
     }
 
     private void returnToPool(Jedis jedis) {

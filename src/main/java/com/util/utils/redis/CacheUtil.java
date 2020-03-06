@@ -48,6 +48,21 @@ public interface CacheUtil {
     Object getKeyWithExpire(String key, int expire);
 
     /**
+     * 删除data
+     * @param key cacheKey
+     * @return 执行结果
+     */
+    Boolean removeObject(String key);
+
+    /**
+     * 修改key名称
+     * @param oldKey 原有key
+     * @param newKey 修改key
+     * @return 执行结果
+     */
+    Boolean renameByKey(String oldKey, String newKey);
+
+    /**
      * 分布式锁（手动解锁）
      * @param key cacheKey
      * @param value data
