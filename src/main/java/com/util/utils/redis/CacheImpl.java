@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
@@ -43,10 +44,60 @@ public class CacheImpl implements CacheUtil {
     private static volatile JedisPool jedisPool;
 
     @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
     private RedisTemplate redisTemplate;
 
     @Autowired
     private static StopWatch stopWatch;
+
+
+    /**
+     * 初始化连接
+     * @return
+     */
+    static Jedis initJedis() {
+        if (null == jedisPool) {
+            synchronized (CacheImpl.class) {
+                if (null == jedisPool) {
+                    JedisPoolConfig poolConfig = new JedisPoolConfig( );
+                    poolConfig.setMaxTotal(1000);
+                    poolConfig.setMaxIdle(32);
+                    poolConfig.setMaxWaitMillis(1000 * 100);
+                    poolConfig.setTestOnBorrow(true);
+                    jedisPool = new JedisPool(poolConfig, "127.0.0.1", 6379);
+                }
+            }
+        }
+        return jedisPool.getResource();
+    }
+
+    private void closeJedisPool(Jedis jedis) {
+        try {
+            if (null != jedis) {
+                jedis.close( );
+            }
+        } catch (RuntimeException e) {
+            log.error("cache-returnToPool error", e);
+        }
+    }
+
+    /**
+     * 计数器初始化
+     * @param functionName 函数
+     * @return StopWatch
+     */
+    private static StopWatch getWatch(String functionName) {
+        stopWatch = new StopWatch(functionName);
+        stopWatch.start( );
+        return stopWatch;
+    }
+
+    private static void stopWatch() {
+        stopWatch.stop( );
+    }
+
 
     @Override
     public Boolean exists(String key) {
@@ -59,7 +110,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-get error" + stopWatch.getTotalTimeMillis( ), "key=" + key);
             return false;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
@@ -75,7 +126,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-get error" + stopWatch.getTotalTimeMillis( ), "key=" + key);
             return null;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
@@ -91,7 +142,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-getString error" + stopWatch.getTotalTimeMillis( ), "key=" + key);
             return null;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
@@ -115,7 +166,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-setexWithExpire error", e);
             return false;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
 
@@ -141,7 +192,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-getKeyWithExpire error", e);
             return null;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
@@ -234,7 +285,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-lock error" + stopWatch.getLastTaskTimeMillis( ), e);
             return false;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
@@ -270,7 +321,7 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-preemptiveLock error", e);
             return false;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
         }
     }
 
@@ -298,49 +349,19 @@ public class CacheImpl implements CacheUtil {
             log.error("cache-unlock error" + stopWatch.getLastTaskTimeMillis( ), e);
             return false;
         } finally {
-            returnToPool(jedis);
+            closeJedisPool(jedis);
             stopWatch( );
         }
     }
 
 
-    public static Jedis initJedis() {
-        if (null == jedisPool) {
-            synchronized (CacheImpl.class) {
-                if (null == jedisPool) {
-                    JedisPoolConfig poolConfig = new JedisPoolConfig( );
-                    poolConfig.setMaxTotal(1000);
-                    poolConfig.setMaxIdle(32);
-                    poolConfig.setMaxWaitMillis(1000 * 100);
-                    poolConfig.setTestOnBorrow(true);
-                    jedisPool = new JedisPool(poolConfig, "127.0.0.1", 6379);
-                }
-            }
-        }
-        return jedisPool.getResource();
-    }
 
 
 
 
-    private static StopWatch getWatch(String functionName) {
-        stopWatch = new StopWatch(functionName);
-        stopWatch.start( );
-        return stopWatch;
-    }
 
-    private static void stopWatch() {
-        stopWatch.stop( );
-    }
 
-    private void returnToPool(Jedis jedis) {
-        try {
-            if (null != jedis) {
-                jedis.close( );
-            }
-        } catch (RuntimeException e) {
-            log.error("cache-returnToPool error", e);
-        }
-    }
+
+
 
 }
