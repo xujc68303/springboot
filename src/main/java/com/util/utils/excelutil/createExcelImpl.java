@@ -23,7 +23,7 @@ import java.util.Map;
  * @Description easyExcel导出工具
  */
 @Slf4j
-public class createExcelByEaysExcelImpl implements createExcelByEaysExcel {
+public class createExcelImpl implements createExcel {
 
     @Override
     public void createExcel(List<? extends BaseRowModel> list, ExcelTypeEnum excelTypeEnum,

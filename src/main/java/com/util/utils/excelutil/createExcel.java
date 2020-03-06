@@ -14,7 +14,7 @@ import java.util.List;
  * @Date 2020/3/6 15:06
  * @Description easyExcel解析工具
  */
-public interface createExcelByEaysExcel {
+public interface createExcel {
 
     /**
      * 文件导出为Excel
