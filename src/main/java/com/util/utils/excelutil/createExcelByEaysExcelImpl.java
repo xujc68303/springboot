@@ -38,7 +38,8 @@ public class createExcelByEaysExcelImpl implements createExcelByEaysExcel {
 
         ExcelWriter excelWriter = new ExcelWriter(outputStream, excelTypeEnum, true);
 
-        //Todo
+        // writeExcelByMap()
+        // writeExcelByList();
         log.info("Excel导出完成");
     }
 
@@ -59,7 +60,7 @@ public class createExcelByEaysExcelImpl implements createExcelByEaysExcel {
      * @param map
      * @param excelWriter
      */
-    private static void setSheet(Map<String, List<? extends BaseRowModel>> map, ExcelWriter excelWriter) {
+    private static void writeExcelByMap(Map<String, List<? extends BaseRowModel>> map, ExcelWriter excelWriter) {
         int sheetNum = 1;
         for (Map.Entry<String, List<? extends BaseRowModel>> stringListEntry : map.entrySet( )) {
             Sheet sheet = new Sheet(sheetNum, 0, stringListEntry.getValue( ).get(0).getClass( ));
@@ -76,7 +77,7 @@ public class createExcelByEaysExcelImpl implements createExcelByEaysExcel {
      * @param list
      * @param excelWriter
      */
-    private static void writeExcel(List<? extends BaseRowModel> list, ExcelWriter excelWriter) {
+    private static void writeExcelByList(List<? extends BaseRowModel> list, ExcelWriter excelWriter) {
         Sheet sheet = new Sheet(1, 0, list.get(0).getClass( ));
         sheet.setSheetName("sheetName");
         excelWriter.write(list, sheet);

@@ -1,5 +1,6 @@
 package com.util.utils;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,13 +12,14 @@ import java.io.*;
  * @ClassName DownLoadUtil
  * @Author xujiachen
  * @Date 2020/3/3 18:11
- * @Description TODO
+ * @Description 下载
  */
+@Service
 public class DownLoadUtil {
 
-    public static String downLoadFile(HttpServletRequest request, HttpServletResponse response) {
+    public  String downLoadFile(HttpServletRequest request, HttpServletResponse response) {
         //读取文件地址
-        File scFileDir = new File("");
+        File scFileDir = new File("F:\\redis-2.8.9");
         File[] trxFiles = scFileDir.listFiles( );
 
         //获取当前目录下的第几个文件

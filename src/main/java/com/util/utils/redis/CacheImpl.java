@@ -2,13 +2,16 @@ package com.util.utils.redis;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -21,6 +24,7 @@ import java.util.Objects;
  * @Description 缓存工具类
  */
 @Slf4j
+@Service
 public class CacheImpl implements CacheUtil {
 
     private static final String CACHE_UTIL_KEY = "cacheUtil";
@@ -31,14 +35,17 @@ public class CacheImpl implements CacheUtil {
 
     private static final String MILLISECONDS = "PX";
 
-    private static final String OK = "ok";
+    private static final String OK = "OK";
 
     private static final String ONE_RESULT = "1";
 
-    private static JedisPool jedisPool;
+    @Autowired
+    private static volatile JedisPool jedisPool;
 
+    @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
     private static StopWatch stopWatch;
 
     @Override
@@ -103,14 +110,17 @@ public class CacheImpl implements CacheUtil {
             }
             log.info("cache-setexWithExpire success" + stopWatch.getTotalTimeMillis( ) + "key=" + key);
             return true;
-        } catch (RuntimeException e) {
+        } catch (
+                RuntimeException e) {
             log.error("cache-setexWithExpire error", e);
             return false;
         } finally {
             returnToPool(jedis);
             stopWatch( );
         }
+
     }
+
 
     @Override
     public Object getKeyWithExpire(String key, int expire) {
@@ -183,7 +193,7 @@ public class CacheImpl implements CacheUtil {
             final String v = JSON.toJSONString(value);
             RedisCallback<String> callback = (connection) -> {
                 JedisCommands commands = (JedisCommands) connection.getNativeConnection( );
-                return commands.set(CACHE_UTIL_KEY + key, v, NOT_EXIST);
+                return String.valueOf(commands.setnx(CACHE_UTIL_KEY + key, v) > 0);
             };
             Object result = redisTemplate.execute(callback);
             if (!StringUtils.isEmpty(result)) {
@@ -293,9 +303,25 @@ public class CacheImpl implements CacheUtil {
         }
     }
 
-    private static Jedis initJedis() {
-        return jedisPool.getResource( );
+
+    public static Jedis initJedis() {
+        if (null == jedisPool) {
+            synchronized (CacheImpl.class) {
+                if (null == jedisPool) {
+                    JedisPoolConfig poolConfig = new JedisPoolConfig( );
+                    poolConfig.setMaxTotal(1000);
+                    poolConfig.setMaxIdle(32);
+                    poolConfig.setMaxWaitMillis(1000 * 100);
+                    poolConfig.setTestOnBorrow(true);
+                    jedisPool = new JedisPool(poolConfig, "127.0.0.1", 6379);
+                }
+            }
+        }
+        return jedisPool.getResource();
     }
+
+
+
 
     private static StopWatch getWatch(String functionName) {
         stopWatch = new StopWatch(functionName);
