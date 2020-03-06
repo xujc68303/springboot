@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * @Version 1.0
  * @ClassName StringUilt
- * @Author xujiachen
+ * @Author jiachenXu
  * @Date 2019/9/21 14:37
  * @Description 字符串工具类，安全不会返回空指针
  */

@@ -1,11 +1,9 @@
 package com.util.utils.redis;
 
-import org.springframework.stereotype.Service;
-
 /**
  * @Version 1.0
  * @ClassName CacheUtil
- * @Author xujiachen
+ * @Author jiachenXu
  * @Date 2020/3/5 13:38
  * @Description 缓存工具类
  */
