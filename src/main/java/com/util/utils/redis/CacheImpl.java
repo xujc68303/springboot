@@ -52,7 +52,6 @@ public class CacheImpl implements CacheUtil {
     @Autowired
     private static StopWatch stopWatch;
 
-
     /**
      * 初始化连接
      * @return
@@ -107,7 +106,7 @@ public class CacheImpl implements CacheUtil {
             jedis = initJedis( );
             return jedis.exists(key);
         } catch (RuntimeException e) {
-            log.error("cache-get error" + stopWatch.getTotalTimeMillis( ), "key=" + key);
+            log.error("cache-get error," + stopWatch.getTotalTimeMillis( ), ",key=" + key);
             return false;
         } finally {
             closeJedisPool(jedis);
@@ -353,15 +352,5 @@ public class CacheImpl implements CacheUtil {
             stopWatch( );
         }
     }
-
-
-
-
-
-
-
-
-
-
 
 }

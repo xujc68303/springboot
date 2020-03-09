@@ -1,18 +1,21 @@
 package com.util.utils.file;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  * @Version 1.0
@@ -25,32 +28,46 @@ import static java.nio.file.StandardOpenOption.CREATE;
 @Service
 public class FilesUtilImpl implements FilesUtil {
 
+    private static final Long SPACE_MAX = 100L;
+
+    @Autowired
+    private static StopWatch stopWatch;
+
     @Override
-    public Boolean createFile(String path, String cs) {
+    public Boolean createFile(String path) {
+        StopWatch stopWatch = null;
         try {
+            stopWatch = getWatch("FilesUtilImpl-createFile");
+
+            checkSpace(path);
             Path dirPath = Paths.get(path);
-            checkSpaceSize(dirPath);
-            if(Files.notExists(dirPath)){
-                Files.newBufferedWriter(dirPath, CREATE);
-                log.info("FileUtil-createFile success");
+            if (!Files.exists(dirPath)) {
+                Files.createFile(dirPath);
+                log.info("FileUtil-createFile success, runTime=", stopWatch.getTotalTimeMillis( ));
                 return true;
             }
-
         } catch (Exception e) {
-            log.error("FileUtil-createFile error", e);
+            log.error("FileUtil-createFile error, runTime=", stopWatch.getTotalTimeMillis( ), e);
+        } finally {
+            if(stopWatch != null){
+                stopWatch.stop();
+            }
         }
         return false;
     }
 
     @Override
-    public Boolean createDirectories(String path, String cs) {
+    public Boolean createDirectories(String path) {
         try {
+            checkSpace(path);
             Path dirPath = Paths.get(path);
-            Files.createDirectories(dirPath);
-            log.info("FileUtil-createDirectories success");
-            return true;
+            if (Files.notExists(dirPath)) {
+                Files.createDirectories(dirPath);
+                log.info("FileUtil-createDirectories success, runTime=", stopWatch.getTotalTimeMillis( ));
+                return true;
+            }
         } catch (Exception e) {
-            log.error("FileUtil-createDirectories error", e);
+            log.error("FileUtil-createDirectories error, runTime=", stopWatch.getTotalTimeMillis( ), e);
         }
         return false;
     }
@@ -58,17 +75,14 @@ public class FilesUtilImpl implements FilesUtil {
     @Override
     public Boolean write(String path, String count, String cs) {
         BufferedWriter writer = null;
-        BufferedReader reader = null;
         try {
+            checkSpace(path);
+
             Path dirPath = Paths.get(path);
-            if (StringUtils.isEmpty(count)) {
 
+            if (!StringUtils.isEmpty(count.trim( ))) {
                 writer = Files.newBufferedWriter(dirPath, APPEND);
-                reader = Files.newBufferedReader(dirPath);
-                if (StringUtils.isEmpty(reader.readLine( ))) {
-                    writer.write(count);
-                }
-
+                writer.write(count);
                 writer.flush( );
                 log.info("FileUtil-write success");
                 return true;
@@ -80,9 +94,6 @@ public class FilesUtilImpl implements FilesUtil {
                 if (writer != null) {
                     writer.close( );
                 }
-                if (reader != null) {
-                    reader.close( );
-                }
             } catch (IOException e) {
                 log.error("FileUtil-write close error", e);
             }
@@ -93,16 +104,15 @@ public class FilesUtilImpl implements FilesUtil {
 
 
     @Override
-    public String read(String path, String cs) {
+    public String read(String path) {
         BufferedReader reader = null;
+        String line;
         try {
             Path dirPath = Paths.get(path);
-            reader = Files.newBufferedReader(dirPath);
-            String count = reader.readLine( );
-
-            if (StringUtils.isEmpty(count)) {
+            reader = Files.newBufferedReader(dirPath, StandardCharsets.UTF_8);
+            while ((line = reader.readLine( )) != null) {
                 log.info("FileUtil-read success");
-                return count;
+                return line;
             }
         } catch (Exception e) {
             log.error("FileUtil-read error", e);
@@ -119,29 +129,65 @@ public class FilesUtilImpl implements FilesUtil {
     }
 
     @Override
-    public Boolean delete(String path, String cs) {
+    public Boolean delete(String path) {
         try {
             Path dirPath = Paths.get(path);
-            if (dirPath.toFile().exists()) {
+            if (Files.exists(dirPath)) {
                 return Files.deleteIfExists(dirPath);
             }
         } catch (Exception e) {
             log.error("FileUtil-delete error", e);
         }
+        return false;
+    }
 
+    @Override
+    public Boolean copy(String oldPath, String newPath) {
+        try {
+            checkSpace(newPath);
+            Files.copy(Paths.get(oldPath), Paths.get(newPath));
+            return true;
+        } catch (Exception e) {
+            log.error("FileUtil-copy error", e);
+        }
         return false;
     }
 
     /**
-     * 空间小于50不创建
-     * @param dirPath
-     * @return
-     * @throws IOException
+     * 获取空间，预留参数后期可以改造
      */
-    private void checkSpaceSize(Path dirPath) throws IOException {
-        FileStore fileStore = Files.getFileStore(dirPath);
-        if(fileStore.getTotalSpace() < 50){
-            throw new IllegalArgumentException("最大空间不足");
+    private static void checkSpace(String dir) throws IOException {
+        // 分区的总空间
+        long totalSpace = 0;
+        // 分区的已用空间
+        long usableSpace = 0;
+        // 分区的剩余空间
+        long unallocatedspace = 0;
+
+        dir = dir.substring(0, 2);
+
+        Path path = Paths.get(dir);
+
+        FileStore fileStore = Files.getFileStore(path);
+
+        if (fileStore.isReadOnly( )) {
+            unallocatedspace = fileStore.getUnallocatedSpace( );
+            if (unallocatedspace <= SPACE_MAX) {
+                throw new IllegalArgumentException("可使用空间不足");
+            }
         }
     }
+
+    /**
+     * 计数器初始化
+     *
+     * @param functionName 函数
+     * @return StopWatch
+     */
+    private static StopWatch getWatch(String functionName) {
+        stopWatch = new StopWatch(functionName);
+        stopWatch.start( );
+        return stopWatch;
+    }
+
 }

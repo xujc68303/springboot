@@ -1,4 +1,4 @@
-package com.util.utils;
+package com.util.utils.string;
 
 import java.util.Iterator;
 

@@ -1,4 +1,4 @@
-package com.util.utils;
+package com.util.utils.down;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,7 +17,7 @@ import java.io.*;
 @Service
 public class DownLoadUtil {
 
-    public  String downLoadFile(HttpServletRequest request, HttpServletResponse response) {
+    public String downLoadFile(HttpServletRequest request, HttpServletResponse response) {
         //读取文件地址
         File scFileDir = new File("F:\\redis-2.8.9");
         File[] trxFiles = scFileDir.listFiles( );

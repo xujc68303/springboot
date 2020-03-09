@@ -1,5 +1,7 @@
 package com.util.utils.redis;
 
+import org.springframework.util.StopWatch;
+
 /**
  * @Version 1.0
  * @ClassName CacheUtil
@@ -8,6 +10,8 @@ package com.util.utils.redis;
  * @Description 缓存工具类
  */
 public interface CacheUtil {
+
+    static StopWatch getWatch(String functionName);
 
     /**
      * 检查key是否存在

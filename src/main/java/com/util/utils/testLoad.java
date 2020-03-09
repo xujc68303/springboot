@@ -1,5 +1,6 @@
 package com.util.utils;
 
+import com.util.utils.down.DownLoadUtil;
 import com.util.utils.file.FilesUtil;
 import com.util.utils.redis.CacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,21 +38,5 @@ public class testLoad {
     public Boolean redis(){
         return cacheUtil.setWithExpire("xjc", "test", 30);
     }
-
-    @RequestMapping("/createFile")
-    public Boolean createFile(){
-        return filesUtil.createFile("E:\\test.doc", "utf-8");
-    }
-
-    @RequestMapping("/createDirectories")
-    public Boolean createDirectories(){
-        return filesUtil.createDirectories("C:\\Users\\Administrator\\Desktop\\test", "utf-8");
-    }
-
-    @RequestMapping("/delete")
-    public Boolean delete(){
-        return filesUtil.delete("C:\\Users\\Administrator\\Desktop\\demo.text", "utf-8");
-    }
-
 
 }

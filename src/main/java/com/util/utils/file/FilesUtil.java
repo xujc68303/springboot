@@ -13,19 +13,17 @@ public interface FilesUtil {
      * 创建文件
      *
      * @param path 路径
-     * @param cs   编码
      * @return 执行结果
      */
-    Boolean createFile(String path, String cs);
+    Boolean createFile(String path);
 
     /**
      * 创建路径
      *
      * @param path 路径
-     * @param cs   编码
      * @return 执行结果
      */
-    Boolean createDirectories(String path, String cs);
+    Boolean createDirectories(String path);
 
     /**
      * 写入文件
@@ -40,18 +38,24 @@ public interface FilesUtil {
      * 读取文件
      *
      * @param path 路径
-     * @param cs   编码
      * @return 文件内容
      */
-    String read(String path, String cs);
+    String read(String path);
 
     /**
-     * 删除文件
+     * 删除文件、目录
      *
      * @param path 路径
-     * @param cs 编码
      * @return 执行结果
      */
-    Boolean delete(String path, String cs);
+    Boolean delete(String path);
+
+    /**
+     * 复制文件
+     * @param oldPath 原有路径
+     * @param newPath 新路径
+     * @return 执行结果
+     */
+    Boolean copy(String oldPath, String newPath);
 
 }
