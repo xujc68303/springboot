@@ -32,7 +32,7 @@ public interface FilesUtil {
      * @param count 文件内容
      * @return 执行结果
      */
-    Boolean write(String path, String count, String cs);
+    Boolean write(String path, String count);
 
     /**
      * 读取文件

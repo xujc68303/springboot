@@ -19,7 +19,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
  * @Version 1.0
- * @ClassName FilesUtil
+ * @ClassName FilesUtilImpl
  * @Author jiachenXu
  * @Date 2020/3/8 21:53
  * @Description JDK7新特性，更快捷创建、读取文件
@@ -49,8 +49,8 @@ public class FilesUtilImpl implements FilesUtil {
         } catch (Exception e) {
             log.error("FileUtil-createFile error, runTime=", stopWatch.getTotalTimeMillis( ), e);
         } finally {
-            if(stopWatch != null){
-                stopWatch.stop();
+            if (stopWatch != null) {
+                stopWatch.stop( );
             }
         }
         return false;
@@ -58,7 +58,9 @@ public class FilesUtilImpl implements FilesUtil {
 
     @Override
     public Boolean createDirectories(String path) {
+        StopWatch stopWatch = null;
         try {
+            stopWatch = getWatch("FilesUtilImpl-createDirectories");
             checkSpace(path);
             Path dirPath = Paths.get(path);
             if (Files.notExists(dirPath)) {
@@ -68,14 +70,20 @@ public class FilesUtilImpl implements FilesUtil {
             }
         } catch (Exception e) {
             log.error("FileUtil-createDirectories error, runTime=", stopWatch.getTotalTimeMillis( ), e);
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop( );
+            }
         }
         return false;
     }
 
     @Override
-    public Boolean write(String path, String count, String cs) {
+    public Boolean write(String path, String count) {
+        StopWatch stopWatch = null;
         BufferedWriter writer = null;
         try {
+            stopWatch = getWatch("FilesUtilImpl-write");
             checkSpace(path);
 
             Path dirPath = Paths.get(path);
@@ -84,45 +92,52 @@ public class FilesUtilImpl implements FilesUtil {
                 writer = Files.newBufferedWriter(dirPath, APPEND);
                 writer.write(count);
                 writer.flush( );
-                log.info("FileUtil-write success");
+                log.info("FileUtil-write success, runTime=", stopWatch.getTotalTimeMillis( ));
                 return true;
             }
         } catch (Exception e) {
-            log.error("FileUtil-write error", e);
+            log.error("FileUtil-write error, runTime=", stopWatch.getTotalTimeMillis( ), e);
         } finally {
             try {
                 if (writer != null) {
                     writer.close( );
                 }
+                if (stopWatch != null) {
+                    stopWatch.stop( );
+                }
             } catch (IOException e) {
                 log.error("FileUtil-write close error", e);
             }
         }
-
         return false;
     }
 
 
     @Override
     public String read(String path) {
+        StopWatch stopWatch = null;
         BufferedReader reader = null;
         String line;
         try {
+            stopWatch = getWatch("FilesUtilImpl-read");
             Path dirPath = Paths.get(path);
             reader = Files.newBufferedReader(dirPath, StandardCharsets.UTF_8);
             while ((line = reader.readLine( )) != null) {
-                log.info("FileUtil-read success");
+                log.info("FileUtil-read success, runTime=", stopWatch.getTotalTimeMillis( ));
                 return line;
             }
         } catch (Exception e) {
-            log.error("FileUtil-read error", e);
+            log.error("FileUtil-read error, runTime=", stopWatch.getTotalTimeMillis( ), e);
         } finally {
             try {
                 if (reader != null) {
                     reader.close( );
                 }
+                if (stopWatch != null) {
+                    stopWatch.stop( );
+                }
             } catch (IOException e) {
-                log.error("FileUtil-write read error", e);
+                log.error("FileUtil-write read error, runTime=", stopWatch.getTotalTimeMillis( ), e);
             }
         }
         return null;
@@ -130,25 +145,40 @@ public class FilesUtilImpl implements FilesUtil {
 
     @Override
     public Boolean delete(String path) {
+        StopWatch stopWatch = null;
         try {
+            stopWatch = getWatch("FilesUtilImpl-delete");
             Path dirPath = Paths.get(path);
             if (Files.exists(dirPath)) {
                 return Files.deleteIfExists(dirPath);
             }
         } catch (Exception e) {
-            log.error("FileUtil-delete error", e);
+            log.error("FileUtil-delete error, runTime=", stopWatch.getTotalTimeMillis( ), e);
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop( );
+            }
         }
         return false;
     }
 
     @Override
     public Boolean copy(String oldPath, String newPath) {
+        StopWatch stopWatch = null;
         try {
+            stopWatch = getWatch("FilesUtilImpl-copy");
             checkSpace(newPath);
-            Files.copy(Paths.get(oldPath), Paths.get(newPath));
-            return true;
+            Path oldDir = Paths.get(oldPath);
+            if (Files.exists(oldDir)) {
+                Files.copy(oldDir, Paths.get(newPath));
+                return true;
+            }
         } catch (Exception e) {
             log.error("FileUtil-copy error", e);
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop( );
+            }
         }
         return false;
     }
@@ -164,10 +194,7 @@ public class FilesUtilImpl implements FilesUtil {
         // 分区的剩余空间
         long unallocatedspace = 0;
 
-        dir = dir.substring(0, 2);
-
-        Path path = Paths.get(dir);
-
+        Path path = Paths.get(dir.substring(0, 2));
         FileStore fileStore = Files.getFileStore(path);
 
         if (fileStore.isReadOnly( )) {

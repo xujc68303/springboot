@@ -9,12 +9,12 @@ import java.util.List;
 
 /**
  * @Version 1.0
- * @ClassName createExcelByEaysExcel
+ * @ClassName CreateExcel
  * @Author jiachenXu
  * @Date 2020/3/6 15:06
  * @Description easyExcel解析工具
  */
-public interface createExcel {
+public interface CreateExcel {
 
     /**
      * 文件导出为Excel

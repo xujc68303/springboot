@@ -17,13 +17,13 @@ import java.util.Map;
 
 /**
  * @Version 1.0
- * @ClassName createExcelByEaysExcelImpl
+ * @ClassName CreateExcelImpl
  * @Author jiachenXu
  * @Date 2020/3/6 15:08
  * @Description easyExcel导出工具
  */
 @Slf4j
-public class createExcelImpl implements createExcel {
+public class CreateExcelImpl implements CreateExcel {
 
     @Override
     public void createExcel(List<? extends BaseRowModel> list, ExcelTypeEnum excelTypeEnum,
