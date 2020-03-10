@@ -26,9 +26,4 @@ public class TestUserController {
         return pageService.selectAll(page, size);
     }
 
-    @PostMapping(value = "/selectByID")
-    public TestUser selectByID(@RequestParam(value = "page", defaultValue = "1") long id) {
-        return pageService.selectById(id);
-    }
-
 }

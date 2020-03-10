@@ -1,6 +1,6 @@
 package com.datasource.service;
 
-import com.datasource.mapper.dao.TestUserMapper;
+import com.datasource.mapper.dao.TestUserDao;
 import com.datasource.mapper.dataobject.TestUser;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -20,18 +20,18 @@ import java.util.List;
 public class PageServiceImpl implements PageService{
 
     @Autowired
-    private TestUserMapper testUserMapper;
+    private TestUserDao testUserDao;
 
     @Override
     public PageInfo<TestUser> selectAll(int pageNum, int size) {
         PageHelper.startPage(pageNum, size);
-        List<TestUser> testUserList = testUserMapper.selectAll();
+        List<TestUser> testUserList = testUserDao.selectAll();
         PageInfo<TestUser> userPageInfo = new PageInfo<>(testUserList);
         return userPageInfo;
     }
 
     @Override
     public TestUser selectById(long id) {
-        return testUserMapper.selectByPrimaryKey(id);
+        return testUserDao.selectByPrimaryKey(id);
     }
 }
