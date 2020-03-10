@@ -54,7 +54,7 @@
         </javaClientGenerator>
 
         <!-- 指定数据库表 -->
-        <table tableName="test_user" domainObjectName="testUser" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="test_user" domainObjectName="TestUser" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
 
 
