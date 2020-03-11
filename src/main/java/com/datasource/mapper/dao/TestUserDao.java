@@ -1,6 +1,5 @@
 package com.datasource.mapper.dao;
 
-
 import com.datasource.mapper.dataobject.TestUser;
 
 import java.util.List;

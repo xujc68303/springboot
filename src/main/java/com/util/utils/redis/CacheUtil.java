@@ -63,33 +63,23 @@ public interface CacheUtil {
     Boolean renameByKey(String oldKey, String newKey);
 
     /**
-     * 分布式锁（手动解锁）
-     * @param key cacheKey
-     * @param value data
-     * @return 执行结果
-     */
-    boolean distributedLock(String key, Object value);
-
-    /**
      * 分布式锁
      * @param key cacheKey
      * @param value data
-     * @param expx 过期时间单位,可空 默认秒
+     * @param expx 过期时间单位, ex px
      * @param expire 过期时间
      * @return 执行结果
      */
-    boolean distributedLock(String key, Object value, String expx, Long expire);
+    boolean distributedLock(String key, Object value, String expx, int expire);
 
     /**
      * 秒杀锁
      * @param key cacheKey
      * @param value data
-     * @param expx 过期时间单位,可空 默认秒
-     * @param expire 过期时间
      * @param lockWaitTimeOut 总持续时间
      * @return 执行结果
      */
-    boolean preemptiveLock(String key, Object value, String expx, String expire, Long lockWaitTimeOut);
+    boolean preemptiveLock(String key, Object value, int lockWaitTimeOut);
 
     /**
      * 解除锁

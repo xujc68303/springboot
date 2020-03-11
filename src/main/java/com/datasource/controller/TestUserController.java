@@ -1,6 +1,5 @@
 package com.datasource.controller;
 
-import com.datasource.mapper.dataobject.TestUser;
 import com.datasource.service.PageService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
