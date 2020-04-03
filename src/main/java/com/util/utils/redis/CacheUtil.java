@@ -1,5 +1,8 @@
 package com.util.utils.redis;
 
+import javax.validation.constraints.NotNull;
+import java.util.concurrent.TimeUnit;
+
 /**
  * @Version 1.0
  * @ClassName CacheUtil
@@ -11,8 +14,8 @@ public interface CacheUtil {
 
     /**
      * 检查key是否存在
-     * @param key
-     * @return
+     * @param key cacheKey
+     * @return 执行结果
      */
     Boolean exists(String key);
 
@@ -24,28 +27,23 @@ public interface CacheUtil {
     Object get(String key);
 
     /**
-     * 根据Key获取value（String）
-     * @param key cacheKey
-     * @return value
-     */
-    String getString(String key);
-
-    /**
      * 添加key & Data 并设置过期时间
      * @param key cacheKey
      * @param value data
-     * @param expire 过期时间 秒
+     * @param expire 过期时间
+     * @param unit 时间类型
      * @return 执行结果
      */
-    Boolean setWithExpire(String key, Object value, int expire);
+    Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit);
 
     /**
      * 给Key重新设置过期时间并获取Value
      * @param key cacheKey
-     * @param expire 过期时间 秒
-     * @return
+     * @param expire 过期时间
+     * @param unit 时间类型
+     * @return Value
      */
-    Object getKeyWithExpire(String key, int expire);
+    Object getKeyWithExpire(String key, long expire, TimeUnit unit);
 
     /**
      * 删除data
@@ -58,9 +56,8 @@ public interface CacheUtil {
      * 修改key名称
      * @param oldKey 原有key
      * @param newKey 修改key
-     * @return 执行结果
      */
-    Boolean renameByKey(String oldKey, String newKey);
+    void renameByKey(String oldKey, String newKey);
 
     /**
      * 分布式锁
@@ -68,18 +65,20 @@ public interface CacheUtil {
      * @param value data
      * @param expx 过期时间单位, ex px
      * @param expire 过期时间
+     * @param unit 时间类型
      * @return 执行结果
      */
-    boolean distributedLock(String key, Object value, String expx, int expire);
+    boolean distributedLock(String key, Object value, @NotNull String expx, @NotNull long expire, @NotNull TimeUnit unit);
 
     /**
      * 秒杀锁
      * @param key cacheKey
      * @param value data
      * @param lockWaitTimeOut 总持续时间
+     * @param unit 时间类型
      * @return 执行结果
      */
-    boolean preemptiveLock(String key, Object value, int lockWaitTimeOut);
+    boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit);
 
     /**
      * 解除锁
