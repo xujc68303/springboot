@@ -50,25 +50,32 @@ public interface CacheUtil {
      * @param key cacheKey
      * @return 执行结果
      */
-    Boolean removeObject(String key);
+    Boolean delete(String key);
 
     /**
      * 修改key名称
      * @param oldKey 原有key
      * @param newKey 修改key
      */
-    void renameByKey(String oldKey, String newKey);
+    Boolean renameByKey(String oldKey, String newKey);
+
+    /**
+     * 移除key过期时间变永久
+     * @param key cacheKey
+     * @return 执行结果
+     */
+    Boolean setPermanentByKey(String key);
 
     /**
      * 分布式锁
      * @param key cacheKey
      * @param value data
-     * @param expx 过期时间单位, ex px
+     * @param nxxx NX-key不存在时进行保存，XX-key存在时才进行保存
      * @param expire 过期时间
      * @param unit 时间类型
      * @return 执行结果
      */
-    boolean distributedLock(String key, Object value, @NotNull String expx, @NotNull long expire, @NotNull TimeUnit unit);
+    boolean distributedLock(String key, Object value, @NotNull String nxxx, @NotNull long expire, @NotNull TimeUnit unit);
 
     /**
      * 秒杀锁

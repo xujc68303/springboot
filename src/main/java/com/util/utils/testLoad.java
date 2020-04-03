@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Version 1.0
@@ -30,12 +31,9 @@ public class testLoad {
     @Autowired
     private FilesUtil filesUtil;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-
     @RequestMapping("/lock")
     public Boolean lock() {
-        return cacheUtil.distributedLock("xjc", "asdasd", "ex", 60*3);
+        return cacheUtil.distributedLock("xjc", "asdasd","NX", 60L, TimeUnit.MINUTES);
     }
 
     @RequestMapping("/unlock")
@@ -50,7 +48,30 @@ public class testLoad {
 
     @RequestMapping("/redis")
     public Boolean redis() {
-        return cacheUtil.setWithExpire("xjc", "test", 30);
+        return cacheUtil.setWithExpire("xjc", "test", 60L, TimeUnit.MINUTES);
     }
+
+    @RequestMapping("/get")
+    public Object get(){
+        return cacheUtil.get("xjc");
+    }
+
+    @RequestMapping("/delete")
+    public Object delete(){
+        return cacheUtil.delete("xjc");
+    }
+
+    @RequestMapping("/rename")
+    public Object rename(){
+        return cacheUtil.renameByKey("xjc","xujiachen");
+    }
+
+    @RequestMapping("/setPermanentByKey")
+    public Boolean setPermanentByKey(){
+        return cacheUtil.setPermanentByKey("xjc");
+
+    }
+
+
 
 }

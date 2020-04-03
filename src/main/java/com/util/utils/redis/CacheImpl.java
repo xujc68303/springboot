@@ -25,6 +25,8 @@ public class CacheImpl implements CacheUtil {
 
     private static final String NOT_EXIST = "NX";
 
+    private static final String EXIST = "XX";
+
     private static final String SECONDS = "EX";
 
     private static final String MILLISECONDS = "PX";
@@ -87,46 +89,52 @@ public class CacheImpl implements CacheUtil {
     }
 
     @Override
-    public Boolean removeObject(String key) {
+    public Boolean delete(String key) {
         try {
-            return stringRedisTemplate.delete(key);
+            if (exists(key)) {
+                return stringRedisTemplate.delete(key);
+            }
         } catch (RuntimeException e) {
-            log.error("cache-removeObject error", e);
+            log.error("cache-delete error", e);
         }
-        log.error("cache-removeObject failed, key=" + key);
+        log.error("cache-delete failed, key=" + key);
         return false;
     }
 
     @Override
-    public void renameByKey(String oldKey, String newKey) {
-        try {
-            if (exists(oldKey)) {
-                stringRedisTemplate.rename(oldKey, newKey);
-                log.info("cache-removeObject success, oldKey=" + oldKey + "newKey=" + newKey);
-            }
-        } catch (RuntimeException e) {
-            log.error("cache-renameByKey error, oldKey=" + oldKey + "newKey=" + newKey, e);
+    public Boolean renameByKey(String oldKey, String newKey) {
+        if (stringRedisTemplate.renameIfAbsent(oldKey, newKey)) {
+            return true;
         }
+        log.error("cache-distributedLock error");
+        return false;
+
     }
 
     @Override
-    public boolean distributedLock(String key, Object value, String expx, long expire, TimeUnit unit) {
+    public Boolean setPermanentByKey(String key) {
+        if (exists(key)) {
+            return stringRedisTemplate.persist(key);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
         try {
             final String v = JSON.toJSONString(value);
-
             // SET_IF_ABSENT--->NX
             // SET_IF_PRESENT--->XX
-            if (!StringUtils.isEmpty(expx)) {
-                if (SECONDS.equalsIgnoreCase(expx)) {
+            if (!StringUtils.isEmpty(nxxx)) {
+                if (NOT_EXIST.equalsIgnoreCase(nxxx)) {
                     return stringRedisTemplate.opsForValue( ).setIfAbsent(key, v, expire, unit);
-                } else {
+                } else if (EXIST.equalsIgnoreCase(nxxx)) {
                     return stringRedisTemplate.opsForValue( ).setIfPresent(key, v, expire, unit);
                 }
             }
         } catch (Exception e) {
-            log.error("cache-lock error", e);
+            log.error("cache-distributedLock error", e);
         }
-
         log.error("cache-distributedLock failed, key=" + key);
         return false;
     }
