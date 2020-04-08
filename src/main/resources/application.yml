@@ -56,6 +56,8 @@ async:
       max_pool_size: 30
       # 队列大小
       queue_capacity: 20
+      # 线程空闲时间
+      keep_alive_time: 300
       name:
         # 线程池中的线程的名称
         prefix: async-service

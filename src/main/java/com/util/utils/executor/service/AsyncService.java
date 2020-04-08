@@ -1,4 +1,4 @@
-package com.util.utils.executor.Service;
+package com.util.utils.executor.service;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;

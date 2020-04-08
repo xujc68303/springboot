@@ -1,12 +1,11 @@
 package com.util.utils;
 
 import com.util.utils.down.DownLoadUtil;
-import com.util.utils.executor.Service.AsyncService;
+import com.util.utils.executor.service.AsyncService;
 import com.util.utils.file.FilesUtil;
 import com.util.utils.redis.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
