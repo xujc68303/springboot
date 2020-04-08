@@ -46,5 +46,16 @@ mybatis:
         # 连接池中的最小空闲连接
         min-idle: 0
 
-
-
+#线程池配置
+async:
+  executor:
+    thread:
+      # 核心线程数
+      core_pool_size: 10
+      # 最大线程数
+      max_pool_size: 30
+      # 队列大小
+      queue_capacity: 20
+      name:
+        # 线程池中的线程的名称
+        prefix: async-service
