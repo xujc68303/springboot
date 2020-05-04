@@ -11,9 +11,49 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
     username: root
     password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      username: root
+      password: root
+      initialSize: 2
+      minIdle: 2
+      maxActive: 30
+
+#  quartz:
+#    #数据库方式
+#    job-store-type: jdbc
+#    #相关属性配置
+#    properties:
+#      org:
+#        quartz:
+#          scheduler:
+#            instanceName: myQuartz
+#            instanceId: AUTO
+#          threadPool:
+#            # 实例化ThreadPool时，使用的线程类为SimpleThreadPool
+#            class: org.quartz.simpl.SimpleThreadPool
+#            # 并发个数
+#            threadCount: 10
+#            # 优先级
+#            threadPriority: 5
+#            threadsInheritContextClassLoaderOfInitializingThread: true
+#          jobStore:
+#            # 持久化使用的类
+#            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+#            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+#            # 数据库中表的前缀
+#            tablePrefix: qrtz_
+#            clusterCheckinInterval: 10000
+#            useProperties: true
+#          dataSource:
+#            default:
+#              URL: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
+#              user: root
+#              password: root
+#              driver: com.mysql.cj.jdbc.Driver
 
   profiles:
     active: dev
@@ -21,7 +61,6 @@ spring:
 mybatis:
   mapper-locations: classpath:/mappers/*.xml
   type-aliases-package: com.datasource.mapper.dataobject
-
 
   redis:
     # Redis服务器地址

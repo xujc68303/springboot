@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -102,37 +103,37 @@ public class testLoad {
 
 
     @RequestMapping("/addJob")
-    public boolean addJob() throws SchedulerException {
+    public boolean addJob() throws SchedulerException, IOException {
         return quartzExecuteService.add("test1", "test", "0/1 * * * * ?", Task.class);
     }
 
     @RequestMapping("/modifyJob")
-    public boolean modifyJob() throws SchedulerException {
+    public boolean modifyJob() throws SchedulerException, IOException {
         return quartzExecuteService.modify("test1", "test", "0/5 * * * * ?");
     }
 
     @RequestMapping("/deleteJob")
-    public boolean deleteJob() throws SchedulerException {
+    public boolean deleteJob() throws SchedulerException, IOException {
         return quartzExecuteService.delete("test1", "test");
     }
 
     @RequestMapping("/pauseJob")
-    public boolean pauseJob() throws SchedulerException {
+    public boolean pauseJob() throws SchedulerException, IOException {
         return quartzExecuteService.pause("test1", "test");
     }
 
     @RequestMapping("/resumeJob")
-    public boolean resumeJob() throws SchedulerException {
+    public boolean resumeJob() throws SchedulerException, IOException {
         return quartzExecuteService.resume("test1", "test");
     }
 
     @RequestMapping("/pauseAll")
-    public boolean pauseAll() throws SchedulerException {
+    public boolean pauseAll() throws SchedulerException, IOException {
         return quartzExecuteService.pauseAll();
     }
 
     @RequestMapping("/resumeAll")
-    public boolean resumeAll() throws SchedulerException {
+    public boolean resumeAll() throws SchedulerException, IOException {
         return quartzExecuteService.resumeAll();
     }
 }

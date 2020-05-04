@@ -3,6 +3,8 @@ package com.util.utils.quartz;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
 
+import java.io.IOException;
+
 /**
  * @Version 1.0
  * @ClassName QuartzExecuteService
@@ -22,7 +24,7 @@ public interface QuartzExecuteService {
      * @return
      * @throws SchedulerException
      */
-    boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException;
+    boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException, IOException;
 
     /**
      * 修改定时任务
@@ -33,7 +35,7 @@ public interface QuartzExecuteService {
      * @return
      * @throws SchedulerException
      */
-    boolean modify(String key, String group, String newCron) throws SchedulerException;
+    boolean modify(String key, String group, String newCron) throws SchedulerException, IOException;
 
     /**
      * 删除定时任务
@@ -43,7 +45,7 @@ public interface QuartzExecuteService {
      * @return
      * @throws SchedulerException
      */
-    boolean delete(String key, String group) throws SchedulerException;
+    boolean delete(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 暂停定时任务
@@ -53,7 +55,7 @@ public interface QuartzExecuteService {
      * @return
      * @throws SchedulerException
      */
-    boolean pause(String key, String group) throws SchedulerException;
+    boolean pause(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 恢复定时任务
@@ -63,21 +65,21 @@ public interface QuartzExecuteService {
      * @return
      * @throws SchedulerException
      */
-    boolean resume(String key, String group) throws SchedulerException;
+    boolean resume(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 暂停全部定时任务
      * @return
      * @throws SchedulerException
      */
-    boolean pauseAll() throws SchedulerException;
+    boolean pauseAll() throws SchedulerException, IOException;
 
     /**
      * 恢复全部定时任务
      * @return
      * @throws SchedulerException
      */
-    boolean resumeAll() throws SchedulerException;
+    boolean resumeAll() throws SchedulerException, IOException;
 
     /**
      * 定时任务是否存在

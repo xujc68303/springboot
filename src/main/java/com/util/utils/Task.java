@@ -2,6 +2,7 @@ package com.util.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
  * @Description
  */
 @Slf4j
+@EnableScheduling
 public class Task extends QuartzJobBean {
 
     @Override

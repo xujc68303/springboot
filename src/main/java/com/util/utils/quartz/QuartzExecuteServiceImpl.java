@@ -5,6 +5,7 @@ import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -22,10 +23,10 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     private QuartzConfig quartzConfig;
 
     @Override
-    public boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException {
+    public boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException, IOException {
         Date result = null;
         Scheduler scheduler = quartzConfig.getSchduler( );
-        scheduler.start( );
+        scheduler.start();
         if (checkCron(cron)) {
             return false;
         }
@@ -43,7 +44,7 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     }
 
     @Override
-    public boolean modify(String key, String group, String newCron) throws SchedulerException {
+    public boolean modify(String key, String group, String newCron) throws SchedulerException, IOException {
         Date result = null;
         if (checkCron(newCron)) {
             return false;
@@ -62,42 +63,39 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     }
 
     @Override
-    public boolean delete(String key, String group) throws SchedulerException {
-        Scheduler scheduler = quartzConfig.getSchduler( );
+    public boolean delete(String key, String group) throws SchedulerException, IOException {
         if (isExist(key, group)) {
-            return scheduler.deleteJob(new JobKey(key, group));
+            return quartzConfig.getSchduler( ).deleteJob(new JobKey(key, group));
         }
         return false;
     }
 
     @Override
-    public boolean pause(String key, String group) throws SchedulerException {
-        Scheduler scheduler = quartzConfig.getSchduler( );
+    public boolean pause(String key, String group) throws SchedulerException, IOException {
         if (isExist(key, group)) {
-            scheduler.pauseJob(new JobKey(key, group));
+            quartzConfig.getSchduler( ).pauseJob(new JobKey(key, group));
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean resume(String key, String group) throws SchedulerException {
-        Scheduler scheduler = quartzConfig.getSchduler( );
+    public boolean resume(String key, String group) throws SchedulerException, IOException {
         if (isExist(key, group)) {
-            scheduler.resumeJob(new JobKey(key, group));
+            quartzConfig.getSchduler( ).resumeJob(new JobKey(key, group));
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean pauseAll() throws SchedulerException {
+    public boolean pauseAll() throws SchedulerException, IOException {
         quartzConfig.getSchduler( ).pauseAll( );
         return true;
     }
 
     @Override
-    public boolean resumeAll() throws SchedulerException {
+    public boolean resumeAll() throws SchedulerException, IOException {
         quartzConfig.getSchduler( ).resumeAll( );
         return true;
     }
