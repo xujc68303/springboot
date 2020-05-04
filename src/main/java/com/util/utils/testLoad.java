@@ -3,8 +3,10 @@ package com.util.utils;
 import com.util.utils.down.DownLoadUtil;
 import com.util.utils.executor.service.AsyncService;
 import com.util.utils.file.FilesUtil;
+import com.util.utils.quartz.QuartzExecuteService;
 import com.util.utils.redis.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,9 +41,12 @@ public class testLoad {
     @Autowired
     private AsyncService asyncService;
 
+    @Autowired
+    private QuartzExecuteService quartzExecuteService;
+
     @RequestMapping("/lock")
     public Boolean lock() {
-        return cacheUtil.distributedLock("xjc", "asdasd","NX", 60L, TimeUnit.MINUTES);
+        return cacheUtil.distributedLock("xjc", "asdasd", "NX", 60L, TimeUnit.MINUTES);
     }
 
     @RequestMapping("/unlock")
@@ -60,28 +65,28 @@ public class testLoad {
     }
 
     @RequestMapping("/get")
-    public Object get(){
+    public Object get() {
         return cacheUtil.get("xjc");
     }
 
     @RequestMapping("/delete")
-    public Object delete(){
+    public Object delete() {
         return cacheUtil.delete("xjc");
     }
 
     @RequestMapping("/rename")
-    public Object rename(){
-        return cacheUtil.renameByKey("xjc","xujiachen");
+    public Object rename() {
+        return cacheUtil.renameByKey("xjc", "xujiachen");
     }
 
     @RequestMapping("/setPermanentByKey")
-    public Boolean setPermanentByKey(){
+    public Boolean setPermanentByKey() {
         return cacheUtil.setPermanentByKey("xjc");
     }
 
     @RequestMapping("/testAsync")
-    public void testAsync(){
-        asyncService.executeAsnc();
+    public void testAsync() {
+        asyncService.executeAsnc( );
     }
 
     @RequestMapping("/doTask1")
@@ -89,10 +94,45 @@ public class testLoad {
         CountDownLatch countDownLatch = new CountDownLatch(2);
         Future<String> result1 = asyncService.task1(countDownLatch);
         Future<String> result2 = asyncService.task2(countDownLatch);
-        countDownLatch.await();
-        log.info("result1 = " + result1.get());
-        log.info("result2 = " + result2.get());
+        countDownLatch.await( );
+        log.info("result1 = " + result1.get( ));
+        log.info("result2 = " + result2.get( ));
         log.info("doTask1 end");
     }
 
+
+    @RequestMapping("/addJob")
+    public boolean addJob() throws SchedulerException {
+        return quartzExecuteService.add("test1", "test", "0/1 * * * * ?", Task.class);
+    }
+
+    @RequestMapping("/modifyJob")
+    public boolean modifyJob() throws SchedulerException {
+        return quartzExecuteService.modify("test1", "test", "0/5 * * * * ?");
+    }
+
+    @RequestMapping("/deleteJob")
+    public boolean deleteJob() throws SchedulerException {
+        return quartzExecuteService.delete("test1", "test");
+    }
+
+    @RequestMapping("/pauseJob")
+    public boolean pauseJob() throws SchedulerException {
+        return quartzExecuteService.pause("test1", "test");
+    }
+
+    @RequestMapping("/resumeJob")
+    public boolean resumeJob() throws SchedulerException {
+        return quartzExecuteService.resume("test1", "test");
+    }
+
+    @RequestMapping("/pauseAll")
+    public boolean pauseAll() throws SchedulerException {
+        return quartzExecuteService.pauseAll();
+    }
+
+    @RequestMapping("/resumeAll")
+    public boolean resumeAll() throws SchedulerException {
+        return quartzExecuteService.resumeAll();
+    }
 }
