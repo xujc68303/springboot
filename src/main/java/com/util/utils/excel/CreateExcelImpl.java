@@ -5,15 +5,22 @@ import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Version 1.0
@@ -23,7 +30,7 @@ import java.util.Map;
  * @Description easyExcel导出工具
  */
 @Slf4j
-public class CreateExcelImpl implements CreateExcel {
+public class CreateExcelImpl implements ExcelService {
 
     @Override
     public void createExcel(List<? extends BaseRowModel> list, ExcelTypeEnum excelTypeEnum,
@@ -43,6 +50,36 @@ public class CreateExcelImpl implements CreateExcel {
         log.info("Excel导出完成");
     }
 
+    @Override
+    public void export(HttpServletResponse response, String fileName) throws IOException {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("xjc");
+        //service
+
+        // 表全部字段注释可以通过sql查询出来
+        String[] headers = {"主键", "创建时间"};
+
+        HSSFRow row = sheet.createRow(0);
+        for(int i =0; i < headers.length ; i++){
+            HSSFCell hssfCell = row.createCell(i);
+            hssfCell.setCellValue(new HSSFRichTextString(headers[i]));
+        }
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+        HSSFRow hssfRow = sheet.createRow(atomicInteger.get());
+        hssfRow.createCell(0).setCellValue(new HSSFRichTextString("通过sql获取的字段"));
+        // ++
+        atomicInteger.getAndIncrement();
+
+        response.setHeader("Content-disposition", "attachment; filename" + getFileName() + "_" + fileName + ".xls");
+        response.setContentType("application/force-download");
+        response.setCharacterEncoding("utf-8");
+        OutputStream outputStream  = response.getOutputStream();
+        workbook.write(outputStream);
+        response.flushBuffer();
+        outputStream.close();
+    }
+
+
     /**
      * 根据当前时间命名文件名称
      *
@@ -50,8 +87,9 @@ public class CreateExcelImpl implements CreateExcel {
      * @throws UnsupportedEncodingException
      */
     private static String getFileName() throws UnsupportedEncodingException {
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(new Date( )).getBytes("utf-8").toString( );
+        return sdf.format(localDateTime).getBytes("utf-8").toString( );
     }
 
     /**

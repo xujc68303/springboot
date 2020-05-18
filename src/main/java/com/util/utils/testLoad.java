@@ -9,11 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -129,11 +131,48 @@ public class testLoad {
 
     @RequestMapping("/pauseAll")
     public boolean pauseAll() throws SchedulerException, IOException {
-        return quartzExecuteService.pauseAll();
+        return quartzExecuteService.pauseAll( );
     }
 
     @RequestMapping("/resumeAll")
     public boolean resumeAll() throws SchedulerException, IOException {
-        return quartzExecuteService.resumeAll();
+        return quartzExecuteService.resumeAll( );
     }
+
+    @RequestMapping("/give")
+    public void give(@RequestParam(value = "offset", required = false) long offset) {
+        cacheUtil.setBit("bit", offset, true);
+    }
+
+    @RequestMapping("/count")
+    public long count() {
+        return cacheUtil.bitCount("give");
+    }
+
+    @RequestMapping("/set")
+    public Boolean set() {
+        return cacheUtil.setWithExpire("adad", "dad", 3000, TimeUnit.MINUTES);
+    }
+
+    @RequestMapping("/zsetAdd")
+    public void zsetAdd(String user, Integer i) {
+        cacheUtil.zsetAdd("xjcLike", user, i);
+    }
+
+    @RequestMapping("/zsetDel")
+    public Boolean zsetDel(String user) {
+        return cacheUtil.zsetDel("xjcLike", user);
+    }
+
+    @RequestMapping("/reverseRank")
+    public Long reverseRank(String user) {
+        return cacheUtil.reverseRank("xjcLike", user);
+    }
+
+    @RequestMapping("/zsetRever")
+    public Set<String> zsetRever() {
+        return cacheUtil.zsetRever("xjcLike", 0, -1);
+    }
+
+
 }

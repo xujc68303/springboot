@@ -9,12 +9,12 @@ import java.util.List;
 
 /**
  * @Version 1.0
- * @ClassName CreateExcel
+ * @ClassName ExcelService
  * @Author jiachenXu
  * @Date 2020/3/6 15:06
  * @Description easyExcel解析工具
  */
-public interface CreateExcel {
+public interface ExcelService {
 
     /**
      * 文件导出为Excel
@@ -26,4 +26,6 @@ public interface CreateExcel {
      */
     void createExcel(List<? extends BaseRowModel> data, ExcelTypeEnum excelTypeEnum,
                      HttpServletResponse response, String fileName) throws IOException;
+
+    void export(HttpServletResponse response, String fileName) throws IOException;
 }

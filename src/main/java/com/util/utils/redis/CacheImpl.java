@@ -3,6 +3,7 @@ package com.util.utils.redis;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,12 +28,6 @@ public class CacheImpl implements CacheUtil {
     private static final String NOT_EXIST = "NX";
 
     private static final String EXIST = "XX";
-
-    private static final String SECONDS = "EX";
-
-    private static final String MILLISECONDS = "PX";
-
-    private static final String OK = "OK";
 
     private static final Long ONE_RESULT = 1L;
 
@@ -120,7 +116,7 @@ public class CacheImpl implements CacheUtil {
     }
 
     @Override
-    public boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
+    public Boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
         try {
             final String v = JSON.toJSONString(value);
             // SET_IF_ABSENT--->NX
@@ -140,7 +136,7 @@ public class CacheImpl implements CacheUtil {
     }
 
     @Override
-    public boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
+    public Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
         try {
             long deadTimeLine = System.currentTimeMillis( ) + lockWaitTimeOut;
 
@@ -170,6 +166,51 @@ public class CacheImpl implements CacheUtil {
         }
         log.error("cache-unlock failed, key=" + key);
         return false;
+    }
+
+    @Override
+    public void setBit(String key, long offset, Boolean value) {
+        stringRedisTemplate.opsForValue( ).setBit(key, offset, value);
+    }
+
+    @Override
+    public Long bitCount(String key) {
+        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
+    }
+
+    @Override
+    public Long increment(String key, long delta) {
+        return stringRedisTemplate.opsForValue( ).increment(key, delta);
+    }
+
+    @Override
+    public Long decrement(String key, long delta) {
+        return stringRedisTemplate.opsForValue( ).decrement(key, delta);
+    }
+
+    @Override
+    public void zsetAdd(String key, String value, long delta) {
+        stringRedisTemplate.opsForZSet( ).add(key, value, delta);
+    }
+
+    @Override
+    public Boolean zsetDel(String key, String value) {
+        return stringRedisTemplate.opsForZSet( ).remove(key, value) == 1;
+    }
+
+    @Override
+    public Set<String> zsetRever(String key, long start, long end) {
+        return stringRedisTemplate.opsForZSet( ).reverseRange(key, start, end);
+    }
+
+    @Override
+    public Integer zetCount(String key) {
+        return zsetRever(key, 0, -1).size( );
+    }
+
+    @Override
+    public Long reverseRank(String key, String value) {
+        return stringRedisTemplate.opsForZSet( ).reverseRank(key, value);
     }
 
 }
