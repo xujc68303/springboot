@@ -1,5 +1,6 @@
 package com.util.utils;
 
+import com.github.pagehelper.PageInfo;
 import com.util.utils.down.DownLoadUtil;
 import com.util.utils.executor.service.AsyncService;
 import com.util.utils.file.FilesUtil;
@@ -132,6 +133,11 @@ public class testLoad {
     @RequestMapping("/pauseAll")
     public boolean pauseAll() throws SchedulerException, IOException {
         return quartzExecuteService.pauseAll( );
+    }
+
+    @RequestMapping("/getJob")
+    public PageInfo getJob() {
+        return quartzExecuteService.getJob("test1", 1, 10);
     }
 
     @RequestMapping("/resumeAll")

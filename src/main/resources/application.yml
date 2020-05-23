@@ -9,51 +9,48 @@ server:
       timeout: 30m
 
 spring:
+
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
-    username: root
-    password: root
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
       username: root
       password: root
-      initialSize: 2
-      minIdle: 2
-      maxActive: 30
+      initial-size: 1
+      max-active: 30
+      min-idle: 1
+      max-wait: 30000
 
-#  quartz:
-#    #数据库方式
-#    job-store-type: jdbc
-#    #相关属性配置
-#    properties:
-#      org:
-#        quartz:
-#          scheduler:
-#            instanceName: myQuartz
-#            instanceId: AUTO
-#          threadPool:
-#            # 实例化ThreadPool时，使用的线程类为SimpleThreadPool
-#            class: org.quartz.simpl.SimpleThreadPool
-#            # 并发个数
-#            threadCount: 10
-#            # 优先级
-#            threadPriority: 5
-#            threadsInheritContextClassLoaderOfInitializingThread: true
-#          jobStore:
-#            # 持久化使用的类
-#            class: org.quartz.impl.jdbcjobstore.JobStoreTX
-#            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-#            # 数据库中表的前缀
-#            tablePrefix: qrtz_
-#            clusterCheckinInterval: 10000
-#            useProperties: true
-#          dataSource:
-#            default:
-#              URL: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
-#              user: root
-#              password: root
-#              driver: com.mysql.cj.jdbc.Driver
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: quartzScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: AUTO
+            clusterCheckinInterval: 10000
+            useProperties: false
+            dataSource: myDS
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+          myDS:
+            driver: com.mysql.cj.jdbc.Driver
+            URL: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
+            user: root
+            password: root
+    job-store-type: JDBC
+    #初始化表结构
+    jdbc:
+      initialize-schema: NEVER
 
   profiles:
     active: dev
@@ -73,7 +70,7 @@ mybatis:
     database: 16
     # 将themilef的默认缓存禁用，热加载生效
     thymeleaf:
-        cache: false
+      cache: false
     jedis:
       pool:
         # 连接池最大连接数（使用负值表示没有限制）
@@ -100,3 +97,4 @@ async:
       name:
         # 线程池中的线程的名称
         prefix: async-service
+

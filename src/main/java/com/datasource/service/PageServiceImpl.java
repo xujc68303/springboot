@@ -26,8 +26,7 @@ public class PageServiceImpl implements PageService{
     public PageInfo<TestUser> selectAll(int pageNum, int size) {
         PageHelper.startPage(pageNum, size);
         List<TestUser> testUserList = testUserDao.selectAll();
-        PageInfo<TestUser> userPageInfo = new PageInfo<>(testUserList);
-        return userPageInfo;
+        return new PageInfo<>(testUserList);
     }
 
     @Override

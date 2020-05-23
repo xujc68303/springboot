@@ -19,7 +19,7 @@ public class TestUserController {
     @Autowired
     private PageService pageService;
 
-    @PostMapping(value = "/selectAll")
+    @RequestMapping(value = "/selectAll")
     public PageInfo selectAll(@RequestParam(value = "page", defaultValue = "1") int page,
                               @RequestParam(value = "size", defaultValue = "5") int size) {
         return pageService.selectAll(page, size);

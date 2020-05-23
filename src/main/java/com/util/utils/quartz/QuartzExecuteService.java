@@ -1,5 +1,6 @@
 package com.util.utils.quartz;
 
+import com.github.pagehelper.PageInfo;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
 
@@ -15,78 +16,90 @@ import java.io.IOException;
 public interface QuartzExecuteService {
 
     /**
+     * 获取定时任务
+     *
+     * @param jobName
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageInfo getJob(String jobName, Integer pageNum, Integer pageSize);
+
+    /**
      * 添加定时任务
      *
-     * @param key
-     * @param group
-     * @param cron
-     * @param jobClass
-     * @return
+     * @param key      key
+     * @param group    分区
+     * @param cron     表达式
+     * @param jobClass 执行类
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException, IOException;
+    Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException, IOException;
 
     /**
      * 修改定时任务
      *
-     * @param key
-     * @param group
-     * @param newCron
-     * @return
+     * @param key     key
+     * @param group   分区
+     * @param newCron 表达式
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean modify(String key, String group, String newCron) throws SchedulerException, IOException;
+    Boolean modify(String key, String group, String newCron) throws SchedulerException, IOException;
 
     /**
      * 删除定时任务
      *
-     * @param key
-     * @param group
-     * @return
+     * @param key   key
+     * @param group 分区
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean delete(String key, String group) throws SchedulerException, IOException;
+    Boolean delete(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 暂停定时任务
      *
-     * @param key
-     * @param group
-     * @return
+     * @param key   key
+     * @param group 分区
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean pause(String key, String group) throws SchedulerException, IOException;
+    Boolean pause(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 恢复定时任务
      *
-     * @param key
-     * @param group
-     * @return
+     * @param key   key
+     * @param group 分区
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean resume(String key, String group) throws SchedulerException, IOException;
+    Boolean resume(String key, String group) throws SchedulerException, IOException;
 
     /**
      * 暂停全部定时任务
-     * @return
+     *
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean pauseAll() throws SchedulerException, IOException;
+    Boolean pauseAll() throws SchedulerException, IOException;
 
     /**
      * 恢复全部定时任务
-     * @return
+     *
+     * @return 执行结果
      * @throws SchedulerException
      */
-    boolean resumeAll() throws SchedulerException, IOException;
+    Boolean resumeAll() throws SchedulerException, IOException;
 
     /**
      * 定时任务是否存在
      *
-     * @param key
-     * @param group
-     * @return
+     * @param key   key
+     * @param group 分区
+     * @return 执行结果
      * @throws SchedulerException
      */
     Boolean isExist(String key, String group) throws SchedulerException;
