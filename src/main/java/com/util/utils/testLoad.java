@@ -1,7 +1,7 @@
 package com.util.utils;
 
 import com.github.pagehelper.PageInfo;
-import com.util.utils.down.DownLoadUtil;
+import com.util.down.DownLoadUtil;
 import com.util.utils.executor.service.AsyncService;
 import com.util.utils.file.FilesUtil;
 import com.util.utils.quartz.QuartzExecuteService;
