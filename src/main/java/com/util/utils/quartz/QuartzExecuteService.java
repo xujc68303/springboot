@@ -35,7 +35,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException, IOException;
+    Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException;
 
     /**
      * 修改定时任务
@@ -46,7 +46,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean modify(String key, String group, String newCron) throws SchedulerException, IOException;
+    Boolean modify(String key, String group, String newCron) throws SchedulerException;
 
     /**
      * 删除定时任务
@@ -56,7 +56,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean delete(String key, String group) throws SchedulerException, IOException;
+    Boolean delete(String key, String group) throws SchedulerException;
 
     /**
      * 暂停定时任务
@@ -66,7 +66,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean pause(String key, String group) throws SchedulerException, IOException;
+    Boolean pause(String key, String group) throws SchedulerException;
 
     /**
      * 恢复定时任务
@@ -76,7 +76,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean resume(String key, String group) throws SchedulerException, IOException;
+    Boolean resume(String key, String group) throws SchedulerException;
 
     /**
      * 暂停全部定时任务
@@ -92,7 +92,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean resumeAll() throws SchedulerException, IOException;
+    Boolean resumeAll() throws SchedulerException;
 
     /**
      * 定时任务是否存在

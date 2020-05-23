@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Version 1.0
@@ -62,4 +64,15 @@ public class QuartzJobDO implements Serializable {
      */
     private String oldJobGroup;
 
+    /**
+     * 方便业务job中进行数据库操作
+     */
+    private List<Map<String, Object>> jobDataParam;
+
+    public QuartzJobDO(String jobName, String jobGroup, String jobClassName, String cronExpression) {
+        this.jobName = jobName;
+        this.jobGroup = jobGroup;
+        this.jobClassName = jobClassName;
+        this.cronExpression = cronExpression;
+    }
 }

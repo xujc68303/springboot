@@ -4,6 +4,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @Description
  */
 @Configuration
-public class QuartzConfig {
+public class QuartzConfig implements CommandLineRunner {
 
     @Bean
     public Scheduler getSchduler() throws SchedulerException {
@@ -23,4 +24,8 @@ public class QuartzConfig {
         return schedulerFactory.getScheduler( );
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+        // init
+    }
 }
