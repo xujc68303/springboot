@@ -1,11 +1,11 @@
-package com.util.utils;
+package com.util;
 
 import com.github.pagehelper.PageInfo;
+import com.util.Task;
 import com.util.down.DownLoadUtil;
-import com.util.utils.executor.service.AsyncService;
-import com.util.utils.file.FilesUtil;
-import com.util.utils.quartz.QuartzExecuteService;
-import com.util.utils.redis.CacheUtil;
+import com.util.executor.service.AsyncService;
+import com.util.quartz.QuartzExecuteService;
+import com.util.redis.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -40,9 +39,6 @@ public class testLoad {
     private CacheUtil cacheUtil;
 
     @Autowired
-    private FilesUtil filesUtil;
-
-    @Autowired
     private AsyncService asyncService;
 
     @Autowired
@@ -61,11 +57,6 @@ public class testLoad {
     @RequestMapping("/load")
     public void load(HttpServletRequest request, HttpServletResponse response) {
         loadUtil.downLoadFile(request, response);
-    }
-
-    @RequestMapping("/redis")
-    public Boolean redis() {
-        return cacheUtil.setWithExpire("xjc", "test", 60L, TimeUnit.MINUTES);
     }
 
     @RequestMapping("/get")
@@ -104,34 +95,33 @@ public class testLoad {
         log.info("doTask1 end");
     }
 
-
     @RequestMapping("/addJob")
-    public boolean addJob() throws SchedulerException, IOException {
+    public boolean addJob() throws SchedulerException {
         return quartzExecuteService.add("test1", "test", "0/1 * * * * ?", Task.class);
     }
 
     @RequestMapping("/modifyJob")
-    public boolean modifyJob() throws SchedulerException, IOException {
+    public boolean modifyJob() throws SchedulerException {
         return quartzExecuteService.modify("test1", "test", "0/5 * * * * ?");
     }
 
     @RequestMapping("/deleteJob")
-    public boolean deleteJob() throws SchedulerException, IOException {
+    public boolean deleteJob() throws SchedulerException {
         return quartzExecuteService.delete("test1", "test");
     }
 
     @RequestMapping("/pauseJob")
-    public boolean pauseJob() throws SchedulerException, IOException {
+    public boolean pauseJob() throws SchedulerException {
         return quartzExecuteService.pause("test1", "test");
     }
 
     @RequestMapping("/resumeJob")
-    public boolean resumeJob() throws SchedulerException, IOException {
+    public boolean resumeJob() throws SchedulerException {
         return quartzExecuteService.resume("test1", "test");
     }
 
     @RequestMapping("/pauseAll")
-    public boolean pauseAll() throws SchedulerException, IOException {
+    public boolean pauseAll() throws SchedulerException {
         return quartzExecuteService.pauseAll( );
     }
 
@@ -141,7 +131,7 @@ public class testLoad {
     }
 
     @RequestMapping("/resumeAll")
-    public boolean resumeAll() throws SchedulerException, IOException {
+    public boolean resumeAll() throws SchedulerException {
         return quartzExecuteService.resumeAll( );
     }
 

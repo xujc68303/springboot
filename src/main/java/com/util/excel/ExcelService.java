@@ -1,4 +1,4 @@
-package com.util.utils.excel;
+package com.util.excel;
 
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.support.ExcelTypeEnum;

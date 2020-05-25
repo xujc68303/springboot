@@ -1,10 +1,8 @@
-package com.util.utils.quartz;
+package com.util.quartz;
 
 import com.github.pagehelper.PageInfo;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
-
-import java.io.IOException;
 
 /**
  * @Version 1.0
@@ -84,7 +82,7 @@ public interface QuartzExecuteService {
      * @return 执行结果
      * @throws SchedulerException
      */
-    Boolean pauseAll() throws SchedulerException, IOException;
+    Boolean pauseAll() throws SchedulerException;
 
     /**
      * 恢复全部定时任务

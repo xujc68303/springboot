@@ -39,8 +39,6 @@ spring:
             useProperties: true
             dataSource: quartzDS
           quartzDS:
-            connectionProvider:
-              class : org.quartz.examples.example17.MyPoolingconnectionProvider
             driver: com.mysql.cj.jdbc.Driver
             URL: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8
             user: root
@@ -50,8 +48,6 @@ spring:
             threadCount: 10
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
-
-
     #数据库方式
     job-store-type: JDBC
     #初始化表结构

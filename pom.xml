@@ -18,6 +18,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <servlet.version>3.1.0</servlet.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <easyexcel.version>2.1.6</easyexcel.version>
+        <mysql.version>8.0.13</mysql.version>
+        <mybatis.version>2.1.1</mybatis.version>
+        <druid.version>1.1.18</druid.version>
+        <mybatis-generator.version>1.3.5</mybatis-generator.version>
+        <pagehelper.version>1.2.3</pagehelper.version>
+        <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
     </properties>
 
     <dependencies>
@@ -53,22 +63,19 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <version>${servlet.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
-        </dependency>
+
+        <!--json-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.62</version>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <!--lombok-->
@@ -78,49 +85,44 @@
             <optional>true</optional>
         </dependency>
 
-        <!--数据源-->
+        <!--datasource-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.13</version>
+            <version>${mysql.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
+
+        <!--mybatis-->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.1</version>
+            <version>${mybatis.version}</version>
         </dependency>
 
         <!--druid连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.10</version>
-        </dependency>
-
-        <!--json-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.18</version>
+            <version>${druid.version}</version>
         </dependency>
 
         <!--自动生成mybatis -->
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
-            <version>1.3.5</version>
+            <version>${mybatis-generator.version}</version>
         </dependency>
 
         <!--分页插件-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.2.3</version>
+            <version>${pagehelper.version}</version>
         </dependency>
 
         <!--redis-->
@@ -128,23 +130,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <version>2.2.5.RELEASE</version>
-        </dependency>
 
         <!--excel-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>2.1.6</version>
+            <version>${easyexcel.version}</version>
         </dependency>
 
         <!--quartz-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jabb</groupId>
+            <artifactId>jabb-core</artifactId>
+            <version>${quartz-jabb-core.version}</version>
+
         </dependency>
 
     </dependencies>

@@ -1,4 +1,4 @@
-package com.util.utils.file;
+package com.util.file;
 
 /**
  * @Version 1.0

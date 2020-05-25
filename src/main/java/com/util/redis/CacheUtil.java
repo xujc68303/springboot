@@ -1,4 +1,4 @@
-package com.util.utils.redis;
+package com.util.redis;
 
 import javax.validation.constraints.NotNull;
 import java.util.Set;

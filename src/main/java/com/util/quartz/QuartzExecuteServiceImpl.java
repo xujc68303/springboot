@@ -1,4 +1,4 @@
-package com.util.utils.quartz;
+package com.util.quartz;
 
 import com.alibaba.excel.util.CollectionUtils;
 import com.datasource.mapper.dao.JobDao;
@@ -8,12 +8,10 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Version 1.0
@@ -25,15 +23,6 @@ import java.util.Map;
 @Slf4j
 @Service
 public class QuartzExecuteServiceImpl implements QuartzExecuteService {
-
-    private static final String SCHEDULER_INSTANCE_NAME = "schedulerInstanceName";
-
-    @Value("${spring.quartz.properties.org.quartz.scheduler.instanceName}")
-    private String schedulerInstanceName;
-
-    private static final String PARAM_NAME = "paramName";
-
-    private static final String PARAM_VALUE = "paramValue";
 
     @Autowired
     private QuartzConfig quartzConfig;
@@ -50,9 +39,9 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
 
     @Override
     public Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException {
-        Scheduler scheduler = quartzConfig.getSchduler( );
+        Scheduler scheduler = quartzConfig.getScheduler( );
         scheduler.start( );
-        cron = cron.trim();
+        cron = cron.trim( );
         // 任务存在直接返回
         List<? extends Trigger> triggers = scheduler.getTriggersOfJob(new JobKey(key, group));
         if (!CollectionUtils.isEmpty(triggers) || checkCron(cron)) {
@@ -62,9 +51,6 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
                 .withIdentity(key, group)
                 .storeDurably( )
                 .build( );
-
-        QuartzJobDO quartz = new QuartzJobDO(key, group, jobClass.getName(), cron);
-        putDataMap(jobDetail, quartz);
 
         Trigger trigger = TriggerBuilder.newTrigger( )
                 .forJob(jobDetail)
@@ -80,7 +66,7 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
         if (checkCron(newCron)) {
             return false;
         }
-        Scheduler scheduler = quartzConfig.getSchduler( );
+        Scheduler scheduler = quartzConfig.getScheduler( );
         CronTrigger oldTrigger = (CronTrigger) scheduler.getTrigger(new TriggerKey(key, group));
         String oldCron = oldTrigger.getCronExpression( );
         if (!oldCron.equals(newCron)) {
@@ -96,7 +82,7 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     @Override
     public Boolean delete(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            return quartzConfig.getSchduler( ).deleteJob(new JobKey(key, group));
+            return quartzConfig.getScheduler( ).deleteJob(new JobKey(key, group));
         }
         return false;
     }
@@ -104,7 +90,7 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     @Override
     public Boolean pause(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            quartzConfig.getSchduler( ).pauseJob(new JobKey(key, group));
+            quartzConfig.getScheduler( ).pauseJob(new JobKey(key, group));
             return true;
         }
         return false;
@@ -113,7 +99,7 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
     @Override
     public Boolean resume(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            quartzConfig.getSchduler( ).resumeJob(new JobKey(key, group));
+            quartzConfig.getScheduler( ).resumeJob(new JobKey(key, group));
             return true;
         }
         return false;
@@ -121,20 +107,20 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
 
     @Override
     public Boolean pauseAll() throws SchedulerException {
-        quartzConfig.getSchduler( ).pauseAll( );
+        quartzConfig.getScheduler( ).pauseAll( );
         return true;
     }
 
     @Override
     public Boolean resumeAll() throws SchedulerException {
-        quartzConfig.getSchduler( ).resumeAll( );
+        quartzConfig.getScheduler( ).resumeAll( );
         return true;
     }
 
     @Override
     public Boolean isExist(String key, String group) throws SchedulerException {
         JobKey jobKey = new JobKey(key, group);
-        return quartzConfig.getSchduler( ).getJobDetail(jobKey) != null;
+        return quartzConfig.getScheduler( ).getJobDetail(jobKey) != null;
     }
 
     /**
@@ -145,21 +131,6 @@ public class QuartzExecuteServiceImpl implements QuartzExecuteService {
      */
     private Boolean checkCron(String cronExpression) {
         return !CronExpression.isValidExpression(cronExpression);
-    }
-
-    /**
-     * 将scheduler instanceName存入jobDataMap，方便业务job中进行数据库操作
-     * @param job
-     * @param quartz
-     */
-    private void putDataMap(JobDetail job, QuartzJobDO quartz) {
-        JobDataMap jobDataMap = job.getJobDataMap();
-        jobDataMap.put(SCHEDULER_INSTANCE_NAME, schedulerInstanceName);
-        List<Map<String, Object>> jobDataParam = quartz.getJobDataParam();
-        if (jobDataParam == null || jobDataParam.isEmpty()) {
-            return;
-        }
-        jobDataParam.forEach(jobData -> jobDataMap.put(String.valueOf(jobData.get(PARAM_NAME)), jobData.get(PARAM_VALUE)));
     }
 
 }
