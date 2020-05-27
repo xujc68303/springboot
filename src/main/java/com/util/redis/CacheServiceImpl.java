@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Version 1.0
- * @ClassName CacheImpl
+ * @ClassName CacheServiceImpl
  * @Author jiachenXu
  * @Date 2020/3/5 13:41
  * @Description 缓存工具类
  */
 @Slf4j
 @Service
-public class CacheImpl implements CacheUtil {
+public class CacheServiceImpl implements CacheService {
 
     private static final String NOT_EXIST = "NX";
 

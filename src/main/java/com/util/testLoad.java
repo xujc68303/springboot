@@ -1,11 +1,10 @@
 package com.util;
 
 import com.github.pagehelper.PageInfo;
-import com.util.Task;
 import com.util.down.DownLoadUtil;
 import com.util.executor.service.AsyncService;
 import com.util.quartz.QuartzExecuteService;
-import com.util.redis.CacheUtil;
+import com.util.redis.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ public class testLoad {
     private DownLoadUtil loadUtil;
 
     @Autowired
-    private CacheUtil cacheUtil;
+    private CacheService cacheUtil;
 
     @Autowired
     private AsyncService asyncService;
