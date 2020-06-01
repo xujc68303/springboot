@@ -10,6 +10,9 @@ server:
 
 spring:
 
+  application:
+    name: utils
+
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
