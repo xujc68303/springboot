@@ -21,6 +21,8 @@ public interface CacheService {
      */
     Boolean exists(String key);
 
+    // string
+
     /**
      * 根据Key获取value（Object）
      *
@@ -142,49 +144,82 @@ public interface CacheService {
      */
     Long decrement(String key, long delta);
 
+    // zset
+
     /**
      * 队列形式点赞
      *
-     * @param key   来源id
+     * @param key   队列名称
      * @param value 用户id
      * @param delta 是否点赞
      */
-    void zsetAdd(String key, String value, long delta);
+    void zadd(String key, String value, long delta);
 
     /**
      * 队列形式取消点赞
      *
-     * @param key   来源id
-     * @param value 用户id
+     * @param key    队列名称
+     * @param values 用户id
      * @return 执行结果
      */
-    Boolean zsetDel(String key, String value);
+    Boolean zrem(String key, String... values);
+
+    /**
+     * 队列形式增量计算
+     *
+     * @param key
+     * @param value
+     * @param delta
+     * @return
+     */
+    Boolean zincrby(String key, String value, long delta);
+
+    /**
+     * 队列正序
+     *
+     * @param key   队列名称
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 列表
+     */
+    Set<String> zrange(String key, long start, long end);
 
     /**
      * 队列倒序
      *
-     * @param key   来源id
+     * @param key   队列名称
      * @param start 开始位置
      * @param end   结束位置
      * @return 队列
      */
-    Set<String> zsetRever(String key, long start, long end);
+    Set<String> zrevrange(String key, long start, long end);
 
     /**
      * 队列长度
      *
-     * @param key 来源id
+     * @param key   队列名称
+     * @param start 开始位置
+     * @param end   结束位置
      * @return 队列长度
      */
-    Integer zetCount(String key);
+    Integer zlexcount(String key, long start, long end);
 
     /**
-     * 倒序当前value在队列中的排名
+     * 正序当前value在队列中的位置
      *
-     * @param key   来源id
+     * @param key   队列名称
      * @param value value
-     * @return 队列总数
+     * @return value位置
      */
-    Long reverseRank(String key, String value);
+    Long zrank(String key, String value);
+
+    /**
+     * 倒序当前value在队列中的位置
+     *
+     * @param key   队列名称
+     * @param value value
+     * @return value位置
+     */
+    Long zrevrank(String key, String value);
 
 }

@@ -3,12 +3,12 @@ package com.util.redis;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -37,6 +37,20 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    private ValueOperations<String, String> stringOperations;
+
+    private ZSetOperations<String, String> zSetOperations;
+
+    private StreamOperations<String, Object, Object> streamOperations;
+
+
+    @PostConstruct
+    private void init(){
+        stringOperations = stringRedisTemplate.opsForValue( );
+        zSetOperations = stringRedisTemplate.opsForZSet();
+        streamOperations = stringRedisTemplate.opsForStream();
+    }
+
     @Override
     public Boolean exists(String key) {
         try {
@@ -50,7 +64,7 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public Object get(String key) {
         try {
-            return stringRedisTemplate.opsForValue( ).get(key);
+            return stringOperations.get(key);
         } catch (RuntimeException e) {
             log.error("cache-get error, key=" + key);
         }
@@ -61,7 +75,7 @@ public class CacheServiceImpl implements CacheService {
     public Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
         try {
             String v = JSON.toJSONString(value);
-            return stringRedisTemplate.opsForValue( ).setIfAbsent(key, v, expire, unit);
+            return stringOperations.setIfAbsent(key, v, expire, unit);
         } catch (RuntimeException e) {
             log.error("cache-setexWithExpire error", e);
         }
@@ -123,9 +137,9 @@ public class CacheServiceImpl implements CacheService {
             // SET_IF_PRESENT--->XX
             if (!StringUtils.isEmpty(nxxx)) {
                 if (NOT_EXIST.equalsIgnoreCase(nxxx)) {
-                    return stringRedisTemplate.opsForValue( ).setIfAbsent(key, v, expire, unit);
+                    return stringOperations.setIfAbsent(key, v, expire, unit);
                 } else if (EXIST.equalsIgnoreCase(nxxx)) {
-                    return stringRedisTemplate.opsForValue( ).setIfPresent(key, v, expire, unit);
+                    return stringOperations.setIfPresent(key, v, expire, unit);
                 }
             }
         } catch (Exception e) {
@@ -146,7 +160,7 @@ public class CacheServiceImpl implements CacheService {
                     return false;
                 }
                 final String v = JSON.toJSONString(value);
-                return stringRedisTemplate.opsForValue( ).setIfAbsent(key, v, lockWaitTimeOut, unit);
+                return stringOperations.setIfAbsent(key, v, lockWaitTimeOut, unit);
             }
         } catch (Exception e) {
             log.error("cache-preemptiveLock error", e);
@@ -170,7 +184,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void setBit(String key, long offset, Boolean value) {
-        stringRedisTemplate.opsForValue( ).setBit(key, offset, value);
+        stringOperations.setBit(key, offset, value);
     }
 
     @Override
@@ -180,37 +194,55 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public Long increment(String key, long delta) {
-        return stringRedisTemplate.opsForValue( ).increment(key, delta);
+        return stringOperations.increment(key, delta);
     }
 
     @Override
     public Long decrement(String key, long delta) {
-        return stringRedisTemplate.opsForValue( ).decrement(key, delta);
+        return stringOperations.decrement(key, delta);
     }
 
     @Override
-    public void zsetAdd(String key, String value, long delta) {
-        stringRedisTemplate.opsForZSet( ).add(key, value, delta);
+    public void zadd(String key, String value, long delta) {
+        zSetOperations.add(key, value, delta);
     }
 
     @Override
-    public Boolean zsetDel(String key, String value) {
-        return stringRedisTemplate.opsForZSet( ).remove(key, value) == 1;
+    public Boolean zrem(String key, String... value) {
+        return zSetOperations.remove(key, value) == 1;
     }
 
     @Override
-    public Set<String> zsetRever(String key, long start, long end) {
-        return stringRedisTemplate.opsForZSet( ).reverseRange(key, start, end);
+    public Boolean zincrby(String key, String value, long delta) {
+        return zSetOperations.incrementScore(key,value,delta) != null;
     }
 
     @Override
-    public Integer zetCount(String key) {
-        return zsetRever(key, 0, -1).size( );
+    public Set<String> zrange(String key, long start, long end) {
+        return zSetOperations.range(key,start, end);
     }
 
     @Override
-    public Long reverseRank(String key, String value) {
-        return stringRedisTemplate.opsForZSet( ).reverseRank(key, value);
+    public Set<String> zrevrange(String key, long start, long end) {
+        return zSetOperations.reverseRange(key, start, end);
+    }
+
+    @Override
+    public Integer zlexcount(String key, long start, long end) {
+        if (Objects.isNull(start) || Objects.isNull(end)) {
+            return zrevrange(key, 0, -1).size( );
+        }
+        return Integer.parseInt(zSetOperations.count(key, start, end).toString());
+    }
+
+    @Override
+    public Long zrank(String key, String value) {
+        return zSetOperations.rank(key, value);
+    }
+
+    @Override
+    public Long zrevrank(String key, String value) {
+        return zSetOperations.reverseRank(key, value);
     }
 
 }

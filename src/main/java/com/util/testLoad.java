@@ -151,22 +151,22 @@ public class testLoad {
 
     @RequestMapping("/zsetAdd")
     public void zsetAdd(String user, Integer i) {
-        cacheUtil.zsetAdd("xjcLike", user, i);
+        cacheUtil.zadd("xjcLike", user, i);
     }
 
     @RequestMapping("/zsetDel")
     public Boolean zsetDel(String user) {
-        return cacheUtil.zsetDel("xjcLike", user);
+        return cacheUtil.zrem("xjcLike", user);
     }
 
     @RequestMapping("/reverseRank")
     public Long reverseRank(String user) {
-        return cacheUtil.reverseRank("xjcLike", user);
+        return cacheUtil.zrevrank("xjcLike", user);
     }
 
     @RequestMapping("/zsetRever")
     public Set<String> zsetRever() {
-        return cacheUtil.zsetRever("xjcLike", 0, -1);
+        return cacheUtil.zrevrange("xjcLike", 0, -1);
     }
 
 
