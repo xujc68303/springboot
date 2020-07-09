@@ -3,15 +3,14 @@ package com.util.redis;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -243,6 +242,56 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public Long zrevrank(String key, String value) {
         return zSetOperations.reverseRank(key, value);
+    }
+
+    @Override
+    public String xAdd(String key, Map<Object, Object> message) {
+        return null;
+    }
+
+    @Override
+    public Boolean xDel(String key, String messageId) {
+        return null;
+    }
+
+    @Override
+    public List<MapRecord<String, Object, Object>> xRange(String key) {
+        return null;
+    }
+
+    @Override
+    public List<MapRecord<String, Object, Object>> xRevRange(String key) {
+        return null;
+    }
+
+    @Override
+    public Long xLen(String key) {
+        return null;
+    }
+
+    @Override
+    public List<MapRecord<String, Object, Object>> xRead(String key, long count, String messageId) {
+        return null;
+    }
+
+    @Override
+    public boolean xGroupCreate(String key, String group, String messageId) {
+        return false;
+    }
+
+    @Override
+    public boolean xDelGroup(String key, String group) {
+        return false;
+    }
+
+    @Override
+    public List<MapRecord<String, Object, Object>> xReadGroup(String group, String consumer, String key, long count) {
+        return null;
+    }
+
+    @Override
+    public boolean xAck(String key, String group, String messageId) {
+        return false;
     }
 
 }

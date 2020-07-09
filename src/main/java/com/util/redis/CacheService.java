@@ -1,6 +1,11 @@
 package com.util.redis;
 
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.lang.NonNull;
+
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -221,5 +226,98 @@ public interface CacheService {
      * @return value位置
      */
     Long zrevrank(String key, String value);
+
+    /**
+     * stream追加消息
+     *
+     * @param key     队列名称
+     * @param message 消息载体
+     * @return 返回唯一标识
+     */
+    String xAdd(@NonNull String key, @NonNull Map<Object, Object> message);
+
+    /**
+     * 删除消息
+     *
+     * @param key       队列名称
+     * @param messageId 消息id
+     * @return 执行结果
+     */
+    Boolean xDel(@NonNull String key, @NonNull String messageId);
+
+    /**
+     * 正序取出stream查询结果集
+     *
+     * @param key 队列名称
+     * @return 结果集
+     */
+    List<MapRecord<String, Object, Object>> xRange(@NonNull String key);
+
+    /**
+     * 倒序取出stream查询结果集
+     *
+     * @param key 队列名称
+     * @return 结果集
+     */
+    List<MapRecord<String, Object, Object>> xRevRange(@NonNull String key);
+
+    /**
+     * stream长度
+     *
+     * @param key 队列名称
+     * @return 队列长度
+     */
+    Long xLen(@NonNull String key);
+
+    /**
+     * 顺序消费消息(返回的消息为下一次messageId)
+     *
+     * @param key       队列名称
+     * @param count     消息条数
+     * @param messageId 消息id
+     * @return 执行结果
+     */
+    List<MapRecord<String, Object, Object>> xRead(@NonNull String key, long count, String messageId);
+
+    /**
+     * 创建与已经存的stream的新消费组
+     *
+     * @param key       队列名称
+     * @param group     消费组名称
+     * @param messageId 消息id
+     * @return 执行结果
+     */
+    boolean xGroupCreate(@NonNull String key, @NonNull String group, String messageId);
+
+    /**
+     * 删除消费组
+     *
+     * @param key   队列名称
+     * @param group 消费组名称
+     * @return 执行结果
+     */
+    boolean xDelGroup(@NonNull String key, @NonNull String group);
+
+    /**
+     * 从消费组租读取数据
+     *
+     * @param group    消费组名称
+     * @param consumer 消费组
+     * @param key      队列名称
+     * @param count    消息条数
+     * @return 执行结果
+     */
+    List<MapRecord<String, Object, Object>> xReadGroup(@NonNull String group, @NonNull String consumer, @NonNull String key, @NonNull long count);
+
+    /**
+     * 确认消息，已处理消息列表中删除
+     *
+     * @param key       队列名称
+     * @param group     消费组名称
+     * @param messageId 消息id
+     * @return 执行结果
+     */
+    boolean xAck(@NonNull String key, @NonNull String group, @NonNull String messageId);
+
 
 }
