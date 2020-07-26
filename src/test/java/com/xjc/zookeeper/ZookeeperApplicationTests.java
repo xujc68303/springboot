@@ -37,8 +37,8 @@ class ZookeeperApplicationTests {
     }
 
     @Test
-    public void deleteNodeTest() throws KeeperException, InterruptedException {
-        Boolean result = zookeeperService.deleteNode("/zk-watcher-1");
+    public void deleteNodeTest() throws Exception {
+        Boolean result = zookeeperService.deleteNode("/zk-watcher-1", false);
         log.warn("result:" + result);
     }
 
