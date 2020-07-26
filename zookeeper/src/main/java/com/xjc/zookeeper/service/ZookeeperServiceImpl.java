@@ -3,13 +3,17 @@ package com.xjc.zookeeper.service;
 import com.xjc.zookeeper.api.ZookeeperService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.atomic.AtomicValue;
+import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,7 +35,14 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     private volatile String path;
 
-    private volatile InterProcessMutex interProcessMutex = new InterProcessMutex(curatorFramework, path);
+    private volatile int retryTime;
+
+    private volatile int sleepMsBetweenRetries;
+
+    private volatile InterProcessMutex interProcessMutex = new InterProcessMutex(this.curatorFramework, this.path);
+
+    private volatile DistributedAtomicInteger distributedAtomicInteger =
+            new DistributedAtomicInteger(this.curatorFramework, this.path, new RetryNTimes(this.retryTime, this.sleepMsBetweenRetries));
 
     @Override
     public Boolean exists(String path, boolean needWatch) throws KeeperException, InterruptedException {
@@ -70,8 +81,20 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public Boolean deleteNode(String path) throws KeeperException, InterruptedException {
-        zkClient.delete(path, -1);
+    public Boolean deleteNode(String path, Boolean deleteChildren) throws Exception {
+        if(deleteChildren){
+            List<String> childrens = this.getChildren(path, false);
+            childrens.stream().filter(Objects::nonNull).forEach(node -> {
+                try {
+                    zkClient.delete(node, -1);
+                } catch (Exception e) {
+                    log.error("deleteNode error", e);
+                }
+            });
+        } else {
+            zkClient.delete(path, -1);
+        }
+
         return true;
     }
 
@@ -105,6 +128,22 @@ public class ZookeeperServiceImpl implements ZookeeperService {
         }
         this.interProcessMutex.release( );
         return true;
+    }
+
+    @Override
+    public AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception {
+        if (!this.exists(path, true)) {
+            return null;
+        }
+        Objects.requireNonNull(this.path);
+        this.path = path;
+        this.retryTime = retryTime;
+        this.sleepMsBetweenRetries = sleepMsBetweenRetries;
+        AtomicValue<Integer> result = this.distributedAtomicInteger.add(delta);
+        if(result.succeeded()){
+            return result;
+        }
+        return null;
     }
 
 }

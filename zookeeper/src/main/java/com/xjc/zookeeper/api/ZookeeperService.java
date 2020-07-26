@@ -1,11 +1,14 @@
 package com.xjc.zookeeper.api;
 
+import org.apache.curator.framework.recipes.atomic.AtomicValue;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Version 1.0
@@ -76,11 +79,12 @@ public interface ZookeeperService {
     /**
      * 删除节点
      * @param path path
+     * @param deleteChildren 是否删除子节点
      * @return 执行结果
      * @throws KeeperException
      * @throws InterruptedException
      */
-    Boolean deleteNode(String path) throws KeeperException, InterruptedException;
+    Boolean deleteNode(String path, Boolean deleteChildren) throws Exception;
 
     /**
      * 获取节点下的子节点
@@ -117,5 +121,16 @@ public interface ZookeeperService {
      * @throws Exception
      */
     Boolean tryLock(String path) throws Exception;
+
+    /**
+     * 分布式计数器
+     * @param path path
+     * @param delta 每次增加数量
+     * @param retryTime 最大重试
+     * @param sleepMsBetweenRetries 重试的时间 s
+     * @return
+     * @throws Exception
+     */
+    AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception;
 
 }
