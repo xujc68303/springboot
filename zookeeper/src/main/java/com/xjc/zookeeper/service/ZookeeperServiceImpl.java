@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.*;
@@ -32,6 +33,8 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Autowired
     private CuratorFramework curatorFramework;
+
+    private TreeCache treeCache;
 
     private volatile String path;
 
