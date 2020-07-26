@@ -103,3 +103,6 @@ async:
         # 线程池中的线程的名称
         prefix: async-service
 
+zookeeper:
+  url: 127.0.0.1:2181
+  timeout: 4000

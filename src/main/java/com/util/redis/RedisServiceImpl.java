@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @SuppressWarnings("all")
-public class CacheServiceImpl implements CacheService {
+public class RedisServiceImpl implements RedisService {
 
     private static final String NOT_EXIST = "NX";
 
