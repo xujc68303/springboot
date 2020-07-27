@@ -4,15 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @Version 1.0
@@ -31,45 +29,67 @@ public class ZookeeperConfig {
     @Value("${zookeeper.timeout}")
     private int timeout;
 
-    @Bean(name = "zkClient")
-    public ZooKeeper zkClient() {
-        ZooKeeper zooKeeper = null;
-        try {
-            final CountDownLatch countDownLatch = new CountDownLatch(1);
-            // 连接成功后，会回调watcher监听，此连接操作是异步的，执行完new语句后直接调用后续
-            // 可指定多台服务地址 127.0.0.1:2181, 127.0.0.1:2182, 127.0.0.1:2183
-            zooKeeper = new ZooKeeper(url, timeout, new Watcher( ) {
-                @Override
-                public void process(WatchedEvent event) {
-                    if (Event.KeeperState.SyncConnected == event.getState( )) {
-                        //如果收到了服务端的响应事件,连接成功
-                        countDownLatch.countDown( );
-                    }
-                }
-            });
-            countDownLatch.await( );
-        } catch (Exception e) {
-            log.error("初始化ZooKeeper连接异常....】={}", e);
-        }
-        return zooKeeper;
-    }
+    @Value("${zookeeper.retries}")
+    private int retries;
+
+    @Value("${zookeeper.baseSleepTimeMs}")
+    private int baseSleepTimeMs;
 
     @Bean(name = "curatorFramework")
     public CuratorFramework curatorFramework() {
         CuratorFramework curatorFramework = null;
         try {
-            RetryPolicy retryPolicy = new ExponentialBackoffRetry(100, 3);
+            RetryPolicy retryPolicy = new ExponentialBackoffRetry(baseSleepTimeMs, retries);
             curatorFramework = CuratorFrameworkFactory.builder( )
                     .connectString(this.url)
                     .sessionTimeoutMs(this.timeout)
                     .retryPolicy(retryPolicy)
-                    .namespace("base")
                     .build( );
-
+            curatorFramework.start( );
         } catch (Exception e) {
             log.error("初始化curatorFramework连接异常....】={}", e);
         }
         return curatorFramework;
+    }
+
+    public void addListener(CuratorFramework curatorFramework, String path) throws Exception {
+        NodeCache nodeCache = new NodeCache(curatorFramework, path, false);
+        nodeCache.getListenable( ).addListener(() -> {
+            log.warn("path : " + nodeCache.getCurrentData( ).getPath( ));
+            log.warn("data : " + new String(nodeCache.getCurrentData( ).getData( )));
+            log.warn("stat : " + nodeCache.getCurrentData( ).getStat( ));
+        });
+        nodeCache.start( );
+    }
+
+    public void addListener(CuratorFramework curatorFramework) throws Exception {
+        //设置节点的cache
+        TreeCache treeCache = new TreeCache(curatorFramework, "/test");
+        //设置监听器和处理过程
+        treeCache.getListenable( ).addListener((client, event) -> {
+                    ChildData data = event.getData( );
+                    if (data != null) {
+                        switch (event.getType( )) {
+                            case NODE_ADDED:
+                                System.out.println("NODE_ADDED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                break;
+                            case NODE_REMOVED:
+                                System.out.println("NODE_REMOVED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                break;
+                            case NODE_UPDATED:
+                                System.out.println("NODE_UPDATED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        System.out.println("data is null : " + event.getType( ));
+                    }
+
+                }
+
+        );
+        treeCache.start( );
     }
 
 }

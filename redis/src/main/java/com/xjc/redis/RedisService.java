@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Version 1.0
- * @ClassName CacheService
+ * @ClassName RedisService
  * @Author jiachenXu
  * @Date 2020/3/5 13:38
  * @Description 缓存工具类
  */
-public interface CacheService {
+public interface RedisService {
 
     /**
      * 检查key是否存在

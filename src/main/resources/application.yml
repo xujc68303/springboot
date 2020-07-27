@@ -106,3 +106,5 @@ async:
 zookeeper:
   url: 127.0.0.1:2181
   timeout: 4000
+  retries: 3
+  baseSleepTimeMs : 1000

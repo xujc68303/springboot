@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Version 1.0
- * @ClassName CacheServiceImpl
+ * @ClassName RedisServiceImpl
  * @Author jiachenXu
  * @Date 2020/3/5 13:41
  * @Description 缓存工具类
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @SuppressWarnings("all")
-public class CacheServiceImpl implements CacheService {
+public class RedisServiceImpl implements RedisService {
 
     private static final String NOT_EXIST = "NX";
 
