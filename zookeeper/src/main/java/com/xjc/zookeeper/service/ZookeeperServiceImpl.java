@@ -7,6 +7,7 @@ import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -41,7 +42,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     private int nThreads = 10;
 
-    private volatile int count;
+    private volatile int countAdd;
 
     private volatile InterProcessMutex interProcessMutex;
 
@@ -51,7 +52,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public Boolean exists(String path) throws Exception {
-        Objects.requireNonNull(this.path);
+        Objects.requireNonNull(path);
         return curatorFramework.checkExists( ).forPath(path) != null;
     }
 
@@ -63,20 +64,42 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
+    public String createNode(String path) throws Exception {
+        if (this.exists(path)) {
+            return null;
+        }
+        return curatorFramework.create( )
+                .creatingParentsIfNeeded( )
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(path);
+    }
+
+    @Override
     public String createNode(String path, String data) throws Exception {
         if (this.exists(path)) {
             return null;
         }
-        return curatorFramework.create( ).withMode(CreateMode.PERSISTENT).forPath(path, data.getBytes( ));
+        return curatorFramework.create( )
+                .creatingParentsIfNeeded( )
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(path, data.getBytes( ));
     }
 
     @Override
     public String getData(String path) throws Exception {
+        Objects.requireNonNull(path);
         return new String(curatorFramework.getData( ).forPath(path));
     }
 
     @Override
+    public String synGetData(String path) throws Exception {
+        curatorFramework.sync();
+        return this.getData(path);
+    }
+
+    @Override
     public String getStat(String path) throws Exception {
+        Objects.requireNonNull(path);
         return new String(curatorFramework.getData( ).storingStatIn(new Stat( )).forPath(path));
     }
 
@@ -100,6 +123,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public Boolean deleteNode(String path, Boolean deleteChildren, int version) throws Exception {
+        Objects.requireNonNull(path);
         if (deleteChildren) {
             curatorFramework.delete( )
                     .guaranteed( )
@@ -122,6 +146,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public Boolean asyncDeleteNode(String path, Boolean deleteChildren, int version) throws Exception {
+        Objects.requireNonNull(path);
         if (deleteChildren) {
             curatorFramework.delete( )
                     .guaranteed( )
@@ -143,7 +168,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public List<String> getChildren(String path) throws Exception {
-        if (this.exists(path)) {
+        if (!this.exists(path)) {
             return null;
         }
         return curatorFramework.getChildren( ).forPath(path);
@@ -151,7 +176,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public Boolean distributed(String path, int count) throws Exception {
-        return this.distributed(path, 10,  -1, TimeUnit.MINUTES);
+        return this.distributed(path, 10, -1, TimeUnit.MINUTES);
     }
 
     @Override
@@ -159,17 +184,16 @@ public class ZookeeperServiceImpl implements ZookeeperService {
         if (this.exists(path)) {
             return false;
         }
-        this.count = count;
         this.interProcessMutex = new InterProcessMutex(this.curatorFramework, path);
-        if(count != 0){
+        if (count != 0) {
             while (true) {
-                if (this.count >= 10) {
+                if (this.countAdd >= 10) {
                     break;
                 }
-                if(this.interProcessMutex.acquire(time, unit)){
+                if (this.interProcessMutex.acquire(time, unit)) {
                     return true;
                 } else {
-                    count++;
+                    countAdd++;
                 }
             }
         } else {
@@ -180,7 +204,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public Boolean release(String path) throws Exception {
-        if (this.exists(path)) {
+        if (!this.exists(path)) {
             return false;
         }
         if (this.interProcessMutex != null) {
@@ -192,17 +216,24 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception {
-        if (!this.exists(path)) {
-            return null;
-        }
+        Objects.requireNonNull(path);
         this.sleepMsBetweenRetries = sleepMsBetweenRetries;
         RetryNTimes retryNTimes = new RetryNTimes(retryTime, this.sleepMsBetweenRetries);
         this.distributedAtomicInteger = new DistributedAtomicInteger(this.curatorFramework, path, retryNTimes);
-        AtomicValue<Integer> result = this.distributedAtomicInteger.add(delta);
-        if (result.succeeded( )) {
-            return result;
+        return this.distributedAtomicInteger.add(delta);
+    }
+
+    @Override
+    public InterProcessReadWriteLock getReadWriteLock(String path) throws Exception {
+        if (!this.exists(path)) {
+            return null;
         }
-        return null;
+        return new InterProcessReadWriteLock(this.curatorFramework, path);
+    }
+
+    @Override
+    public String serviceRegistry(String path, String data) throws Exception {
+        return this.createNode(path, data);
     }
 
 }

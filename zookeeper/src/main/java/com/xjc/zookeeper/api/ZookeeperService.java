@@ -1,7 +1,7 @@
 package com.xjc.zookeeper.api;
 
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
-import org.apache.zookeeper.KeeperException;
+import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +37,18 @@ public interface ZookeeperService {
      * 创建节点
      *
      * @param path path
+     * @return data
+     * @throws Exception
+     */
+    String createNode(String path) throws Exception;
+
+    /**
+     * 创建节点
+     *
+     * @param path path
      * @param data data
      * @return data
-     * @throws KeeperException
-     * @throws InterruptedException
+     * @throws Exception
      */
     String createNode(String path, String data) throws Exception;
 
@@ -48,17 +56,24 @@ public interface ZookeeperService {
      * 获取节点data
      *
      * @param path path
-     * @return data
-     * @throws KeeperException
-     * @throws InterruptedException
+     * @return
+     * @throws Exception
      */
     String getData(String path) throws Exception;
+
+    /**
+     * 同步数据并获取节点data
+     * @param path
+     * @return
+     */
+    String synGetData(String path) throws Exception;
 
     /**
      * 获取节点信息
      *
      * @param path path
      * @return
+     * @throws Exception
      */
     String getStat(String path) throws Exception;
 
@@ -68,8 +83,7 @@ public interface ZookeeperService {
      * @param path    path
      * @param newData 修改数据
      * @return 执行结果
-     * @throws KeeperException
-     * @throws InterruptedException
+     * @throws Exception
      */
     Boolean updateNode(String path, String newData) throws Exception;
 
@@ -147,10 +161,10 @@ public interface ZookeeperService {
     /**
      * 分布式锁
      *
-     * @param path path
-     * @param count 重试时间
-     * @param time 加锁时间
-     * @param unit 时间单位
+     * @param path  path
+     * @param count 自旋次数
+     * @param time  加锁时间
+     * @param unit  时间单位
      * @return 执行结果
      * @throws Exception
      */
@@ -176,5 +190,23 @@ public interface ZookeeperService {
      * @throws Exception
      */
     AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception;
+
+    /**
+     * 获取读写锁
+     *
+     * @param path path
+     * @return
+     * @throws Exception
+     */
+    InterProcessReadWriteLock getReadWriteLock(String path) throws Exception;
+
+    /**
+     * 服务注册
+     *
+     * @param path path
+     * @param data data
+     * @return
+     */
+    String serviceRegistry(String path, String data) throws Exception;
 
 }
