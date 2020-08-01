@@ -62,9 +62,9 @@ public class ZookeeperConfig {
         nodeCache.start( );
     }
 
-    public void addListener(CuratorFramework curatorFramework) throws Exception {
+    public TreeCache addTreeCache(CuratorFramework curatorFramework, String path) throws Exception {
         //设置节点的cache
-        TreeCache treeCache = new TreeCache(curatorFramework, "/test");
+        TreeCache treeCache = new TreeCache(curatorFramework, path);
         //设置监听器和处理过程
         treeCache.getListenable( ).addListener((client, event) -> {
                     ChildData data = event.getData( );
@@ -90,6 +90,8 @@ public class ZookeeperConfig {
 
         );
         treeCache.start( );
+        return treeCache;
+
     }
 
 }

@@ -1,11 +1,14 @@
 package com.xjc.zookeeper.service;
 
 import com.xjc.zookeeper.api.ZookeeperService;
+import com.xjc.zookeeper.config.ZookeeperConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
 import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 import org.apache.curator.retry.RetryNTimes;
@@ -19,6 +22,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * @Version 1.0
@@ -34,7 +38,12 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     @Autowired
     private CuratorFramework curatorFramework;
 
+    @Autowired
+    private ZookeeperConfig zookeeperConfig;
+
     private TreeCache treeCache;
+
+    private Stream<Object> leaderId;
 
     private String path = "/zk-1";
 
@@ -48,11 +57,16 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     private volatile DistributedAtomicInteger distributedAtomicInteger;
 
+    private volatile LeaderLatch leaderLatch;
+
+    private List<LeaderLatch> leaderLatchList;
+
     private ExecutorService executorService = Executors.newFixedThreadPool(this.nThreads);
 
     @Override
     public Boolean exists(String path) throws Exception {
         Objects.requireNonNull(path);
+        zookeeperConfig.addListener(curatorFramework, path);
         return curatorFramework.checkExists( ).forPath(path) != null;
     }
 
@@ -93,7 +107,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public String synGetData(String path) throws Exception {
-        curatorFramework.sync();
+        curatorFramework.sync( );
         return this.getData(path);
     }
 
@@ -187,7 +201,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
         this.interProcessMutex = new InterProcessMutex(this.curatorFramework, path);
         if (count != 0) {
             while (true) {
-                if (this.countAdd >= 10) {
+                if (this.countAdd == 10) {
                     break;
                 }
                 if (this.interProcessMutex.acquire(time, unit)) {
@@ -224,6 +238,35 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
+    public String leaderLatch(int clientCount, String path) throws Exception {
+        if (!this.exists(path)) {
+            return null;
+        }
+        for (int i = 0; i < clientCount; i++) {
+            this.leaderLatch = new LeaderLatch(curatorFramework, path, String.valueOf(i));
+            leaderLatchList.add(leaderLatch);
+            this.leaderLatch.start( );
+        }
+
+        do{
+            checkLeader(leaderLatchList);
+        } while (this.leaderId == null);
+
+        this.leaderLatch.addListener(new LeaderLatchListener( ) {
+            @Override
+            public void isLeader() {
+                log.warn(leaderId + "抢主成功，现在晋升为master");
+            }
+
+            @Override
+            public void notLeader() {
+                log.warn(leaderId + "抢主失败，现在继续选举master");
+            }
+        });
+        return "path=" + this.leaderLatch.getOurPath() + "leaderId" + this.leaderId;
+    }
+
+    @Override
     public InterProcessReadWriteLock getReadWriteLock(String path) throws Exception {
         if (!this.exists(path)) {
             return null;
@@ -233,7 +276,14 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public String serviceRegistry(String path, String data) throws Exception {
-        return this.createNode(path, data);
+        return "";
+    }
+
+    private void checkLeader(List<LeaderLatch> leaderLatchList) throws InterruptedException {
+        Thread.sleep(1000);
+        if (leaderLatchList.stream( ).allMatch(LeaderLatch::hasLeadership)) {
+            this.leaderId = leaderLatchList.stream( ).filter(LeaderLatch::hasLeadership).map(LeaderLatch::getId);
+        }
     }
 
 }

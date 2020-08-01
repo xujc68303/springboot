@@ -182,7 +182,7 @@ public interface ZookeeperService {
     /**
      * 分布式计数器
      *
-     * @param path                  path
+     * @param path
      * @param delta                 每次增加数量
      * @param retryTime             最大重试
      * @param sleepMsBetweenRetries 重试的时间 s
@@ -190,6 +190,14 @@ public interface ZookeeperService {
      * @throws Exception
      */
     AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception;
+
+    /**
+     * master选举
+     * @param clientCount 客户端数量
+     * @param path path
+     * @return
+     */
+    String leaderLatch(int clientCount, String path) throws Exception;
 
     /**
      * 获取读写锁
