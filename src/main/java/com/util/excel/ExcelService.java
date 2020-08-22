@@ -2,6 +2,7 @@ package com.util.excel;
 
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,9 +24,11 @@ public interface ExcelService {
      * @param excelTypeEnum 导出格式
      * @param response response
      * @param fileName 文件名称
+     * @return 文件名称
      */
-    void createExcel(List<? extends BaseRowModel> data, ExcelTypeEnum excelTypeEnum,
+    String export(List<? extends BaseRowModel> data, ExcelTypeEnum excelTypeEnum,
                      HttpServletResponse response, String fileName) throws IOException;
 
-    void export(HttpServletResponse response, String fileName) throws IOException;
+    String upload(MultipartFile file);
+
 }
