@@ -1,4 +1,4 @@
-package com.xjc.quartz;
+package com.xjc.quartz.api;
 
 import com.github.pagehelper.PageInfo;
 import org.quartz.Job;

@@ -1,4 +1,4 @@
-package com.util.quartz;
+package com.xjc.quartz.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jabb.quartz.AutowiringSpringBeanJobFactory;
