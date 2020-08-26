@@ -1,11 +1,7 @@
 package com.xjc.quartz.service;
 
 import com.alibaba.excel.util.CollectionUtils;
-import com.datasource.mapper.dao.JobDao;
-import com.datasource.mapper.dataobject.QuartzJobDO;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.xjc.quartz.api.QuartzExecuteService;
+import com.xjc.quartz.api.QuartzService;
 import com.xjc.quartz.config.QuartzConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -17,27 +13,27 @@ import java.util.List;
 
 /**
  * @Version 1.0
- * @ClassName QuartzExecuteServiceImpl
+ * @ClassName QuartzServiceImpl
  * @Author jiachenXu
  * @Date 2020/5/4 15:21
  * @Description
  */
 @Slf4j
 @Service
-public class QuartzExecuteServiceImpl implements QuartzExecuteService {
+public class QuartzServiceImpl implements QuartzService {
 
     @Autowired
     private QuartzConfig quartzConfig;
 
-    @Autowired
-    private JobDao jobDao;
-
-    @Override
-    public PageInfo getJob(String jobName, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<QuartzJobDO> list = jobDao.queryJob(jobName);
-        return new PageInfo<>(list);
-    }
+//    @Autowired
+//    private JobDao jobDao;
+//
+//    @Override
+//    public PageInfo getJob(String jobName, Integer pageNum, Integer pageSize) {
+//        PageHelper.startPage(pageNum, pageSize);
+//        List<QuartzJobDO> list = jobDao.queryJob(jobName);
+//        return new PageInfo<>(list);
+//    }
 
     @Override
     public Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException {

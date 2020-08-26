@@ -1,4 +1,4 @@
-package com.xjc.redis;
+package com.xjc.redis.api;
 
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.lang.NonNull;

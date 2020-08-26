@@ -6,12 +6,12 @@ import org.quartz.SchedulerException;
 
 /**
  * @Version 1.0
- * @ClassName QuartzExecuteService
+ * @ClassName QuartzService
  * @Author jiachenXu
  * @Date 2020/5/4 15:54
  * @Description 定时任务执行
  */
-public interface QuartzExecuteService {
+public interface QuartzService {
 
     /**
      * 获取定时任务
@@ -21,7 +21,7 @@ public interface QuartzExecuteService {
      * @param pageSize
      * @return
      */
-    PageInfo getJob(String jobName, Integer pageNum, Integer pageSize);
+//    PageInfo getJob(String jobName, Integer pageNum, Integer pageSize);
 
     /**
      * 添加定时任务

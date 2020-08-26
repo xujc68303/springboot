@@ -1,6 +1,7 @@
-package com.xjc.redis;
+package com.xjc.redis.service;
 
 import com.alibaba.fastjson.JSON;
+import com.xjc.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;

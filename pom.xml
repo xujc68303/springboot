@@ -187,6 +187,20 @@
             <version>${curator.version}</version>
         </dependency>
 
+        <!--model-->
+        <dependency>
+            <groupId>com.xjc</groupId>
+            <artifactId>redis</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.xjc</groupId>
+            <artifactId>quartz</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 
