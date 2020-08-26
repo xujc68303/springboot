@@ -18,27 +18,27 @@ public class SnowflakeId {
     /**
      * 开始时间截
      */
-    private long twepoch = 1420041600000L;
+    private static long twepoch = 1420041600000L;
 
     /**
      * 机器id所占的位数
      */
-    private final long workerIdBits = 5L;
+    private final static long workerIdBits = 5L;
 
     /**
      * 数据标识id所占的位数
      */
-    private final long datacenterIdBits = 5L;
+    private final static long datacenterIdBits = 5L;
 
     /**
      * 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
      */
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    private final static long maxWorkerId = -1L ^ (-1L << workerIdBits);
 
     /**
      * 支持的最大数据标识id，结果是31
      */
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
+    private final static long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
 
     /**
      * 序列在id中占的位数
@@ -68,12 +68,12 @@ public class SnowflakeId {
     /**
      * 工作机器ID(0~31)
      */
-    private long workerId;
+    private static long workerId;
 
     /**
      * 数据中心ID(0~31)
      */
-    private long datacenterId;
+    private static long datacenterId;
 
     /**
      * 毫秒内序列(0~4095)
@@ -85,27 +85,17 @@ public class SnowflakeId {
      */
     private long lastTimestamp = -1L;
 
-    private LocalDateTime localDateTime;
-
-    /**
-     * 构造函数
-     *
-     * @param workerId     工作ID (0~31)
-     * @param datacenterId 数据中心ID (0~31)
-     */
-    public SnowflakeId(long workerId, long datacenterId) {
+    static {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
         if (datacenterId > maxDatacenterId || datacenterId < 0) {
             throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
         }
-
-        this.twepoch = LocalDateTime.now( ).getLong(ChronoField.MICRO_OF_SECOND);
-        this.workerId = workerId;
-        this.datacenterId = datacenterId;
+        twepoch = LocalDateTime.now( ).getLong(ChronoField.MICRO_OF_SECOND);
+        workerId = workerId;
+        datacenterId = datacenterId;
     }
-
 
     /**
      * 获得下一个ID (该方法是线程安全的)
@@ -154,7 +144,6 @@ public class SnowflakeId {
 
         }
         return timestamp;
-
     }
 
     /**
@@ -166,12 +155,20 @@ public class SnowflakeId {
         return System.currentTimeMillis( );
     }
 
-    public static void main(String[] args) {
-        SnowflakeId snowflakeId = new SnowflakeId(0, 0);
-        for (int i = 0; i < 10; i++) {
-            System.out.println(snowflakeId.nextId( ));
-        }
+    public void setWorkerId(long workerId) {
+        workerId = workerId;
+    }
 
+    public void setDatacenterId(long datacenterId) {
+        datacenterId = datacenterId;
+    }
+
+    public long getWorkerIdShift() {
+        return workerIdShift;
+    }
+
+    public long getDatacenterIdShift() {
+        return datacenterIdShift;
     }
 
 }
