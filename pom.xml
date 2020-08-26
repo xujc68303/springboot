@@ -32,6 +32,7 @@
         <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <curator.version>4.3.0</curator.version>
+        <docker.image.prefix>registry.aliyuncs.com/linhuatest</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -106,6 +107,12 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
+        <!--mongodb-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!--mybatis-->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -163,25 +170,25 @@
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>${zookeeper.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
             <version>${curator.version}</version>
         </dependency>
-
-
-        <!--model-->
         <dependency>
-            <groupId>com.xjc</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>${curator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-x-discovery</artifactId>
+            <version>${curator.version}</version>
         </dependency>
 
-
     </dependencies>
+
 
     <build>
         <plugins>
@@ -205,6 +212,24 @@
                     <verbose>true</verbose>
                     <overwrite>true</overwrite>
                     <configurationFile>src/main/resources/generator/generatorConfig.xml</configurationFile>
+                </configuration>
+            </plugin>
+            <!--docker插件-->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <!--docker文件所在的目录-->
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
                 </configuration>
             </plugin>
         </plugins>
