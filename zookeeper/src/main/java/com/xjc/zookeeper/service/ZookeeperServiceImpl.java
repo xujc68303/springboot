@@ -2,23 +2,27 @@ package com.xjc.zookeeper.service;
 
 import com.xjc.zookeeper.api.ZookeeperService;
 import com.xjc.zookeeper.config.ZookeeperConfig;
+import com.xjc.zookeeper.object.InstanceDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.api.transaction.TransactionOp;
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
-import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
+import org.apache.curator.framework.recipes.queue.DistributedIdQueue;
+import org.apache.curator.framework.recipes.queue.DistributedQueue;
 import org.apache.curator.retry.RetryNTimes;
+import org.apache.curator.x.discovery.*;
+import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -41,19 +45,16 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     @Autowired
     private ZookeeperConfig zookeeperConfig;
 
-    private TreeCache treeCache;
+    private int nThreads = 10;
+
+    private static volatile int countAdd;
+
+    private TransactionOp transactionOp;
 
     private Stream<Object> leaderId;
 
-    private String path = "/zk-1";
-
-    private int sleepMsBetweenRetries;
-
-    private int nThreads = 10;
-
-    private volatile int countAdd;
-
     private volatile InterProcessMutex interProcessMutex;
+
 
     private volatile DistributedAtomicInteger distributedAtomicInteger;
 
@@ -63,18 +64,36 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(this.nThreads);
 
+    private ServiceDiscovery<Object> serviceDiscovery;
+
+    private DistributedQueue distributedQueue;
+
+    private DistributedIdQueue distributedIdQueue;
+
+    private List<Object> messageList = new ArrayList<>( );
+
+    private volatile InterProcessReadWriteLock readWriteLock;
+
     @Override
-    public Boolean exists(String path) throws Exception {
-        Objects.requireNonNull(path);
+    public boolean exists(String path) throws Exception {
+        path = checkPath(path);
         zookeeperConfig.addListener(curatorFramework, path);
         return curatorFramework.checkExists( ).forPath(path) != null;
     }
 
     @Override
-    public Boolean asyncExists(String path) throws Exception {
+    public boolean asyncExists(String path) throws Exception {
         return curatorFramework.checkExists( ).inBackground((client, event) -> {
             log.warn("asyncExists, path={}, data={}", event.getPath( ), event.getData( ));
         }, executorService).forPath(path) != null;
+    }
+
+    @Override
+    public TransactionOp transaction() {
+        if (this.transactionOp == null) {
+            this.transactionOp = curatorFramework.transactionOp( );
+        }
+        return transactionOp;
     }
 
     @Override
@@ -101,7 +120,9 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public String getData(String path) throws Exception {
-        Objects.requireNonNull(path);
+        if (this.exists(path)) {
+            return null;
+        }
         return new String(curatorFramework.getData( ).forPath(path));
     }
 
@@ -113,17 +134,19 @@ public class ZookeeperServiceImpl implements ZookeeperService {
 
     @Override
     public String getStat(String path) throws Exception {
-        Objects.requireNonNull(path);
+        if (this.exists(path)) {
+            return null;
+        }
         return new String(curatorFramework.getData( ).storingStatIn(new Stat( )).forPath(path));
     }
 
     @Override
-    public Boolean updateNode(String path, String newData) throws Exception {
+    public boolean updateNode(String path, String newData) throws Exception {
         return this.updateNode(path, newData, -1);
     }
 
     @Override
-    public Boolean updateNode(String path, String data, int version) throws Exception {
+    public boolean updateNode(String path, String data, int version) throws Exception {
         if (!this.exists(path)) {
             return false;
         }
@@ -131,12 +154,12 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public Boolean deleteNode(String path, Boolean deleteChildren) throws Exception {
+    public boolean deleteNode(String path, Boolean deleteChildren) throws Exception {
         return this.deleteNode(path, deleteChildren, -1);
     }
 
     @Override
-    public Boolean deleteNode(String path, Boolean deleteChildren, int version) throws Exception {
+    public boolean deleteNode(String path, Boolean deleteChildren, int version) throws Exception {
         Objects.requireNonNull(path);
         if (deleteChildren) {
             curatorFramework.delete( )
@@ -154,13 +177,15 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public Boolean asyncDeleteNode(String path, Boolean deleteChildren) throws Exception {
+    public boolean asyncDeleteNode(String path, Boolean deleteChildren) throws Exception {
         return this.asyncDeleteNode(path, deleteChildren, -1);
     }
 
     @Override
-    public Boolean asyncDeleteNode(String path, Boolean deleteChildren, int version) throws Exception {
-        Objects.requireNonNull(path);
+    public boolean asyncDeleteNode(String path, Boolean deleteChildren, int version) throws Exception {
+        if (this.exists(path)) {
+            return false;
+        }
         if (deleteChildren) {
             curatorFramework.delete( )
                     .guaranteed( )
@@ -189,19 +214,19 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public Boolean distributed(String path, int count) throws Exception {
+    public boolean distributed(String path, int count) throws Exception {
         return this.distributed(path, 10, -1, TimeUnit.MINUTES);
     }
 
     @Override
-    public Boolean distributed(String path, int count, long time, TimeUnit unit) throws Exception {
+    public boolean distributed(String path, int count, long time, TimeUnit unit) throws Exception {
         if (this.exists(path)) {
             return false;
         }
         this.interProcessMutex = new InterProcessMutex(this.curatorFramework, path);
         if (count != 0) {
             while (true) {
-                if (this.countAdd == 10) {
+                if (countAdd == 10) {
                     break;
                 }
                 if (this.interProcessMutex.acquire(time, unit)) {
@@ -217,7 +242,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public Boolean release(String path) throws Exception {
+    public boolean releaseDistributed(String path) throws Exception {
         if (!this.exists(path)) {
             return false;
         }
@@ -229,12 +254,24 @@ public class ZookeeperServiceImpl implements ZookeeperService {
     }
 
     @Override
-    public AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception {
-        Objects.requireNonNull(path);
-        this.sleepMsBetweenRetries = sleepMsBetweenRetries;
-        RetryNTimes retryNTimes = new RetryNTimes(retryTime, this.sleepMsBetweenRetries);
+    public AtomicValue<Integer> distributedCountAdd(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception {
+        if (!this.exists(path)) {
+            return null;
+        }
+        RetryNTimes retryNTimes = new RetryNTimes(retryTime, sleepMsBetweenRetries);
         this.distributedAtomicInteger = new DistributedAtomicInteger(this.curatorFramework, path, retryNTimes);
         return this.distributedAtomicInteger.add(delta);
+    }
+
+    @Override
+    public AtomicValue<Integer> distributedCountSubtract(String path, int delta) throws Exception {
+        if (!this.exists(path)) {
+            return null;
+        }
+        if (distributedAtomicInteger != null) {
+            return distributedAtomicInteger.subtract(delta);
+        }
+        return null;
     }
 
     @Override
@@ -248,7 +285,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
             this.leaderLatch.start( );
         }
 
-        do{
+        do {
             checkLeader(leaderLatchList);
         } while (this.leaderId == null);
 
@@ -263,7 +300,7 @@ public class ZookeeperServiceImpl implements ZookeeperService {
                 log.warn(leaderId + "抢主失败，现在继续选举master");
             }
         });
-        return "path=" + this.leaderLatch.getOurPath() + "leaderId" + this.leaderId;
+        return "path=" + this.leaderLatch.getOurPath( ) + "leaderId" + this.leaderId;
     }
 
     @Override
@@ -271,12 +308,75 @@ public class ZookeeperServiceImpl implements ZookeeperService {
         if (!this.exists(path)) {
             return null;
         }
-        return new InterProcessReadWriteLock(this.curatorFramework, path);
+        if (readWriteLock == null) {
+            readWriteLock = new InterProcessReadWriteLock(this.curatorFramework, path);
+        }
+        return readWriteLock;
     }
 
     @Override
-    public String serviceRegistry(String path, String data) throws Exception {
-        return "";
+    public ServiceInstance<Object> registryService(String path, String serviceName, Object data) throws Exception {
+        ServiceInstance<Object> serviceInstance = this.builderServiceInstance(serviceName, data);
+        if (serviceDiscovery == null) {
+            serviceDiscovery = this.builderServiceDiscovery(path, data);
+        }
+        serviceDiscovery.registerService(serviceInstance);
+        serviceDiscovery.start( );
+        return serviceInstance;
+    }
+
+    @Override
+    public void unregisterService(String path, String serviceName, Object data, ServiceInstance<Object> serviceInstance) throws Exception {
+        if (serviceDiscovery == null) {
+            serviceDiscovery = this.builderServiceDiscovery(path, data);
+        }
+        serviceDiscovery.unregisterService(serviceInstance);
+        serviceDiscovery.start( );
+    }
+
+    @Override
+    public List<Object> getServices(String path, String serviceName, Object data) throws Exception {
+        ServiceDiscovery<Object> serviceDiscovery = this.builderServiceDiscovery(path, data);
+        serviceDiscovery.start( );
+        return this.queryForInstances(serviceDiscovery, serviceName);
+    }
+
+    /**
+     * 不停的获取服务列表
+     *
+     * @param serviceDiscovery
+     * @param servieName
+     * @return
+     * @throws Exception
+     */
+    private List<Object> queryForInstances(ServiceDiscovery<Object> serviceDiscovery, String servieName) throws Exception {
+        List<Object> result = new ArrayList<>( );
+        Collection<ServiceInstance<Object>> services;
+        services = serviceDiscovery.queryForInstances(servieName);
+        if (services == null) {
+            while (true) {
+                services = serviceDiscovery.queryForInstances(servieName);
+                if (services != null) {
+                    break;
+                }
+            }
+        } else {
+            services.forEach(x -> {
+                Object p = x.getPayload( );
+                InstanceDetails payload = null;
+                if (p instanceof InstanceDetails) {
+                    payload = (InstanceDetails) x.getPayload( );
+                }
+                // 业务描述
+                String serviceDesc = payload.getServiceDesc( );
+                // 接口列表
+                Map<String, Object> maps = payload.getMaps( );
+
+                InstanceDetails instanceDetails = new InstanceDetails(serviceDesc, maps);
+                result.add(instanceDetails);
+            });
+        }
+        return result;
     }
 
     private void checkLeader(List<LeaderLatch> leaderLatchList) throws InterruptedException {
@@ -284,6 +384,42 @@ public class ZookeeperServiceImpl implements ZookeeperService {
         if (leaderLatchList.stream( ).allMatch(LeaderLatch::hasLeadership)) {
             this.leaderId = leaderLatchList.stream( ).filter(LeaderLatch::hasLeadership).map(LeaderLatch::getId);
         }
+    }
+
+    private ServiceDiscovery<Object> builderServiceDiscovery(String path, Object payloadClass) {
+        return ServiceDiscoveryBuilder.builder(Object.class)
+                .client(this.curatorFramework)
+                .serializer(new JsonInstanceSerializer<>(Object.class))
+                .basePath(path)
+                .thisInstance((ServiceInstance<Object>) payloadClass)
+                .build( );
+    }
+
+    /**
+     * 将服务添加到 ServiceInstance
+     *
+     * @param serviceName
+     * @param payload
+     * @return
+     * @throws Exception
+     */
+    private ServiceInstance<Object> builderServiceInstance(String serviceName, Object payload) throws Exception {
+        ServiceInstanceBuilder<Object> serviceInstanceBuilder = ServiceInstance.builder( );
+        return serviceInstanceBuilder
+                .address("127.0.0.1")
+                .port(9090)
+                .name(serviceName)
+                .payload(payload)
+                .uriSpec(new UriSpec("{scheme}://{address}:{port}"))
+                .build( );
+    }
+
+    private String checkPath(String path) {
+        Objects.requireNonNull(path);
+        if (path.indexOf("/") == 0) {
+            return path;
+        }
+        return "/" + path;
     }
 
 }

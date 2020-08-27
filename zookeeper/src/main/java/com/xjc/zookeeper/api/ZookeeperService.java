@@ -1,7 +1,9 @@
 package com.xjc.zookeeper.api;
 
+import org.apache.curator.framework.api.transaction.TransactionOp;
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
+import org.apache.curator.x.discovery.ServiceInstance;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +24,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean exists(String path) throws Exception;
+    boolean exists(String path) throws Exception;
 
     /**
      * 异步节点是否存在
@@ -31,7 +33,14 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean asyncExists(String path) throws Exception;
+    boolean asyncExists(String path) throws Exception;
+
+    /**
+     * 事务
+     *
+     * @return
+     */
+    TransactionOp transaction();
 
     /**
      * 创建节点
@@ -63,6 +72,7 @@ public interface ZookeeperService {
 
     /**
      * 同步数据并获取节点data
+     *
      * @param path
      * @return
      */
@@ -85,7 +95,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean updateNode(String path, String newData) throws Exception;
+    boolean updateNode(String path, String newData) throws Exception;
 
     /**
      * 修改节点
@@ -96,7 +106,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean updateNode(String path, String newData, int version) throws Exception;
+    boolean updateNode(String path, String newData, int version) throws Exception;
 
     /**
      * 删除节点
@@ -106,7 +116,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean deleteNode(String path, Boolean deleteChildren) throws Exception;
+    boolean deleteNode(String path, Boolean deleteChildren) throws Exception;
 
     /**
      * 删除节点
@@ -117,7 +127,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean deleteNode(String path, Boolean deleteChildren, int version) throws Exception;
+    boolean deleteNode(String path, Boolean deleteChildren, int version) throws Exception;
 
     /**
      * 异步删除节点
@@ -127,7 +137,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean asyncDeleteNode(String path, Boolean deleteChildren) throws Exception;
+    boolean asyncDeleteNode(String path, Boolean deleteChildren) throws Exception;
 
     /**
      * 异步删除节点
@@ -138,7 +148,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean asyncDeleteNode(String path, Boolean deleteChildren, int version) throws Exception;
+    boolean asyncDeleteNode(String path, Boolean deleteChildren, int version) throws Exception;
 
     /**
      * 获取节点下的子节点
@@ -156,7 +166,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean distributed(String path, int count) throws Exception;
+    boolean distributed(String path, int count) throws Exception;
 
     /**
      * 分布式锁
@@ -168,7 +178,7 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean distributed(String path, int count, long time, TimeUnit unit) throws Exception;
+    boolean distributed(String path, int count, long time, TimeUnit unit) throws Exception;
 
     /**
      * 解锁
@@ -177,24 +187,34 @@ public interface ZookeeperService {
      * @return 执行结果
      * @throws Exception
      */
-    Boolean release(String path) throws Exception;
+    boolean releaseDistributed(String path) throws Exception;
 
     /**
-     * 分布式计数器
+     * 计数器add
      *
-     * @param path
+     * @param path                  path
      * @param delta                 每次增加数量
      * @param retryTime             最大重试
      * @param sleepMsBetweenRetries 重试的时间 s
-     * @return
+     * @return 当前数值
      * @throws Exception
      */
-    AtomicValue<Integer> distributedCount(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception;
+    AtomicValue<Integer> distributedCountAdd(String path, int delta, int retryTime, int sleepMsBetweenRetries) throws Exception;
+
+    /**
+     * 计数器Subtract
+     *
+     * @param path  path
+     * @param delta 每次减少数量
+     * @return 当前数值
+     */
+    AtomicValue<Integer> distributedCountSubtract(String path, int delta) throws Exception;
 
     /**
      * master选举
+     *
      * @param clientCount 客户端数量
-     * @param path path
+     * @param path        path
      * @return
      */
     String leaderLatch(int clientCount, String path) throws Exception;
@@ -211,10 +231,31 @@ public interface ZookeeperService {
     /**
      * 服务注册
      *
-     * @param path path
-     * @param data data
+     * @param path        path
+     * @param serviceName serviceName
+     * @param data        data
      * @return
      */
-    String serviceRegistry(String path, String data) throws Exception;
+    ServiceInstance<Object> registryService(String path, String serviceName, Object data) throws Exception;
+
+    /**
+     * 卸载服务
+     *
+     * @param path            path
+     * @param serviceName     serviceName
+     * @param data            映射模型
+     * @param serviceInstance serviceInstance
+     */
+    void unregisterService(String path, String serviceName, Object data, ServiceInstance<Object> serviceInstance) throws Exception;
+
+    /**
+     * 获取服务
+     *
+     * @param path        path
+     * @param serviceName serviceName
+     * @param data        映射模型
+     * @return
+     */
+    List<Object> getServices(String path, String serviceName, Object data) throws Exception;
 
 }
