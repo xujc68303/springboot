@@ -1,8 +1,13 @@
 package com.xjc.mongodb.api;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -141,4 +146,49 @@ public interface MongodbService {
      * @return 文档
      */
     Object findById(String id, Object entity, String collectionName);
+
+    /**
+     * 查询文档排序
+     *
+     * @param desc           是否倒序
+     * @param field          排序字段
+     * @param entity         映射模型
+     * @param collectionName 集合名称
+     * @return 文档集合
+     */
+    List<Object> findFieldOrder(boolean desc, String field, Object entity, String collectionName);
+
+    /**
+     * 上传文件
+     *
+     * @param file 文件
+     * @return id + 文件名称
+     */
+    String uploadFile(MultipartFile file) throws IOException;
+
+    /**
+     * 下载文件
+     *
+     * @param id       id
+     * @param request  request
+     * @param response response
+     */
+    void downloadFile(String id, HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    /**
+     * 根据id查看上传文件
+     *
+     * @param id id
+     * @return 文件
+     */
+    GridFSFile findFileById(String id);
+
+    /**
+     * 根据id删除文件
+     *
+     * @param id id
+     * @return 执行结果
+     */
+    boolean deleteFile(String id);
+
 }

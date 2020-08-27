@@ -4,21 +4,33 @@ import com.google.common.collect.Lists;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSDownloadStream;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import com.sun.istack.NotNull;
 import com.xjc.mongodb.api.MongodbService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.util.IOUtils;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -165,12 +177,60 @@ public class MongodbServiceImpl implements MongodbService {
         this.builderQuery(query, key, condition, pageSize);
         this.orderByField(query, desc, field);
         query.skip((pageNum - 1) * pageSize);
-        return mongoTemplate.find(query, (Class<Object>) entity.getClass(), collectionName);
+        return mongoTemplate.find(query, (Class<Object>) entity.getClass( ), collectionName);
     }
 
     @Override
     public Object findById(String id, Object entity, String collectionName) {
-        return mongoTemplate.findById(id, entity.getClass(), collectionName);
+        return mongoTemplate.findById(id, entity.getClass( ), collectionName);
+    }
+
+    @Override
+    public List<Object> findFieldOrder(boolean desc, String field, Object entity, String collectionName) {
+        Query query = new Query( );
+        this.orderByField(query, desc, field);
+        return mongoTemplate.find(query, (Class<Object>) entity.getClass( ), collectionName);
+    }
+
+    @Override
+    public String uploadFile(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream( );
+        String fileName = new String(file.getOriginalFilename( ).getBytes(UTF8));
+        ObjectId objectId = gridFsTemplate.store(inputStream, fileName, file.getContentType( ));
+        return objectId + "-" + fileName;
+    }
+
+    @Override
+    public void downloadFile(String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        GridFSFile gridFSFile = this.findFileById(id);
+        if (gridFSFile != null) {
+            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoTemplate.getDb( ));
+            GridFSDownloadStream gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId( ));
+            GridFsResource gridFsResource = new GridFsResource(gridFSFile, gridFSDownloadStream);
+            //防止文件名称乱码
+            String fileName = new String(gridFsResource.getFilename( ).getBytes(UTF8));
+            response.setContentType(gridFsResource.getContentType( ));
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setCharacterEncoding(UTF8);
+
+            IOUtils.copy(gridFsResource.getInputStream( ), response.getOutputStream( ));
+            response.flushBuffer( );
+        }
+    }
+
+    @Override
+    public GridFSFile findFileById(String id) {
+        Query query = new Query( );
+        this.builderQuery(query, ID, id, 0);
+        return gridFsTemplate.findOne(query);
+    }
+
+    @Override
+    public boolean deleteFile(String id) {
+        Query query = new Query( );
+        this.builderQuery(query, ID, id, 0);
+        gridFsTemplate.delete(query);
+        return Boolean.TRUE;
     }
 
 
