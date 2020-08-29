@@ -35,17 +35,24 @@ public class ZookeeperConfig {
     @Value("${zookeeper.baseSleepTimeMs}")
     private int baseSleepTimeMs;
 
+    private volatile CuratorFramework curatorFramework;
+
+    private volatile NodeCache nodeCache;
+
+    private volatile TreeCache treeCache;
+
     @Bean(name = "curatorFramework")
     public CuratorFramework curatorFramework() {
-        CuratorFramework curatorFramework = null;
         try {
-            RetryPolicy retryPolicy = new ExponentialBackoffRetry(baseSleepTimeMs, retries);
-            curatorFramework = CuratorFrameworkFactory.builder( )
-                    .connectString(this.url)
-                    .sessionTimeoutMs(this.timeout)
-                    .retryPolicy(retryPolicy)
-                    .build( );
-            curatorFramework.start( );
+            synchronized (ZookeeperConfig.class) {
+                RetryPolicy retryPolicy = new ExponentialBackoffRetry(baseSleepTimeMs, retries);
+                curatorFramework = CuratorFrameworkFactory.builder( )
+                        .connectString(this.url)
+                        .sessionTimeoutMs(this.timeout)
+                        .retryPolicy(retryPolicy)
+                        .build( );
+                curatorFramework.start( );
+            }
         } catch (Exception e) {
             log.error("初始化curatorFramework连接异常....】={}", e);
         }
@@ -53,45 +60,53 @@ public class ZookeeperConfig {
     }
 
     public void addListener(CuratorFramework curatorFramework, String path) throws Exception {
-        NodeCache nodeCache = new NodeCache(curatorFramework, path, false);
-        nodeCache.getListenable( ).addListener(() -> {
-            log.warn("path : " + nodeCache.getCurrentData( ).getPath( ));
-            log.warn("data : " + new String(nodeCache.getCurrentData( ).getData( )));
-            log.warn("stat : " + nodeCache.getCurrentData( ).getStat( ));
-        });
-        nodeCache.start( );
+        synchronized (NodeCache.class) {
+            if (nodeCache == null) {
+                nodeCache = new NodeCache(curatorFramework, path, false);
+            }
+            nodeCache.getListenable( ).addListener(() -> {
+                log.warn("path : " + nodeCache.getCurrentData( ).getPath( ));
+                log.warn("data : " + new String(nodeCache.getCurrentData( ).getData( )));
+                log.warn("stat : " + nodeCache.getCurrentData( ).getStat( ));
+            });
+            nodeCache.start( );
+        }
     }
 
     public TreeCache addTreeCache(CuratorFramework curatorFramework, String path) throws Exception {
-        //设置节点的cache
-        TreeCache treeCache = new TreeCache(curatorFramework, path);
-        //设置监听器和处理过程
-        treeCache.getListenable( ).addListener((client, event) -> {
-                    ChildData data = event.getData( );
-                    if (data != null) {
-                        switch (event.getType( )) {
-                            case NODE_ADDED:
-                                System.out.println("NODE_ADDED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
-                                break;
-                            case NODE_REMOVED:
-                                System.out.println("NODE_REMOVED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
-                                break;
-                            case NODE_UPDATED:
-                                System.out.println("NODE_UPDATED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
-                                break;
-                            default:
-                                break;
+        synchronized (TreeCache.class) {
+            if (treeCache == null) {
+                //设置节点的cache
+                treeCache = new TreeCache(curatorFramework, path);
+            }
+
+            //设置监听器和处理过程
+            treeCache.getListenable( ).addListener((client, event) -> {
+                        ChildData data = event.getData( );
+                        if (data != null) {
+                            switch (event.getType( )) {
+                                case NODE_ADDED:
+                                    System.out.println("NODE_ADDED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                    break;
+                                case NODE_REMOVED:
+                                    System.out.println("NODE_REMOVED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                    break;
+                                case NODE_UPDATED:
+                                    System.out.println("NODE_UPDATED : " + data.getPath( ) + "  数据:" + new String(data.getData( )));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            System.out.println("data is null : " + event.getType( ));
                         }
-                    } else {
-                        System.out.println("data is null : " + event.getType( ));
+
                     }
 
-                }
-
-        );
-        treeCache.start( );
+            );
+            treeCache.start( );
+        }
         return treeCache;
-
     }
 
 }

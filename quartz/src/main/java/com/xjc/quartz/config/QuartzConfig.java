@@ -25,11 +25,19 @@ import javax.sql.DataSource;
 public class QuartzConfig {
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private volatile ApplicationContext applicationContext;
+
+    private volatile Scheduler scheduler;
 
     @Bean
-    public Scheduler getScheduler() {
-        return schedulerFactoryBean(jobFactory(applicationContext)).getScheduler( );
+    public Scheduler scheduler() {
+        synchronized (SchedulerFactoryBean.class) {
+            SchedulerFactoryBean schedulerFactoryBean = schedulerFactoryBean(jobFactory(applicationContext));
+            if (schedulerFactoryBean != null) {
+                scheduler = schedulerFactoryBean.getScheduler( );
+            }
+        }
+        return scheduler;
     }
 
     @Bean
@@ -55,6 +63,10 @@ public class QuartzConfig {
         //设置数据源，使用与项目统一数据源
         schedulerFactoryBean.setDataSource(applicationContext.getBean(DataSource.class));
         return schedulerFactoryBean;
+    }
+
+    public Scheduler getScheduler(){
+        return this.scheduler;
     }
 
 }

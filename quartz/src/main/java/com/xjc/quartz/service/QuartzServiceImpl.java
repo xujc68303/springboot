@@ -124,7 +124,7 @@ public class QuartzServiceImpl implements QuartzService {
     /**
      * 检车corn表达式合法性
      *
-     * @param cronExpression
+     * @param cronExpression cron
      * @return
      */
     private Boolean checkCron(String cronExpression) {
