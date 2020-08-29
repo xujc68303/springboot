@@ -22,6 +22,7 @@
         <commons-lang3.version>3.4</commons-lang3.version>
         <servlet.version>3.1.0</servlet.version>
         <joda-time.version>2.9.8</joda-time.version>
+        <aspectjweaver.version>1.9.6</aspectjweaver.version>
         <fastjson.version>1.2.62</fastjson.version>
         <easyexcel.version>2.1.6</easyexcel.version>
         <mysql.version>8.0.16</mysql.version>
@@ -32,7 +33,9 @@
         <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <curator.version>4.3.0</curator.version>
+        <docker.version>1.0.0</docker.version>
         <docker.image.prefix>registry.aliyuncs.com/linhuatest</docker.image.prefix>
+        <mybatis-generator.version>1.3.5</mybatis-generator.version>
     </properties>
 
     <dependencies>
@@ -79,6 +82,13 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${joda-time.version}</version>
+        </dependency>
+
+        <!--aop-->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectjweaver.version}</version>
         </dependency>
 
         <!--json-->
@@ -190,15 +200,13 @@
         <!--model-->
         <dependency>
             <groupId>com.xjc</groupId>
-            <artifactId>redis</artifactId>
+            <artifactId>quartz</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.xjc</groupId>
-            <artifactId>quartz</artifactId>
+            <artifactId>redis</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
@@ -221,7 +229,7 @@
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.5</version>
+                <version>${mybatis-generator.version}</version>
                 <configuration>
                     <verbose>true</verbose>
                     <overwrite>true</overwrite>
@@ -232,7 +240,7 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>${docker.version}</version>
                 <configuration>
                     <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
                     <!--docker文件所在的目录-->

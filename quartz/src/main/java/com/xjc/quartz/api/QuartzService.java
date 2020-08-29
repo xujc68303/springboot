@@ -1,6 +1,5 @@
 package com.xjc.quartz.api;
 
-import com.github.pagehelper.PageInfo;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
 
