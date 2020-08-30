@@ -23,6 +23,16 @@ public interface ExpiringMapService {
     void modifyConfig(int maxSize, TimeUnit timeUnit, long expiration);
 
     /**
+     * 添加监听事件
+     */
+    void addListener();
+
+    /**
+     * 删除监听事件
+     */
+    void removeListener();
+
+    /**
      * k 是否存在
      *
      * @param k k
@@ -31,7 +41,7 @@ public interface ExpiringMapService {
     boolean isExist(String k);
 
     /**
-     * 添加数据
+     * 添加数据, 单个元素设置过期时间
      *
      * @param k          k
      * @param v          v

@@ -2,6 +2,8 @@ package com.util.expiring.service;
 
 import com.google.common.collect.Maps;
 import com.util.expiring.api.ExpiringMapService;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2020/8/29 21:53
  * @Description
  */
+@Slf4j
 @Service
 @SuppressWarnings("all")
 public class ExpiringMapServiceImpl implements ExpiringMapService {
@@ -29,6 +32,10 @@ public class ExpiringMapServiceImpl implements ExpiringMapService {
     private static TimeUnit timeUnit = TimeUnit.SECONDS;
 
     private static long expiration = 60 * 60 * 24;
+
+    private final ExpirationListener<String, Object> expirationListener = ((theKey, theValue) -> {
+        log.info("过期监听事件: key:{}, value:{}", theKey, theValue);
+    });
 
     /**
      * 初始化配置
@@ -61,6 +68,20 @@ public class ExpiringMapServiceImpl implements ExpiringMapService {
         }
         if (expiration != 0) {
             expiration = expiration;
+        }
+    }
+
+    @Override
+    public void addListener() {
+        if(!expiringMap.isEmpty()){
+            expiringMap.addAsyncExpirationListener(expirationListener);
+        }
+    }
+
+    @Override
+    public void removeListener() {
+        if(!expiringMap.isEmpty()){
+            expiringMap.removeAsyncExpirationListener(expirationListener);
         }
     }
 
@@ -121,8 +142,8 @@ public class ExpiringMapServiceImpl implements ExpiringMapService {
     @Override
     public Map<String, Object> getAll() {
         Map<String, Object> result = Maps.newLinkedHashMap( );
-         expiringMap.entrySet( ).forEach(x -> {
-            result.put(x.getKey(), x.getValue());
+        expiringMap.entrySet( ).forEach(x -> {
+            result.put(x.getKey( ), x.getValue( ));
         });
         return result;
     }
@@ -131,5 +152,6 @@ public class ExpiringMapServiceImpl implements ExpiringMapService {
     public void clear() {
         expiringMap.clear( );
     }
+
 
 }
