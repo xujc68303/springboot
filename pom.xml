@@ -22,6 +22,7 @@
         <commons-lang3.version>3.4</commons-lang3.version>
         <servlet.version>3.1.0</servlet.version>
         <joda-time.version>2.9.8</joda-time.version>
+        <jetbrains.version>18.0.0</jetbrains.version>
         <aspectjweaver.version>1.9.6</aspectjweaver.version>
         <fastjson.version>1.2.62</fastjson.version>
         <easyexcel.version>2.1.6</easyexcel.version>
@@ -31,6 +32,7 @@
         <mybatis-generator.version>1.3.5</mybatis-generator.version>
         <pagehelper.version>1.2.3</pagehelper.version>
         <expiringmap.version>0.5.9</expiringmap.version>
+        <redisson.version>3.13.3</redisson.version>
         <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <curator.version>4.3.0</curator.version>
@@ -83,6 +85,11 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${joda-time.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.version}</version>
         </dependency>
 
         <!--aop-->
@@ -164,6 +171,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
 
         <!--excel-->
         <dependency>
@@ -203,6 +215,18 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-x-discovery</artifactId>
             <version>${curator.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.xjc</groupId>
+            <artifactId>quartz</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xjc</groupId>
+            <artifactId>redis</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

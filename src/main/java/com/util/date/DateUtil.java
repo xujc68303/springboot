@@ -1,5 +1,7 @@
 package com.util.date;
 
+import org.springframework.stereotype.Component;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -13,11 +15,14 @@ import static java.time.DayOfWeek.SUNDAY;
  * @Date 2020/8/9 21:40
  * @Description 时间工具类
  */
+@Component
 public class DateUtil {
 
     private volatile static LocalDate localDate;
 
     private volatile static LocalDateTime localDateTime;
+
+    public static final String YYYY_MM_DD = "yyyy-MM-dd";
 
     static {
         localDate = LocalDate.now( );
@@ -148,7 +153,7 @@ public class DateUtil {
         LocalDate with = LocalDate.now( );
         with = with.withMonth(month);
         with = with.with(TemporalAdjusters.firstDayOfMonth( ));
-        return formatOfLocalDate(with, "yyyy-MM-dd");
+        return formatOfLocalDate(with, YYYY_MM_DD);
     }
 
     /**
@@ -161,7 +166,7 @@ public class DateUtil {
         LocalDate with = LocalDate.now( );
         with = with.withMonth(month);
         with = with.with(TemporalAdjusters.lastDayOfMonth( ));
-        return formatOfLocalDate(with, "yyyy-MM-dd");
+        return formatOfLocalDate(with, YYYY_MM_DD);
     }
 
     /**

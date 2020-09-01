@@ -5,8 +5,9 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.util.date.DateUtil;
 import com.util.excel.api.ExcelService;
-import com.util.excel.object.ExcelModel;
+import com.util.excel.object.ExcelUploadModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Map;
 
 import static com.util.date.DateUtil.formatOfLocalDate;
 
@@ -36,7 +36,7 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public void export(List<Object> data, Class<? extends BaseRowModel> clazz, ExcelTypeEnum excelTypeEnum,
-                         HttpServletResponse response, String fileName) throws IOException {
+                       HttpServletResponse response, String fileName) throws IOException {
         String fileType = excelTypeEnum.getValue( );
         fileName = correction(fileName);
         response.setHeader("Content-Disposition", "attachment;fileName=" + fileName + getFileName( ) + fileType);
@@ -45,15 +45,15 @@ public class ExcelServiceImpl implements ExcelService {
         ServletOutputStream outputStream = response.getOutputStream( );
         ExcelWriter excelWriter = new ExcelWriter(outputStream, excelTypeEnum);
         excelWriter.write(data, new Sheet(1, 0, clazz));
-        excelWriter.finish();
-        outputStream.flush();
+        excelWriter.finish( );
+        outputStream.flush( );
         log.info("Excel导出完成");
     }
 
     @Override
     public List<? extends BaseRowModel> upload(MultipartFile file, Class<? extends BaseRowModel> clazz, Class<?> dbHandle) throws IOException {
         InputStream inputStream = file.getInputStream( );
-        ExcelReadListener<ExcelModel> excelReadListener = new ExcelReadListener<>( );
+        ExcelReadListener<ExcelUploadModel> excelReadListener = new ExcelReadListener<>( );
         ExcelReader reader = new ExcelReader(inputStream, null, excelReadListener);
         reader.read(new Sheet(1, 1, clazz));
         log.info("Excel解析完成");
@@ -67,7 +67,7 @@ public class ExcelServiceImpl implements ExcelService {
      * @throws
      */
     private static String getFileName() {
-        return formatOfLocalDate("yyyy-MM-dd");
+        return formatOfLocalDate(DateUtil.YYYY_MM_DD);
     }
 
     /**
