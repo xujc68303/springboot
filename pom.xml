@@ -24,6 +24,7 @@
         <joda-time.version>2.9.8</joda-time.version>
         <jetbrains.version>18.0.0</jetbrains.version>
         <aspectjweaver.version>1.9.6</aspectjweaver.version>
+        <guava.version>29.0-jre</guava.version>
         <fastjson.version>1.2.62</fastjson.version>
         <easyexcel.version>2.1.6</easyexcel.version>
         <mysql.version>8.0.16</mysql.version>
@@ -97,6 +98,13 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>${aspectjweaver.version}</version>
+        </dependency>
+
+        <!--guava-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <!--json-->
@@ -216,18 +224,19 @@
             <artifactId>curator-x-discovery</artifactId>
             <version>${curator.version}</version>
         </dependency>
-
-
-        <dependency>
-            <groupId>com.xjc</groupId>
-            <artifactId>quartz</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>com.xjc</groupId>
             <artifactId>redis</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.xjc</groupId>
+            <artifactId>quartz</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
 
     </dependencies>
 

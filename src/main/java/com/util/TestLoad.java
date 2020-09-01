@@ -21,14 +21,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Version 1.0
- * @ClassName testLoad
+ * @ClassName TestLoad
  * @Author jiachenXu
  * @Date 2020/3/6 16:06
  * @Description
  */
 @Slf4j
 @RestController
-public class testLoad {
+public class TestLoad {
 
     @Autowired
     private DownLoadUtil loadUtil;
