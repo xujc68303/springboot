@@ -1,4 +1,4 @@
-package com.xjc.guava.guava.bloomfilter;
+package com.xjc.guava.bloomfilter.api;
 
 import java.util.List;
 

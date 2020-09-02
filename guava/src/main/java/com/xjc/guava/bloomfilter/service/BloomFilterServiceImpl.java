@@ -1,7 +1,8 @@
-package com.xjc.guava.guava.bloomfilter;
+package com.xjc.guava.bloomfilter.service;
 
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
+import com.xjc.guava.bloomfilter.api.BloomFilterService;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.Charset;
