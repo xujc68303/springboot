@@ -21,7 +21,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * @Version 1.0
  * @ClassName FilesUtilImpl
  * @Author jiachenXu
- * @Date 2020/3/8 21:53
+ * @Date 2020/3/8
  * @Description JDK7新特性，更快捷创建、读取文件
  */
 @Slf4j

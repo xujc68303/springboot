@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * @Version 1.0
  * @ClassName DockerApi
  * @Author jiachenXu
- * @Date 2020/8/23 22:26
+ * @Date 2020/8/23
  * @Description
  */
 @Configuration

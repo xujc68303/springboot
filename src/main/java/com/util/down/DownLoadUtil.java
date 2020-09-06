@@ -11,7 +11,7 @@ import java.io.*;
  * @Version 1.0
  * @ClassName DownLoadUtil
  * @Author jiachenXu
- * @Date 2020/3/3 18:11
+ * @Date 2020/3/3
  * @Description 下载
  */
 @Service

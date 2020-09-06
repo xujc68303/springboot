@@ -5,7 +5,11 @@ import com.datasource.mapper.dataobject.TestUser;
 import java.util.List;
 
 /**
- * @author Administrator
+ * @Version 1.0
+ * @ClassName TestUserDao
+ * @Author jiachenXu
+ * @Date 2020/5/23
+ * @Description
  */
 public interface TestUserDao {
 

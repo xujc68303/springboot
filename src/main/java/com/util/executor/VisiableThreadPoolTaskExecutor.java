@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @Version 1.0
  * @ClassName VisiableThreadPoolTaskExecutor
  * @Author jiachenXu
- * @Date 2020/4/8 22:20
+ * @Date 2020/4/8
  * @Description
  */
 @Slf4j

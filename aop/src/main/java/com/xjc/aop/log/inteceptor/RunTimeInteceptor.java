@@ -16,7 +16,7 @@ import org.springframework.util.StopWatch;
  * @Version 1.0
  * @ClassName RunTimeInteceptor
  * @Author jiachenXu
- * @Date 2020/8/29 20:35
+ * @Date 2020/8/29
  * @Description
  */
 @Slf4j

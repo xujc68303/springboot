@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
  * @Version 1.0
  * @ClassName AsyncService
  * @Author jiachenXu
- * @Date 2020/4/8 21:55
+ * @Date 2020/4/8
  * @Description
  */
 public interface AsyncService {

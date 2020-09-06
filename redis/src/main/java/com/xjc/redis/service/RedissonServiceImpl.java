@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  * @ClassName RedissonServiceImpl
  * @Author jiachenXu
- * @Date 2020/9/1 23:06
+ * @Date 2020/9/1
  * @Description
  */
 @Slf4j

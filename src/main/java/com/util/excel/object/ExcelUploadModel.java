@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @Version 1.0
  * @ClassName ExcelUploadModel
  * @Author jiachenXu
- * @Date 2020/8/29 21:33
+ * @Date 2020/8/29
  * @Description 解析excel映射到数据表 模型
  */
 public class ExcelUploadModel extends BaseRowModel implements Serializable {

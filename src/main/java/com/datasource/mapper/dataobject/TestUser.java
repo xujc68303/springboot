@@ -2,6 +2,13 @@ package com.datasource.mapper.dataobject;
 
 import java.io.Serializable;
 
+/**
+ * @Version 1.0
+ * @ClassName TestUser
+ * @Author jiachenXu
+ * @Date 2020/3/10
+ * @Description
+ */
 public class TestUser implements Serializable {
 
     private static final long serialVersionUID = 3580865635839853856L;

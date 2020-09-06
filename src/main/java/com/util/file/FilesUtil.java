@@ -5,7 +5,7 @@ package com.util.file;
  * @ClassName FilesUtil
  * @Author jiachenXu
  * @Date 2020/3/8 21:57
- * @Description 更快捷文件操作 JDK7
+ * @Description JDK7新特性，更快捷创建、读取文件
  */
 public interface FilesUtil {
 

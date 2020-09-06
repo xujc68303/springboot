@@ -14,7 +14,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName MongodbService
  * @Author jiachenXu
- * @Date 2020/8/26 22:11
+ * @Date 2020/8/26
  * @Description
  * @see com.xjc.mongodb.model.Document  entity
  */

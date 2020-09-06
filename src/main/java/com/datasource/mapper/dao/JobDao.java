@@ -8,7 +8,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName JobDao
  * @Author jiachenXu
- * @Date 2020/5/23 17:07
+ * @Date 2020/5/23
  * @Description
  */
 public interface JobDao {

@@ -25,8 +25,8 @@ import static com.util.date.DateUtil.formatOfLocalDate;
  * @Version 1.0
  * @ClassName ExcelServiceImpl
  * @Author jiachenXu
- * @Date 2020/3/6 15:08
- * @Description easyExcel导出工具
+ * @Date 2020/3/6
+ * @Description easyExcel工具
  */
 @Slf4j
 @Service

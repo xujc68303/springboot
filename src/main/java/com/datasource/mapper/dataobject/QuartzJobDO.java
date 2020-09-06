@@ -8,7 +8,7 @@ import java.util.Map;
  * @Version 1.0
  * @ClassName QuartzJobDO
  * @Author jiachenXu
- * @Date 2020/5/23 17:12
+ * @Date 2020/5/23
  * @Description
  */
 public class QuartzJobDO implements Serializable {

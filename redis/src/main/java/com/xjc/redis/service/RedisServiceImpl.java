@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  * @ClassName RedisServiceImpl
  * @Author jiachenXu
- * @Date 2020/3/5 13:41
+ * @Date 2020/3/5
  * @Description 缓存工具类
  */
 @Slf4j

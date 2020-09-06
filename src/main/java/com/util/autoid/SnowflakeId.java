@@ -9,7 +9,7 @@ import java.time.temporal.ChronoField;
  * @Version 1.0
  * @ClassName SnowflakeId
  * @Author jiachenXu
- * @Date 2020/8/22 21:48
+ * @Date 2020/8/22
  * @Description ID自增工具
  */
 @Configuration

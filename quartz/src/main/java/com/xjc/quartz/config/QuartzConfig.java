@@ -17,7 +17,7 @@ import javax.sql.DataSource;
  * @Version 1.0
  * @ClassName QuartzConfig
  * @Author jiachenXu
- * @Date 2020/5/4 16:14
+ * @Date 2020/5/4
  * @Description
  */
 @Slf4j

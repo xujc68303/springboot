@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @Version 1.0
  * @ClassName ExecutorConfig
  * @Author jiachenXu
- * @Date 2020/4/8 21:33
+ * @Date 2020/4/8
  * @Description 线程池配置
  */
 @Slf4j

@@ -12,7 +12,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName ExcelReadListener
  * @Author jiachenXu
- * @Date 2020/8/29 21:19
+ * @Date 2020/8/29
  * @Description excel解析数据监控
  */
 public class ExcelReadListener<ExcelUploadModel> extends AnalysisEventListener<ExcelUploadModel> {

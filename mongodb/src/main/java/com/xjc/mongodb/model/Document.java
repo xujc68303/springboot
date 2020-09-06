@@ -8,7 +8,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName Document
  * @Author jiachenXu
- * @Date 2020/9/1 20:56
+ * @Date 2020/9/1
  * @Description mongodb请求模型
  */
 

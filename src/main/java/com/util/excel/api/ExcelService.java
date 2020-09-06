@@ -12,7 +12,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName ExcelService
  * @Author jiachenXu
- * @Date 2020/3/6 15:06
+ * @Date 2020/3/6
  * @Description easyExcel解析工具
  */
 public interface ExcelService {

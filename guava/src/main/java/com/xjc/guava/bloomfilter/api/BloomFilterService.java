@@ -6,7 +6,7 @@ import java.util.List;
  * @Version 1.0
  * @ClassName BloomFilterService
  * @Author jiachenXu
- * @Date 2020/9/1 21:35
+ * @Date 2020/9/1
  * @Description 布隆过滤器
  */
 public interface BloomFilterService {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
  * @Version 1.0
  * @ClassName TestUserController
  * @Author jiachenXu
- * @Date 2020/3/10 14:58
+ * @Date 2020/3/10
  * @Description
  */
 @RestController

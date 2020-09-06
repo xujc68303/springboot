@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
  * @Version 1.0
  * @ClassName AsyncServiceImpl
  * @Author jiachenXu
- * @Date 2020/4/8 21:56
+ * @Date 2020/4/8
  * @Description
  */
 @Slf4j

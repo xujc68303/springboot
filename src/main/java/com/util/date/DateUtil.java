@@ -12,7 +12,7 @@ import static java.time.DayOfWeek.SUNDAY;
  * @Version 1.0
  * @ClassName DateUtil
  * @Author jiachenXu
- * @Date 2020/8/9 21:40
+ * @Date 2020/8/9
  * @Description 时间工具类
  */
 @Component

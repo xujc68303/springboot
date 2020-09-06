@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  * @ClassName RedisService
  * @Author jiachenXu
- * @Date 2020/3/5 13:38
+ * @Date 2020/3/5
  * @Description 缓存工具类
  */
 public interface RedisService {

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  * @ClassName LoadingCacheServiceImpl
  * @Author jiachenXu
- * @Date 2020/9/1 22:13
+ * @Date 2020/9/1
  * @Description
  */
 @Slf4j

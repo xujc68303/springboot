@@ -7,7 +7,7 @@ import org.quartz.SchedulerException;
  * @Version 1.0
  * @ClassName QuartzService
  * @Author jiachenXu
- * @Date 2020/5/4 15:54
+ * @Date 2020/5/4
  * @Description 定时任务执行
  */
 public interface QuartzService {
