@@ -1,5 +1,7 @@
 package com.xjc.redis.service;
 
+import com.google.common.collect.Maps;
+import com.xjc.redis.GeoRequest;
 import com.xjc.redis.api.RedissonService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.RedissonMultiLock;
@@ -43,6 +45,10 @@ public class RedissonServiceImpl implements RedissonService {
     private volatile RCountDownLatch rCountDownLatch;
 
     private volatile RBuckets rBuckets;
+
+    private volatile RGeo<Object> rGeo;
+
+    private volatile RBitSet rBitSet;
 
     @Override
     public RRateLimiter currentLimiting(String serviceName, long maxSize, long section, long expired, TimeUnit unit) {
@@ -272,6 +278,43 @@ public class RedissonServiceImpl implements RedissonService {
         return rBuckets.delete(keys.toArray(new String[0]));
     }
 
+    @Override
+    public boolean addressAdd(List<GeoRequest> geoRequests) {
+        getGeo( );
+        geoRequests.forEach(e -> rGeo.add(e.getLongitude( ), e.getLatitude( ), e.getMember( )));
+        return true;
+    }
+
+    @Override
+    public Map<Object, GeoPosition> addressGet(List<String> members) {
+        getGeo( );
+        Map<Object, GeoPosition> result = Maps.newLinkedHashMap( );
+        members.forEach(e -> {
+            Map<Object, GeoPosition> map = rGeo.pos(e);
+            map.forEach(result::put);
+        });
+        return result;
+    }
+
+    @Override
+    public void bitSetAndModify(long key, boolean value) {
+        getBit( );
+        rBitSet.set(key, value);
+    }
+
+    @Override
+    public boolean bitGet(long key) {
+        getBit( );
+        return rBitSet.get(key);
+    }
+
+    @Override
+    public boolean bitRemove(List<Long> keys) {
+        getBit( );
+        keys.forEach(k -> rBitSet.clear(k, k));
+        return true;
+    }
+
     private void getRateLimiter(String serviceName) {
         if (bloomFilter != null) {
             this.rRateLimiter = redissonClient.getRateLimiter(serviceName);
@@ -306,6 +349,18 @@ public class RedissonServiceImpl implements RedissonService {
     private RBuckets getrBuckets() {
         rBuckets = redissonClient.getBuckets( );
         return rBuckets;
+    }
+
+    private void getGeo() {
+        if (rGeo == null) {
+            rGeo = redissonClient.getGeo("address");
+        }
+    }
+
+    private void getBit() {
+        if (rBitSet == null) {
+            rBitSet = redissonClient.getBitSet("bit");
+        }
     }
 
 }

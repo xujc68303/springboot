@@ -1,9 +1,7 @@
 package com.xjc.redis.api;
 
 import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.lang.NonNull;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +22,7 @@ public interface RedisService {
      * @param key cacheKey
      * @return 执行结果
      */
-    Boolean exists(String key);
+    boolean exists(String key);
 
     // string
 
@@ -45,7 +43,7 @@ public interface RedisService {
      * @param unit   时间类型
      * @return 执行结果
      */
-    Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit);
+    boolean setWithExpire(String key, Object value, long expire, TimeUnit unit);
 
     /**
      * 给Key重新设置过期时间并获取Value
@@ -58,12 +56,12 @@ public interface RedisService {
     Object getKeyWithExpire(String key, long expire, TimeUnit unit);
 
     /**
-     * 删除data
+     * 根据key删除
      *
      * @param key cacheKey
      * @return 执行结果
      */
-    Boolean delete(String key);
+    boolean delete(String key);
 
     /**
      * 修改key名称
@@ -71,7 +69,7 @@ public interface RedisService {
      * @param oldKey 原有key
      * @param newKey 修改key
      */
-    Boolean renameByKey(String oldKey, String newKey);
+    boolean renameByKey(String oldKey, String newKey);
 
     /**
      * 移除key过期时间变永久
@@ -79,7 +77,7 @@ public interface RedisService {
      * @param key cacheKey
      * @return 执行结果
      */
-    Boolean setPermanentByKey(String key);
+    boolean setPermanentByKey(String key);
 
     /**
      * 分布式锁
@@ -91,7 +89,7 @@ public interface RedisService {
      * @param unit   时间类型
      * @return 执行结果
      */
-    Boolean distributedLock(String key, Object value, @NotNull String nxxx, @NotNull long expire, @NotNull TimeUnit unit);
+    boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit);
 
     /**
      * 秒杀锁
@@ -102,7 +100,7 @@ public interface RedisService {
      * @param unit            时间类型
      * @return 执行结果
      */
-    Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit);
+    boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit);
 
     /**
      * 解除锁
@@ -111,7 +109,7 @@ public interface RedisService {
      * @param value data
      * @return 执行结果
      */
-    Boolean unlock(String key, Object value);
+    boolean unlock(String key, Object value);
 
     /**
      * 点赞功能
@@ -129,7 +127,7 @@ public interface RedisService {
      * @param key 来源id
      * @return 数量
      */
-    Long bitCount(String key);
+    long bitCount(String key);
 
     /**
      * 增量计算
@@ -138,7 +136,7 @@ public interface RedisService {
      * @param delta 增加数量
      * @return 当前数量
      */
-    Long increment(String key, long delta);
+    long increment(String key, long delta);
 
     /**
      * 减量计算
@@ -147,9 +145,17 @@ public interface RedisService {
      * @param delta 减少数量
      * @return 当前数量
      */
-    Long decrement(String key, long delta);
+    long decrement(String key, long delta);
 
     // zset
+
+    /**
+     * 获取队列的长度
+     *
+     * @param key 队列名称
+     * @return
+     */
+    long zCard(String key);
 
     /**
      * 队列形式点赞
@@ -158,7 +164,7 @@ public interface RedisService {
      * @param value 用户id
      * @param delta 是否点赞
      */
-    void zadd(String key, String value, long delta);
+    void zAdd(String key, String value, long delta);
 
     /**
      * 队列形式取消点赞
@@ -167,7 +173,7 @@ public interface RedisService {
      * @param values 用户id
      * @return 执行结果
      */
-    Boolean zrem(String key, String... values);
+    boolean zRem(String key, List<String> values);
 
     /**
      * 队列形式增量计算
@@ -177,7 +183,7 @@ public interface RedisService {
      * @param delta
      * @return
      */
-    Boolean zincrby(String key, String value, long delta);
+    boolean zincrby(String key, String value, long delta);
 
     /**
      * 队列正序
@@ -187,7 +193,7 @@ public interface RedisService {
      * @param end   结束位置
      * @return 列表
      */
-    Set<String> zrange(String key, long start, long end);
+    Set<String> zRange(String key, long start, long end);
 
     /**
      * 队列倒序
@@ -197,7 +203,27 @@ public interface RedisService {
      * @param end   结束位置
      * @return 队列
      */
-    Set<String> zrevrange(String key, long start, long end);
+    Set<String> zRevRange(String key, long start, long end);
+
+    /**
+     * 根据score的大小升序显示value
+     *
+     * @param key   队列名称
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 队列
+     */
+    Set<String> zRangeByScore(String key, long start, long end);
+
+    /**
+     * 根据score的大小倒序显示value
+     *
+     * @param key   队列名称
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 队列
+     */
+    Set<String> zReverseRangeByScore(String key, long start, long end);
 
     /**
      * 队列长度
@@ -207,7 +233,7 @@ public interface RedisService {
      * @param end   结束位置
      * @return 队列长度
      */
-    Integer zlexcount(String key, long start, long end);
+    long zlexCount(String key, long start, long end);
 
     /**
      * 正序当前value在队列中的位置
@@ -216,7 +242,7 @@ public interface RedisService {
      * @param value value
      * @return value位置
      */
-    Long zrank(String key, String value);
+    long zRank(String key, String value);
 
     /**
      * 倒序当前value在队列中的位置
@@ -225,7 +251,7 @@ public interface RedisService {
      * @param value value
      * @return value位置
      */
-    Long zrevrank(String key, String value);
+    long zRevRank(String key, String value);
 
     /**
      * stream追加消息
@@ -234,7 +260,7 @@ public interface RedisService {
      * @param message 消息载体
      * @return 返回唯一标识
      */
-    String xAdd(@NonNull String key, @NonNull Map<Object, Object> message);
+    String xAdd(String key, Map<Object, Object> message);
 
     /**
      * 删除消息
@@ -243,7 +269,7 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    Boolean xDel(@NonNull String key, @NonNull String messageId);
+    boolean xDel(String key, String messageId);
 
     /**
      * 正序取出stream查询结果集
@@ -251,7 +277,7 @@ public interface RedisService {
      * @param key 队列名称
      * @return 结果集
      */
-    List<MapRecord<String, Object, Object>> xRange(@NonNull String key);
+    List<MapRecord<String, Object, Object>> xRange(String key);
 
     /**
      * 倒序取出stream查询结果集
@@ -259,7 +285,7 @@ public interface RedisService {
      * @param key 队列名称
      * @return 结果集
      */
-    List<MapRecord<String, Object, Object>> xRevRange(@NonNull String key);
+    List<MapRecord<String, Object, Object>> xRevRange(String key);
 
     /**
      * stream长度
@@ -267,7 +293,7 @@ public interface RedisService {
      * @param key 队列名称
      * @return 队列长度
      */
-    Long xLen(@NonNull String key);
+    long xLen(String key);
 
     /**
      * 顺序消费消息(返回的消息为下一次messageId)
@@ -277,7 +303,7 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    List<MapRecord<String, Object, Object>> xRead(@NonNull String key, long count, String messageId);
+    List<MapRecord<String, Object, Object>> xRead(String key, long count, String messageId);
 
     /**
      * 创建与已经存的stream的新消费组
@@ -287,7 +313,7 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    boolean xGroupCreate(@NonNull String key, @NonNull String group, String messageId);
+    boolean xGroupCreate(String key, String group, String messageId);
 
     /**
      * 删除消费组
@@ -296,7 +322,7 @@ public interface RedisService {
      * @param group 消费组名称
      * @return 执行结果
      */
-    boolean xDelGroup(@NonNull String key, @NonNull String group);
+    boolean xDelGroup(String key, String group);
 
     /**
      * 从消费组租读取数据
@@ -307,7 +333,7 @@ public interface RedisService {
      * @param count    消息条数
      * @return 执行结果
      */
-    List<MapRecord<String, Object, Object>> xReadGroup(@NonNull String group, @NonNull String consumer, @NonNull String key, @NonNull long count);
+    List<MapRecord<String, Object, Object>> xReadGroup(String group, String consumer, String key, long count);
 
     /**
      * 确认消息，已处理消息列表中删除
@@ -317,7 +343,6 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    boolean xAck(@NonNull String key, @NonNull String group, @NonNull String messageId);
-
+    boolean xAck(String key, String group, String messageId);
 
 }

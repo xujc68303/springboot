@@ -8,7 +8,6 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -54,7 +53,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean exists(String key) {
+    public boolean exists(String key) {
         try {
             return stringRedisTemplate.hasKey(key);
         } catch (RuntimeException e) {
@@ -74,7 +73,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
+    public boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
         try {
             String v = JSON.toJSONString(value);
             return stringOperations.setIfAbsent(key, v, expire, unit);
@@ -101,7 +100,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean delete(String key) {
+    public boolean delete(String key) {
         try {
             if (exists(key)) {
                 return stringRedisTemplate.delete(key);
@@ -114,7 +113,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean renameByKey(String oldKey, String newKey) {
+    public boolean renameByKey(String oldKey, String newKey) {
         if (stringRedisTemplate.renameIfAbsent(oldKey, newKey)) {
             return true;
         }
@@ -124,7 +123,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean setPermanentByKey(String key) {
+    public boolean setPermanentByKey(String key) {
         if (exists(key)) {
             return stringRedisTemplate.persist(key);
         }
@@ -132,7 +131,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
+    public boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
         try {
             final String v = JSON.toJSONString(value);
             // SET_IF_ABSENT--->NX
@@ -152,7 +151,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
+    public boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
         try {
             long deadTimeLine = System.currentTimeMillis( ) + lockWaitTimeOut;
 
@@ -171,7 +170,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean unlock(String key, Object value) {
+    public boolean unlock(String key, Object value) {
         try {
             final String v = JSON.toJSONString(value);
             DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(SCRIPT, Long.class);
@@ -190,60 +189,75 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long bitCount(String key) {
+    public long bitCount(String key) {
         return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
     }
 
     @Override
-    public Long increment(String key, long delta) {
+    public long increment(String key, long delta) {
         return stringOperations.increment(key, delta);
     }
 
     @Override
-    public Long decrement(String key, long delta) {
+    public long decrement(String key, long delta) {
         return stringOperations.decrement(key, delta);
     }
 
     @Override
-    public void zadd(String key, String value, long delta) {
+    public long zCard(String key) {
+        return zSetOperations.zCard(key);
+    }
+
+    @Override
+    public void zAdd(String key, String value, long delta) {
         zSetOperations.add(key, value, delta);
     }
 
     @Override
-    public Boolean zrem(String key, String... value) {
-        return zSetOperations.remove(key, value) == 1;
+    public boolean zRem(String key, List<String> values) {
+        return zSetOperations.remove(key, values.toArray(new String[0])) == 1;
     }
 
     @Override
-    public Boolean zincrby(String key, String value, long delta) {
+    public boolean zincrby(String key, String value, long delta) {
         return zSetOperations.incrementScore(key, value, delta) != null;
     }
 
     @Override
-    public Set<String> zrange(String key, long start, long end) {
+    public Set<String> zRange(String key, long start, long end) {
         return zSetOperations.range(key, start, end);
     }
 
     @Override
-    public Set<String> zrevrange(String key, long start, long end) {
+    public Set<String> zRevRange(String key, long start, long end) {
         return zSetOperations.reverseRange(key, start, end);
     }
 
     @Override
-    public Integer zlexcount(String key, long start, long end) {
+    public Set<String> zRangeByScore(String key, long start, long end) {
+        return zSetOperations.rangeByScore(key, start, end);
+    }
+
+    @Override
+    public Set<String> zReverseRangeByScore(String key, long start, long end) {
+        return zSetOperations.reverseRangeByScore(key, start, end);
+    }
+
+    @Override
+    public long zlexCount(String key, long start, long end) {
         if (Objects.isNull(start) || Objects.isNull(end)) {
-            return zrevrange(key, 0, -1).size( );
+            return zRevRange(key, 0, -1).size( );
         }
         return Integer.parseInt(zSetOperations.count(key, start, end).toString( ));
     }
 
     @Override
-    public Long zrank(String key, String value) {
+    public long zRank(String key, String value) {
         return zSetOperations.rank(key, value);
     }
 
     @Override
-    public Long zrevrank(String key, String value) {
+    public long zRevRank(String key, String value) {
         return zSetOperations.reverseRank(key, value);
     }
 
@@ -261,12 +275,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean xDel(String key, String messageId) {
+    public boolean xDel(String key, String messageId) {
         return streamOperations.delete(key, messageId) != null;
     }
 
     @Override
-    public List<MapRecord<String, Object, Object>> xRange(@NonNull String key) {
+    public List<MapRecord<String, Object, Object>> xRange(String key) {
         return streamOperations.range(key, Range.unbounded( ));
     }
 
@@ -276,7 +290,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long xLen(String key) {
+    public long xLen(String key) {
         return streamOperations.size(key);
     }
 

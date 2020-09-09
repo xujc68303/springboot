@@ -1,5 +1,6 @@
 package com.xjc.redis.api;
 
+import com.xjc.redis.GeoRequest;
 import org.redisson.RedissonMultiLock;
 import org.redisson.RedissonRedLock;
 import org.redisson.api.*;
@@ -160,6 +161,7 @@ public interface RedissonService {
 
     /**
      * 对象桶添加
+     *
      * @param map map
      * @return
      */
@@ -167,6 +169,7 @@ public interface RedissonService {
 
     /**
      * 对象桶 根据key获取对象
+     *
      * @param keys keys
      * @return
      */
@@ -174,9 +177,50 @@ public interface RedissonService {
 
     /**
      * 对象桶 根据key删除对象
+     *
      * @param keys keys
      * @return 成功删除数量
      */
     long deleteBuckets(List<String> keys);
+
+    /**
+     * 地址存储
+     *
+     * @param geoRequests
+     * @return 执行结果
+     */
+    boolean addressAdd(List<GeoRequest> geoRequests);
+
+    /**
+     * 获取地址
+     *
+     * @param members 地址key
+     * @return
+     */
+    Map<Object, GeoPosition> addressGet(List<String> members);
+
+    /**
+     * 位图添加修改
+     *
+     * @param key   key
+     * @param value value
+     */
+    void bitSetAndModify(long key, boolean value);
+
+    /**
+     * 位图获取value
+     *
+     * @param key key
+     * @return
+     */
+    boolean bitGet(long key);
+
+    /**
+     * 删除位图
+     *
+     * @param keys keys
+     * @return 执行结果
+     */
+    boolean bitRemove(List<Long> keys);
 
 }
