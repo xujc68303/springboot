@@ -1,5 +1,6 @@
 package com.xjc.redis.api;
 
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.stream.MapRecord;
 
 import java.util.List;
@@ -23,6 +24,14 @@ public interface RedisService {
      * @return 执行结果
      */
     boolean exists(String key);
+
+    /**
+     * 查询key
+     * @param pattern
+     * @param count
+     * @return
+     */
+    Set<String> scanKey(String pattern, int count);
 
     // string
 
@@ -128,6 +137,15 @@ public interface RedisService {
      * @return 数量
      */
     long bitCount(String key);
+
+    /**
+     * 位图计算
+     * @param bitOperation bitOperation
+     * @param keys keys
+     * @param resultKey resultKey
+     * @return
+     */
+    long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey);
 
     /**
      * 增量计算

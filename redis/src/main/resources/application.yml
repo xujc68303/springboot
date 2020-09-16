@@ -30,13 +30,10 @@ spring:
     active: dev
 
   redis:
-    # Redis服务器地址
-    host: 127.0.0.1
-    # Redis服务器连接端口
-    port: 6379
-    # Redis服务器连接密码（默认为空）
+    sentinel:
+      nodes: redis://127.0.0.1:26379,redis://127.0.0.1:26380
+      master: mymaster
     password:
-    # Redis数据库索引（默认为0）
     database: 16
     # 将themilef的默认缓存禁用，热加载生效
     thymeleaf:

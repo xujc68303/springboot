@@ -5,6 +5,7 @@ import com.xjc.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -60,6 +61,23 @@ public class RedisServiceImpl implements RedisService {
             log.error("cache-get error, key=" + key);
         }
         return false;
+    }
+
+    @Override
+    public Set<String> scanKey(String pattern, int count) {
+        Set<String> keysTmp = new LinkedHashSet<>( );
+        stringRedisTemplate.execute((RedisCallback<Set<String>>) con -> {
+            Cursor<byte[]> cursor = con.scan(new ScanOptions
+                    .ScanOptionsBuilder( )
+                    .match("*" + pattern + "*")
+                    .count(count)
+                    .build( ));
+            while (cursor.hasNext( )) {
+                keysTmp.add(new String(cursor.next( )));
+            }
+            return keysTmp;
+        });
+        return keysTmp;
     }
 
     @Override
@@ -191,6 +209,14 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public long bitCount(String key) {
         return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
+    }
+
+    @Override
+    public long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey) {
+        byte[][] bytes = new byte[keys.size( )][];
+        final int[] index = {0};
+        keys.forEach(k -> bytes[index[0]++] = k.getBytes( ));
+        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes( ), bytes));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.xjc.redis.GeoRequest;
 import org.redisson.RedissonMultiLock;
 import org.redisson.RedissonRedLock;
 import org.redisson.api.*;
+import org.springframework.data.redis.connection.RedisStringCommands;
 
 import java.util.List;
 import java.util.Map;
@@ -222,5 +223,7 @@ public interface RedissonService {
      * @return 执行结果
      */
     boolean bitRemove(List<Long> keys);
+
+
 
 }
