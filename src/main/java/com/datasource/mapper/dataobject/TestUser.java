@@ -1,70 +1,35 @@
 package com.datasource.mapper.dataobject;
 
-import java.io.Serializable;
+import lombok.Data;
 
-/**
- * @Version 1.0
- * @ClassName TestUser
- * @Author jiachenXu
- * @Date 2020/3/10
- * @Description
- */
-public class TestUser implements Serializable {
-
+@Data
+public class TestUser {
     private static final long serialVersionUID = 3580865635839853856L;
-
+    /**
+     * 主键id
+     */
     private Long id;
 
+    /**
+     * 名称
+     */
     private String userName;
 
+    /**
+     * 年龄
+     */
     private Integer userAge;
 
+    /**
+     * 地址
+     */
     private String userBase;
 
-    public TestUser() {
-    }
+    public static final String COL_ID = "id";
 
-    public TestUser(Long id, String userName, Integer userAge, String userBase) {
-        this.id = id;
-        this.userName = userName;
-        this.userAge = userAge;
-        this.userBase = userBase;
-    }
+    public static final String COL_USER_NAME = "user_name";
 
-    public Long getId() {
-        return id;
-    }
+    public static final String COL_USER_AGE = "user_age";
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Integer getUserAge() {
-        return userAge;
-    }
-
-    public void setUserAge(Integer userAge) {
-        this.userAge = userAge;
-    }
-
-    public String getUserBase() {
-        return userBase;
-    }
-
-    public void setUserBase(String userBase) {
-        this.userBase = userBase;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString( );
-    }
+    public static final String COL_USER_BASE = "user_base";
 }
