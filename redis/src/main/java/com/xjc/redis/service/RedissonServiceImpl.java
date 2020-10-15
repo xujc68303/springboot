@@ -1,7 +1,7 @@
 package com.xjc.redis.service;
 
 import com.google.common.collect.Maps;
-import com.xjc.redis.GeoRequest;
+import com.xjc.redis.config.GeoRequest;
 import com.xjc.redis.api.RedissonService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.RedissonMultiLock;

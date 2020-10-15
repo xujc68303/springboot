@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8082
 
   tomcat:
     uri-encoding: utf-8
@@ -9,6 +9,12 @@ server:
       timeout: 30m
 
 spring:
+
+  application:
+    name: guava
+
+  profiles:
+    active: dev
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -21,9 +27,3 @@ spring:
       max-active: 30
       min-idle: 1
       max-wait: 30000
-
-  application:
-    name: guava
-
-  profiles:
-    active: dev

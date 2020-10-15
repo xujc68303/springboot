@@ -4,10 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.util</groupId>
-        <artifactId>utils</artifactId>
+        <groupId>com.xjc</groupId>
+        <artifactId>main</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.xjc</groupId>
@@ -16,10 +15,6 @@
     <name>quartz</name>
     <description>quartz for Spring Boot</description>
 
-    <dependencies>
-
-
-    </dependencies>
 
     <build>
         <plugins>

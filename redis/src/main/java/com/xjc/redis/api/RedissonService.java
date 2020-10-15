@@ -1,10 +1,9 @@
 package com.xjc.redis.api;
 
-import com.xjc.redis.GeoRequest;
+import com.xjc.redis.config.GeoRequest;
 import org.redisson.RedissonMultiLock;
 import org.redisson.RedissonRedLock;
 import org.redisson.api.*;
-import org.springframework.data.redis.connection.RedisStringCommands;
 
 import java.util.List;
 import java.util.Map;

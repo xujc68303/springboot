@@ -1,0 +1,33 @@
+server:
+  port: 8086
+
+  tomcat:
+    uri-encoding: utf-8
+
+  servlet:
+    session:
+      timeout: 30m
+
+spring:
+
+  application:
+    name: util
+
+  profiles:
+    active: dev
+
+#线程池配置
+async:
+  executor:
+    thread:
+      # 核心线程数
+      core_pool_size: 10
+      # 最大线程数
+      max_pool_size: 30
+      # 队列大小
+      queue_capacity: 20
+      # 线程空闲时间
+      keep_alive_time: 300
+      name:
+        # 线程池中的线程的名称
+        prefix: async-service
