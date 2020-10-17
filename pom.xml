@@ -8,7 +8,6 @@
 
     <modules>
         <module>redis</module>
-        <module>util</module>
         <module>mysql</module>
         <module>aop</module>
         <module>docker</module>
@@ -43,13 +42,11 @@
         <aspectjweaver.version>1.9.6</aspectjweaver.version>
         <guava.version>29.0-jre</guava.version>
         <fastjson.version>1.2.62</fastjson.version>
-        <easyexcel.version>2.1.6</easyexcel.version>
         <mysql.version>8.0.16</mysql.version>
         <mybatis.version>2.1.1</mybatis.version>
         <druid.version>1.1.18</druid.version>
         <mybatis-generator.version>1.3.5</mybatis-generator.version>
         <pagehelper.version>1.2.3</pagehelper.version>
-        <expiringmap.version>0.5.9</expiringmap.version>
         <redisson.version>3.13.3</redisson.version>
         <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
         <zookeeper.version>3.4.14</zookeeper.version>
@@ -186,13 +183,6 @@
             <version>${pagehelper.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/net.jodah/expiringmap -->
-        <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>expiringmap</artifactId>
-            <version>${expiringmap.version}</version>
-        </dependency>
-
         <!--redis-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -202,13 +192,6 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>${redisson.version}</version>
-        </dependency>
-
-        <!--excel-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>easyexcel</artifactId>
-            <version>${easyexcel.version}</version>
         </dependency>
 
         <!--quartz-->
