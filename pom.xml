@@ -15,7 +15,6 @@
         <module>mongodb</module>
         <module>quartz</module>
         <module>zookeeper</module>
-        <module>start</module>
     </modules>
 
     <parent>
