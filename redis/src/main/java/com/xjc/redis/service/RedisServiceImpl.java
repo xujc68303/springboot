@@ -3,6 +3,9 @@ package com.xjc.redis.service;
 import com.alibaba.fastjson.JSON;
 import com.xjc.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStringCommands;
@@ -38,35 +41,33 @@ public class RedisServiceImpl implements RedisService {
             "return redis.call('del', KEYS[1]) else return 0 end ";
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     private ValueOperations<String, String> stringOperations;
 
     private ZSetOperations<String, String> zSetOperations;
 
+    private HashOperations<String, Object, Object> hashOperations;
+
     private StreamOperations<String, Object, Object> streamOperations;
 
     @PostConstruct
     private void init() {
-        stringOperations = stringRedisTemplate.opsForValue( );
-        zSetOperations = stringRedisTemplate.opsForZSet( );
-        streamOperations = stringRedisTemplate.opsForStream( );
+        stringOperations = redisTemplate.opsForValue( );
+        zSetOperations = redisTemplate.opsForZSet( );
+        hashOperations = redisTemplate.opsForHash( );
+        streamOperations = redisTemplate.opsForStream( );
     }
 
     @Override
     public boolean exists(String key) {
-        try {
-            return stringRedisTemplate.hasKey(key);
-        } catch (RuntimeException e) {
-            log.error("cache-get error, key=" + key);
-        }
-        return false;
+        return redisTemplate.hasKey(key);
     }
 
     @Override
     public Set<String> scanKey(String pattern, int count) {
         Set<String> keysTmp = new LinkedHashSet<>( );
-        stringRedisTemplate.execute((RedisCallback<Set<String>>) con -> {
+        redisTemplate.execute((RedisCallback<Set<String>>) con -> {
             Cursor<byte[]> cursor = con.scan(new ScanOptions
                     .ScanOptionsBuilder( )
                     .match("*" + pattern + "*")
@@ -82,70 +83,39 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Object get(String key) {
-        try {
-            return stringOperations.get(key);
-        } catch (RuntimeException e) {
-            log.error("cache-get error, key=" + key);
-        }
-        return null;
+        return stringOperations.get(key);
     }
 
     @Override
     public boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
-        try {
-            String v = JSON.toJSONString(value);
-            return stringOperations.setIfAbsent(key, v, expire, unit);
-        } catch (RuntimeException e) {
-            log.error("cache-setexWithExpire error", e);
-        }
-        log.error("cache-setexWithExpire failed, key=" + key);
-        return false;
-
+        String v = JSON.toJSONString(value);
+        return stringOperations.setIfAbsent(key, v, expire, unit);
     }
 
     @Override
     public Object getKeyWithExpire(String key, long expire, TimeUnit unit) {
-        try {
-            Object value = get(key);
-            if (Objects.nonNull(value)) {
-                return stringRedisTemplate.expire(key, expire, unit);
-            }
-        } catch (RuntimeException e) {
-            log.error("cache-getKeyWithExpire error, key=" + key, e);
+        Object value = get(key);
+        if (Objects.nonNull(value)) {
+            redisTemplate.expire(key, expire, unit);
+            return value;
         }
-        log.error("cache-getKeyWithExpire failed, key=" + key);
         return null;
     }
 
     @Override
     public boolean delete(String key) {
-        try {
-            if (exists(key)) {
-                return stringRedisTemplate.delete(key);
-            }
-        } catch (RuntimeException e) {
-            log.error("cache-delete error", e);
-        }
-        log.error("cache-delete failed, key=" + key);
-        return false;
+        return redisTemplate.delete(key);
     }
 
     @Override
     public boolean renameByKey(String oldKey, String newKey) {
-        if (stringRedisTemplate.renameIfAbsent(oldKey, newKey)) {
-            return true;
-        }
-        log.error("cache-distributedLock error");
-        return false;
+        return redisTemplate.renameIfAbsent(oldKey, newKey);
 
     }
 
     @Override
     public boolean setPermanentByKey(String key) {
-        if (exists(key)) {
-            return stringRedisTemplate.persist(key);
-        }
-        return false;
+        return redisTemplate.persist(key);
     }
 
     @Override
@@ -189,16 +159,10 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean unlock(String key, Object value) {
-        try {
-            final String v = JSON.toJSONString(value);
-            DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(SCRIPT, Long.class);
-            Object result = stringRedisTemplate.execute(redisScript, Collections.singletonList(key), v);
-            return Objects.equals(result, ONE_RESULT);
-        } catch (Exception e) {
-            log.error("cache-unlock error, key=" + key, e);
-        }
-        log.error("cache-unlock failed, key=" + key);
-        return false;
+        final String v = JSON.toJSONString(value);
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(SCRIPT, Long.class);
+        Object result = redisTemplate.execute(redisScript, Collections.singletonList(key), v);
+        return Objects.equals(result, ONE_RESULT);
     }
 
     @Override
@@ -208,7 +172,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public long bitCount(String key) {
-        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
+        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
     }
 
     @Override
@@ -216,7 +180,7 @@ public class RedisServiceImpl implements RedisService {
         byte[][] bytes = new byte[keys.size( )][];
         final int[] index = {0};
         keys.forEach(k -> bytes[index[0]++] = k.getBytes( ));
-        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes( ), bytes));
+        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes( ), bytes));
     }
 
     @Override
@@ -285,6 +249,73 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public long zRevRank(String key, String value) {
         return zSetOperations.reverseRank(key, value);
+    }
+
+    @Override
+    public boolean hasKey(String key, String hashKey) {
+        return hashOperations.hasKey(key,hashKey);
+    }
+
+    @Override
+    public List<Object> hashKeys(String key) {
+        return Collections.singletonList(hashOperations.keys(key));
+    }
+
+    @Override
+    public boolean hashPutIfAbsent(String key, Pair<Object, Object> pair) {
+        return hashOperations.putIfAbsent(key,pair.getLeft(),pair.getRight());
+    }
+
+    @Override
+    public void hashPutAll(String key, Map<Object, Object> map) {
+        hashOperations.putAll(key,map);
+    }
+
+    @Override
+    public boolean hashExpire(String key, long expire, TimeUnit timeUnit) {
+        return hashOperations.getOperations().expire(key, expire, timeUnit);
+    }
+
+    @Override
+    public Map<Object, Object> hashGetByHashKeys(String key) {
+        return hashOperations.entries(key);
+    }
+
+    @Override
+    public Object hashGet(String key, String hashKey) {
+        return hashOperations.get(key,hashKey);
+    }
+
+    @Override
+    public List<Object> hashMultiGetByHashKey(String key, List<String> hashKeys) {
+        return hashOperations.multiGet(key, Collections.singleton(hashKeys));
+    }
+
+    @Override
+    public Map<Object, Pair<Object,Object>> hashGetAll(List<String> keys) {
+        Map<Object, Pair<Object,Object>> result = Maps.newLinkedHashMap();
+        keys.forEach(key -> {
+            Map<Object, Object> objectMap = hashGetByHashKeys(key);
+            objectMap.forEach((k, v)-> {
+                result.put(key,ImmutablePair.of(k, v));
+            });
+        });
+        return result;
+    }
+
+    @Override
+    public void hashDelete(String key, List<String> hashKey) {
+         hashOperations.delete(key, hashKey);
+    }
+
+    @Override
+    public long hashSize(String key) {
+        return hashOperations.size(key);
+    }
+
+    @Override
+    public long lengthOfValue(String key, String hashKey) {
+       return hashOperations.lengthOfValue(key,hashKey);
     }
 
     @Override

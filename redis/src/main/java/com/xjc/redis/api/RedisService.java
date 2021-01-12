@@ -1,5 +1,6 @@
 package com.xjc.redis.api;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.stream.MapRecord;
 
@@ -271,8 +272,103 @@ public interface RedisService {
      */
     long zRevRank(String key, String value);
 
+    // hash
+
     /**
-     * stream追加消息
+     * hashKey是否存在
+     * @param key key
+     * @param hashKey hashKey
+     * @return 执行结果
+     */
+    boolean hasKey(String key, String hashKey);
+
+    /**
+     * 获取映射的hashKey
+     * @param key key
+     * @return hashKey
+     */
+    List<Object> hashKeys(String key);
+
+    /**
+     * 当key不存在时，缓存数据
+     * @param key key
+     * @param pair pair
+     * @return 执行结果
+     */
+    boolean hashPutIfAbsent(String key, Pair<Object,Object> pair);
+
+    /**
+     * 批量缓存数据
+     * @param key key
+     * @param map map
+     */
+    void hashPutAll(String key, Map<Object,Object> map);
+
+    /**
+     * 给key设置过期时间
+     * @param key key
+     * @param expire 过期时间
+     * @param timeUnit 时间单位
+     * @return 执行结果
+     */
+    boolean hashExpire(String key, long expire, TimeUnit timeUnit);
+
+    /**
+     * 获取全部map
+     * @param key key
+     * @return Pair
+     */
+    Map<Object,Object> hashGetByHashKeys(String key);
+
+    /**
+     * 获取hashKey对应value
+     * @param key key
+     * @param hashKey hashKey
+     * @return value
+     */
+    Object hashGet(String key, String hashKey);
+
+    /**
+     * 根据hashKeys获取value
+     * @param key key
+     * @param hashKeys hashKeys
+     * @return value
+     */
+    List<Object> hashMultiGetByHashKey(String key, List<String> hashKeys);
+
+    /**
+     * 根据key批量获取
+     * @param keys keys
+     * @return maps
+     */
+    Map<Object, Pair<Object,Object>> hashGetAll(List<String> keys);
+
+    /**
+     * 根据key删除
+     * @param key key
+     * @param hashKeys hashKeys
+     * @return 执行结果
+     */
+    void hashDelete(String key, List<String> hashKeys);
+
+    /**
+     * 获取hashKey数量
+     * @param key key
+     * @return 数量
+     */
+    long hashSize(String key);
+
+    /**
+     * 返回hashKey映射值的长度
+     * @param key key
+     * @param hashKey hashKey
+     * @return value长度
+     */
+    long lengthOfValue(String key, String hashKey);
+
+    // stream
+    /**
+     * stream 追加消息
      *
      * @param key     队列名称
      * @param message 消息载体
