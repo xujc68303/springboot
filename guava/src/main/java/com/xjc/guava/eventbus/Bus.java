@@ -2,6 +2,10 @@ package com.xjc.guava.eventbus;
 
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @Version 1.0
  * @ClassName Bus
@@ -12,10 +16,20 @@ import org.junit.Test;
 public class Bus {
 
     @Test
-    public void testEventBus(){
-        EventBusCenter eventBusCenter = new EventBusCenter("test");
+    public void testSync(){
+        EventBusCenter eventBusCenter = new EventBusCenter("test" , null, null);
         eventBusCenter.register(new ListenEvent());
         eventBusCenter.post("test message");
+    }
+
+    @Test
+    public void testASync(){
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        EventBusCenter eventBusCenter = new EventBusCenter("test" , "ASYNC", executorService);
+        eventBusCenter.register(new ListenEvent());
+        for(int i=0; i<=10; i++){
+            eventBusCenter.post("test async message" + LocalDateTime.now());
+        }
     }
 
 }
