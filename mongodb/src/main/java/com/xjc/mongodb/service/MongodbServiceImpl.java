@@ -10,12 +10,12 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
-import com.sun.istack.NotNull;
 import com.xjc.mongodb.api.MongodbService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -212,7 +212,6 @@ public class MongodbServiceImpl implements MongodbService {
             response.setContentType(gridFsResource.getContentType( ));
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
             response.setCharacterEncoding(UTF8);
-
             IOUtils.copy(gridFsResource.getInputStream( ), response.getOutputStream( ));
             response.flushBuffer( );
         }
