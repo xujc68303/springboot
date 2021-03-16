@@ -5,10 +5,7 @@ import com.sun.istack.internal.NotNull;
 import com.xjc.aop.log.annotation.RunTime;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -28,7 +25,11 @@ public class RunTimeInteceptor {
 
     private long startTime;
 
-    @Before(value = "@annotation(RunTime)")
+    @Pointcut("@annotation(com.xjc.aop.log.annotation.RunTime)")
+    public void inteceptor() {
+    }
+
+    @Before(value = "inteceptor()")
     public void beforeService(@NotNull JoinPoint point, @NotNull RunTime runTime) {
         String service = runTime.value( );
         stopWatch = new StopWatch(service);
@@ -37,12 +38,12 @@ public class RunTimeInteceptor {
         log.info("服务{}调用开始, request:{}", service, JSON.toJSONString(point.getArgs( )));
     }
 
-    @Around(value = "@annotation(RunTime)")
+    @Around(value = "inteceptor()")
     public void aroundService(@NotNull RunTime runTime) {
         log.info("服务{}调用中,", runTime.value( ));
     }
 
-    @AfterReturning(value = "@annotation(RunTime)", returning = "rvt")
+    @AfterReturning(value = "inteceptor()", returning = "rvt")
     public void after(@NotNull RunTime runTime, Object rvt) {
         if(stopWatch.isRunning()){
             stopWatch.stop();
