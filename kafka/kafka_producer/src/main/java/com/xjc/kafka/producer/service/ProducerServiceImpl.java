@@ -2,6 +2,9 @@ package com.xjc.kafka.producer.service;
 
 import com.xjc.kafka.producer.config.KakfaTopicConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.CreateTopicsOptions;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +26,19 @@ public class ProducerServiceImpl implements producerService {
     @Autowired
     private KafkaTemplate<Object, Object> kafkaTemplate;
 
+    @Autowired
+    private KafkaAdminClient kafkaAdminClient;
+
     private static Long TIME_OUT = 3000L;
+
+    @Override
+    public boolean createTopic(String topicName, int partition, short replication) {
+        NewTopic newTopic = new NewTopic(topicName, partition, replication);
+        CreateTopicsOptions createTopicsOptions = new CreateTopicsOptions();
+        createTopicsOptions.validateOnly(true);
+        kafkaAdminClient.createTopics(Collections.singleton(newTopic), createTopicsOptions);
+        return true;
+    }
 
     @Override
     public void syncSend(Object key, Map<Object, Object> map, Long timeOut) {

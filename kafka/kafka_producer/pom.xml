@@ -11,10 +11,7 @@
 
     <artifactId>kafka_producer</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
+
     </dependencies>
 
 
