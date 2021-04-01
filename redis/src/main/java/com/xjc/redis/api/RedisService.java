@@ -24,7 +24,7 @@ public interface RedisService {
      * @param key cacheKey
      * @return 执行结果
      */
-    boolean exists(String key);
+    Boolean exists(String key);
 
     /**
      * 查询key
@@ -33,6 +33,13 @@ public interface RedisService {
      * @return
      */
     Set<String> scanKey(String pattern, int count);
+
+    /**
+     * 获取key的过期时间
+     * @param key cacheKey
+     * @return 过期时间
+     */
+    Long getExpire(String key);
 
     // string
 
@@ -45,6 +52,13 @@ public interface RedisService {
     Object get(String key);
 
     /**
+     * 添加key & Data
+     * @param key cacheKey
+     * @param value data
+     */
+    void set(String key, Object value);
+
+    /**
      * 添加key & Data 并设置过期时间
      *
      * @param key    cacheKey
@@ -53,7 +67,7 @@ public interface RedisService {
      * @param unit   时间类型
      * @return 执行结果
      */
-    boolean setWithExpire(String key, Object value, long expire, TimeUnit unit);
+    Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit);
 
     /**
      * 给Key重新设置过期时间并获取Value
@@ -71,15 +85,16 @@ public interface RedisService {
      * @param key cacheKey
      * @return 执行结果
      */
-    boolean delete(String key);
+    Boolean delete(String key);
 
     /**
      * 修改key名称
      *
      * @param oldKey 原有key
      * @param newKey 修改key
+     * @return 执行结果
      */
-    boolean renameByKey(String oldKey, String newKey);
+    Boolean renameByKey(String oldKey, String newKey);
 
     /**
      * 移除key过期时间变永久
@@ -87,7 +102,7 @@ public interface RedisService {
      * @param key cacheKey
      * @return 执行结果
      */
-    boolean setPermanentByKey(String key);
+    Boolean setPermanentByKey(String key);
 
     /**
      * 分布式锁
@@ -99,7 +114,7 @@ public interface RedisService {
      * @param unit   时间类型
      * @return 执行结果
      */
-    boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit);
+    Boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit);
 
     /**
      * 秒杀锁
@@ -110,7 +125,7 @@ public interface RedisService {
      * @param unit            时间类型
      * @return 执行结果
      */
-    boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit);
+    Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit);
 
     /**
      * 解除锁
@@ -119,7 +134,7 @@ public interface RedisService {
      * @param value data
      * @return 执行结果
      */
-    boolean unlock(String key, Object value);
+    Boolean unlock(String key, Object value);
 
     /**
      * 点赞功能
@@ -137,7 +152,7 @@ public interface RedisService {
      * @param key 来源id
      * @return 数量
      */
-    long bitCount(String key);
+    Long bitCount(String key);
 
     /**
      * 位图计算
@@ -146,7 +161,7 @@ public interface RedisService {
      * @param resultKey resultKey
      * @return
      */
-    long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey);
+    Long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey);
 
     /**
      * 增量计算
@@ -155,7 +170,7 @@ public interface RedisService {
      * @param delta 增加数量
      * @return 当前数量
      */
-    long increment(String key, long delta);
+    Long increment(String key, long delta);
 
     /**
      * 减量计算
@@ -192,7 +207,7 @@ public interface RedisService {
      * @param values 用户id
      * @return 执行结果
      */
-    boolean zRem(String key, List<String> values);
+    Boolean zRem(String key, List<String> values);
 
     /**
      * 队列形式增量计算
@@ -202,7 +217,7 @@ public interface RedisService {
      * @param delta
      * @return
      */
-    boolean zincrby(String key, String value, long delta);
+    Boolean zincrby(String key, String value, long delta);
 
     /**
      * 队列正序
@@ -261,7 +276,7 @@ public interface RedisService {
      * @param value value
      * @return value位置
      */
-    long zRank(String key, String value);
+    Long zRank(String key, String value);
 
     /**
      * 倒序当前value在队列中的位置
@@ -270,7 +285,7 @@ public interface RedisService {
      * @param value value
      * @return value位置
      */
-    long zRevRank(String key, String value);
+    Long zRevRank(String key, String value);
 
     // hash
 
@@ -280,7 +295,7 @@ public interface RedisService {
      * @param hashKey hashKey
      * @return 执行结果
      */
-    boolean hasKey(String key, String hashKey);
+    Boolean hasKey(String key, String hashKey);
 
     /**
      * 获取映射的hashKey
@@ -295,7 +310,7 @@ public interface RedisService {
      * @param pair pair
      * @return 执行结果
      */
-    boolean hashPutIfAbsent(String key, Pair<Object,Object> pair);
+    Boolean hashPutIfAbsent(String key, Pair<Object,Object> pair);
 
     /**
      * 批量缓存数据
@@ -311,7 +326,7 @@ public interface RedisService {
      * @param timeUnit 时间单位
      * @return 执行结果
      */
-    boolean hashExpire(String key, long expire, TimeUnit timeUnit);
+    Boolean hashExpire(String key, long expire, TimeUnit timeUnit);
 
     /**
      * 获取全部map
@@ -356,7 +371,7 @@ public interface RedisService {
      * @param key key
      * @return 数量
      */
-    long hashSize(String key);
+    Long hashSize(String key);
 
     /**
      * 返回hashKey映射值的长度
@@ -364,7 +379,7 @@ public interface RedisService {
      * @param hashKey hashKey
      * @return value长度
      */
-    long lengthOfValue(String key, String hashKey);
+    Long lengthOfValue(String key, String hashKey);
 
     // stream
     /**
@@ -407,7 +422,7 @@ public interface RedisService {
      * @param key 队列名称
      * @return 队列长度
      */
-    long xLen(String key);
+    Long xLen(String key);
 
     /**
      * 顺序消费消息(返回的消息为下一次messageId)
@@ -427,7 +442,7 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    boolean xGroupCreate(String key, String group, String messageId);
+    Boolean xGroupCreate(String key, String group, String messageId);
 
     /**
      * 删除消费组
@@ -436,7 +451,7 @@ public interface RedisService {
      * @param group 消费组名称
      * @return 执行结果
      */
-    boolean xDelGroup(String key, String group);
+    Boolean xDelGroup(String key, String group);
 
     /**
      * 从消费组租读取数据
@@ -457,6 +472,6 @@ public interface RedisService {
      * @param messageId 消息id
      * @return 执行结果
      */
-    boolean xAck(String key, String group, String messageId);
+    Boolean xAck(String key, String group, String messageId);
 
 }

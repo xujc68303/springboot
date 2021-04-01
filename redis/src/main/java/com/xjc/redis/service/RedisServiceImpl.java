@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-@SuppressWarnings("all")
 public class RedisServiceImpl implements RedisService {
 
     private static final String NOT_EXIST = "NX";
@@ -60,7 +59,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean exists(String key) {
+    public Boolean exists(String key) {
         return redisTemplate.hasKey(key);
     }
 
@@ -82,12 +81,22 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(key);
+    }
+
+    @Override
     public Object get(String key) {
         return stringOperations.get(key);
     }
 
     @Override
-    public boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
+    public void set(String key, Object value) {
+       stringOperations.set(key, JSON.toJSONString(value));
+    }
+
+    @Override
+    public Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
         String v = JSON.toJSONString(value);
         return stringOperations.setIfAbsent(key, v, expire, unit);
     }
@@ -103,23 +112,22 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean delete(String key) {
+    public Boolean delete(String key) {
         return redisTemplate.delete(key);
     }
 
     @Override
-    public boolean renameByKey(String oldKey, String newKey) {
+    public Boolean renameByKey(String oldKey, String newKey) {
         return redisTemplate.renameIfAbsent(oldKey, newKey);
-
     }
 
     @Override
-    public boolean setPermanentByKey(String key) {
+    public Boolean setPermanentByKey(String key) {
         return redisTemplate.persist(key);
     }
 
     @Override
-    public boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
+    public Boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
         try {
             final String v = JSON.toJSONString(value);
             // SET_IF_ABSENT--->NX
@@ -139,7 +147,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
+    public Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
         try {
             long deadTimeLine = System.currentTimeMillis( ) + lockWaitTimeOut;
 
@@ -158,7 +166,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean unlock(String key, Object value) {
+    public Boolean unlock(String key, Object value) {
         final String v = JSON.toJSONString(value);
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(SCRIPT, Long.class);
         Object result = redisTemplate.execute(redisScript, Collections.singletonList(key), v);
@@ -171,12 +179,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long bitCount(String key) {
+    public Long bitCount(String key) {
         return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
     }
 
     @Override
-    public long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey) {
+    public Long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey) {
         byte[][] bytes = new byte[keys.size( )][];
         final int[] index = {0};
         keys.forEach(k -> bytes[index[0]++] = k.getBytes( ));
@@ -184,7 +192,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long increment(String key, long delta) {
+    public Long increment(String key, long delta) {
         return stringOperations.increment(key, delta);
     }
 
@@ -204,12 +212,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean zRem(String key, List<String> values) {
+    public Boolean zRem(String key, List<String> values) {
         return zSetOperations.remove(key, values.toArray(new String[0])) == 1;
     }
 
     @Override
-    public boolean zincrby(String key, String value, long delta) {
+    public Boolean zincrby(String key, String value, long delta) {
         return zSetOperations.incrementScore(key, value, delta) != null;
     }
 
@@ -238,21 +246,21 @@ public class RedisServiceImpl implements RedisService {
         if (Objects.isNull(start) || Objects.isNull(end)) {
             return zRevRange(key, 0, -1).size( );
         }
-        return Integer.parseInt(zSetOperations.count(key, start, end).toString( ));
+        return zSetOperations.count(key, start, end);
     }
 
     @Override
-    public long zRank(String key, String value) {
+    public Long zRank(String key, String value) {
         return zSetOperations.rank(key, value);
     }
 
     @Override
-    public long zRevRank(String key, String value) {
+    public Long zRevRank(String key, String value) {
         return zSetOperations.reverseRank(key, value);
     }
 
     @Override
-    public boolean hasKey(String key, String hashKey) {
+    public Boolean hasKey(String key, String hashKey) {
         return hashOperations.hasKey(key,hashKey);
     }
 
@@ -262,7 +270,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean hashPutIfAbsent(String key, Pair<Object, Object> pair) {
+    public Boolean hashPutIfAbsent(String key, Pair<Object, Object> pair) {
         return hashOperations.putIfAbsent(key,pair.getLeft(),pair.getRight());
     }
 
@@ -272,7 +280,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean hashExpire(String key, long expire, TimeUnit timeUnit) {
+    public Boolean hashExpire(String key, long expire, TimeUnit timeUnit) {
         return hashOperations.getOperations().expire(key, expire, timeUnit);
     }
 
@@ -309,12 +317,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long hashSize(String key) {
+    public Long hashSize(String key) {
         return hashOperations.size(key);
     }
 
     @Override
-    public long lengthOfValue(String key, String hashKey) {
+    public Long lengthOfValue(String key, String hashKey) {
        return hashOperations.lengthOfValue(key,hashKey);
     }
 
@@ -347,7 +355,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long xLen(String key) {
+    public Long xLen(String key) {
         return streamOperations.size(key);
     }
 
@@ -371,8 +379,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean xGroupCreate(String key, String group, String messageId) {
-        boolean result;
+    public Boolean xGroupCreate(String key, String group, String messageId) {
+        Boolean result;
         if (StringUtils.isEmpty(messageId)) {
             result = streamOperations.createGroup(key, ReadOffset.latest( ), group) != null;
         } else {
@@ -386,7 +394,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean xDelGroup(String key, String group) {
+    public Boolean xDelGroup(String key, String group) {
         return streamOperations.destroyGroup(key, group);
     }
 
@@ -400,7 +408,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public boolean xAck(String key, String group, String messageId) {
+    public Boolean xAck(String key, String group, String messageId) {
         String[] messageIdArray = convertMessageId(messageId);
         long millisecondsTime = Long.parseLong(messageIdArray[0]);
         long sequenceNumber = Long.parseLong(messageIdArray[1]);
