@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @Version 1.0
@@ -239,6 +240,16 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Set<String> zReverseRangeByScore(String key, long start, long end) {
         return zSetOperations.reverseRangeByScore(key, start, end);
+    }
+
+    @Override
+    public Set<ZSetOperations.TypedTuple<String>> reverseRangeWithScores(String key, long start, long end) {
+        return zSetOperations.reverseRangeWithScores(key, start, end);
+    }
+
+    @Override
+    public Set<ZSetOperations.TypedTuple<String>> rangeWithScores(String key, long start, long end) {
+        return zSetOperations.rangeWithScores(key, start, end);
     }
 
     @Override
