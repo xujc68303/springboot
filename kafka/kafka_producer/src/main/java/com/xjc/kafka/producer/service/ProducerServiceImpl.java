@@ -1,5 +1,6 @@
 package com.xjc.kafka.producer.service;
 
+import com.alibaba.fastjson.JSON;
 import com.xjc.kafka.producer.config.KakfaTopicConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.CreateTopicsOptions;
@@ -9,8 +10,11 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -21,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
+@EnableAsync
 public class ProducerServiceImpl implements producerService {
 
     @Autowired
@@ -29,7 +34,7 @@ public class ProducerServiceImpl implements producerService {
     @Autowired
     private KafkaAdminClient kafkaAdminClient;
 
-    private static Long TIME_OUT = 3000L;
+    private final static Long TIME_OUT = 3000L;
 
     @Override
     public boolean createTopic(String topicName, int partition, short replication) {
@@ -41,7 +46,7 @@ public class ProducerServiceImpl implements producerService {
     }
 
     @Override
-    public void syncSend(Object key, Map<Object, Object> map, Long timeOut) {
+    public void syncSend(Object key, Map<String, Object> map, Long timeOut) {
         map.put("CREATE_DATE", LocalDateTime.now());
         timeOut = timeOut == null ? TIME_OUT : timeOut;
         ListenableFuture<SendResult<Object, Object>> send = kafkaTemplate.send(KakfaTopicConfig.TOPIC, key, map.toString());
@@ -54,13 +59,32 @@ public class ProducerServiceImpl implements producerService {
             }, failureCallback -> {
                 log.error("kafka Producer发送消息异常！ sendResult=" + sendResult.getProducerRecord());
             });
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } catch (TimeoutException e) {
             e.printStackTrace();
             log.error("同步消息发送超时");
         }
+    }
+
+    @Async
+    @Override
+    public void asyncSend(String topic, String key, Map<String, Object> map) {
+        map.put("CREATE_DATE", LocalDateTime.now());
+        ListenableFuture<SendResult<Object, Object>> send = kafkaTemplate.send(topic, key, JSON.toJSONString(map));
+        send.addCallback(new ListenableFutureCallback<SendResult<Object, Object>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                log.error("kafka producer async service error={}", throwable);
+            }
+
+            @Override
+            public void onSuccess(SendResult<Object, Object> result) {
+                RecordMetadata recordMetadata = result.getRecordMetadata();
+                log.info("kafka producer service success topic={}", recordMetadata.topic());
+            }
+        });
+
+
     }
 }
