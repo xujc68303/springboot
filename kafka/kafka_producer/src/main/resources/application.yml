@@ -42,4 +42,8 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
     listener:
+      # 消费者数量
+      concurrency: 1
+      # 每一批拉取的数据被消费者监听器处理之后，距离上次提交时间大于TIME时提交，或者被处理record数量大于等于COUNT时提交
+      ack-mode: COUNT_TIME
       missing-topics-fatal: false
