@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @Version 1.0
@@ -53,10 +52,10 @@ public class RedisServiceImpl implements RedisService {
 
     @PostConstruct
     private void init() {
-        stringOperations = redisTemplate.opsForValue( );
-        zSetOperations = redisTemplate.opsForZSet( );
-        hashOperations = redisTemplate.opsForHash( );
-        streamOperations = redisTemplate.opsForStream( );
+        stringOperations = redisTemplate.opsForValue();
+        zSetOperations = redisTemplate.opsForZSet();
+        hashOperations = redisTemplate.opsForHash();
+        streamOperations = redisTemplate.opsForStream();
     }
 
     @Override
@@ -66,15 +65,15 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Set<String> scanKey(String pattern, int count) {
-        Set<String> keysTmp = new LinkedHashSet<>( );
+        Set<String> keysTmp = new LinkedHashSet<>();
         redisTemplate.execute((RedisCallback<Set<String>>) con -> {
             Cursor<byte[]> cursor = con.scan(new ScanOptions
-                    .ScanOptionsBuilder( )
+                    .ScanOptionsBuilder()
                     .match("*" + pattern + "*")
                     .count(count)
-                    .build( ));
-            while (cursor.hasNext( )) {
-                keysTmp.add(new String(cursor.next( )));
+                    .build());
+            while (cursor.hasNext()) {
+                keysTmp.add(new String(cursor.next()));
             }
             return keysTmp;
         });
@@ -93,7 +92,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void set(String key, Object value) {
-       stringOperations.set(key, JSON.toJSONString(value));
+        stringOperations.set(key, JSON.toJSONString(value));
     }
 
     @Override
@@ -150,7 +149,7 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
         try {
-            long deadTimeLine = System.currentTimeMillis( ) + lockWaitTimeOut;
+            long deadTimeLine = System.currentTimeMillis() + lockWaitTimeOut;
 
             for (; ; ) {
                 // 循环退出剩余时间，秒杀结束
@@ -181,15 +180,15 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long bitCount(String key) {
-        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes( )));
+        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes()));
     }
 
     @Override
     public Long bitOp(RedisStringCommands.BitOperation bitOperation, List<String> keys, String resultKey) {
-        byte[][] bytes = new byte[keys.size( )][];
+        byte[][] bytes = new byte[keys.size()][];
         final int[] index = {0};
-        keys.forEach(k -> bytes[index[0]++] = k.getBytes( ));
-        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes( ), bytes));
+        keys.forEach(k -> bytes[index[0]++] = k.getBytes());
+        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes(), bytes));
     }
 
     @Override
@@ -198,12 +197,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long decrement(String key, long delta) {
+    public Long decrement(String key, long delta) {
         return stringOperations.decrement(key, delta);
     }
 
     @Override
-    public long zCard(String key) {
+    public Long zCard(String key) {
         return zSetOperations.zCard(key);
     }
 
@@ -213,8 +212,18 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean zRem(String key, List<String> values) {
-        return zSetOperations.remove(key, values.toArray(new String[0])) == 1;
+    public void zRem(String key, List<String> values) {
+        zSetOperations.remove(key, values);
+    }
+
+    @Override
+    public void removeRange(String key, long start, long end) {
+        zSetOperations.removeRange(key, start, end);
+    }
+
+    @Override
+    public void removeRangeByScore(String key, long min, long max) {
+        zSetOperations.removeRangeByScore(key, min, max);
     }
 
     @Override
@@ -253,10 +262,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long zlexCount(String key, long start, long end) {
-        if (Objects.isNull(start) || Objects.isNull(end)) {
-            return zRevRange(key, 0, -1).size( );
-        }
+    public Long zlexCount(String key, long start, long end) {
         return zSetOperations.count(key, start, end);
     }
 
@@ -272,7 +278,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Boolean hasKey(String key, String hashKey) {
-        return hashOperations.hasKey(key,hashKey);
+        return hashOperations.hasKey(key, hashKey);
     }
 
     @Override
@@ -282,12 +288,12 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Boolean hashPutIfAbsent(String key, Pair<Object, Object> pair) {
-        return hashOperations.putIfAbsent(key,pair.getLeft(),pair.getRight());
+        return hashOperations.putIfAbsent(key, pair.getLeft(), pair.getRight());
     }
 
     @Override
     public void hashPutAll(String key, Map<Object, Object> map) {
-        hashOperations.putAll(key,map);
+        hashOperations.putAll(key, map);
     }
 
     @Override
@@ -302,7 +308,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Object hashGet(String key, String hashKey) {
-        return hashOperations.get(key,hashKey);
+        return hashOperations.get(key, hashKey);
     }
 
     @Override
@@ -311,12 +317,12 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Map<Object, Pair<Object,Object>> hashGetAll(List<String> keys) {
-        Map<Object, Pair<Object,Object>> result = Maps.newLinkedHashMap();
+    public Map<Object, Pair<Object, Object>> hashGetAll(List<String> keys) {
+        Map<Object, Pair<Object, Object>> result = Maps.newLinkedHashMap();
         keys.forEach(key -> {
             Map<Object, Object> objectMap = hashGetByHashKeys(key);
-            objectMap.forEach((k, v)-> {
-                result.put(key,ImmutablePair.of(k, v));
+            objectMap.forEach((k, v) -> {
+                result.put(key, ImmutablePair.of(k, v));
             });
         });
         return result;
@@ -324,7 +330,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void hashDelete(String key, List<String> hashKey) {
-         hashOperations.delete(key, hashKey);
+        hashOperations.delete(key, hashKey);
     }
 
     @Override
@@ -334,17 +340,17 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long lengthOfValue(String key, String hashKey) {
-       return hashOperations.lengthOfValue(key,hashKey);
+        return hashOperations.lengthOfValue(key, hashKey);
     }
 
     @Override
     public String xAdd(String key, Map<Object, Object> message) {
         RecordId recordId = streamOperations.add(key, message);
         if (Objects.nonNull(recordId)) {
-            if (recordId.shouldBeAutoGenerated( )) {
-                StringBuilder stringBuilder = new StringBuilder( );
-                stringBuilder.append(recordId.getTimestamp( )).append("-").append(recordId.getSequence( ));
-                return stringBuilder.toString( );
+            if (recordId.shouldBeAutoGenerated()) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(recordId.getTimestamp()).append("-").append(recordId.getSequence());
+                return stringBuilder.toString();
             }
         }
         return null;
@@ -357,12 +363,12 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public List<MapRecord<String, Object, Object>> xRange(String key) {
-        return streamOperations.range(key, Range.unbounded( ));
+        return streamOperations.range(key, Range.unbounded());
     }
 
     @Override
     public List<MapRecord<String, Object, Object>> xRevRange(String key) {
-        return streamOperations.reverseRange(key, Range.unbounded( ));
+        return streamOperations.reverseRange(key, Range.unbounded());
     }
 
     @Override
@@ -377,12 +383,12 @@ public class RedisServiceImpl implements RedisService {
             count = 1L;
         }
         if (StringUtils.isEmpty(messageId)) {
-            recordList = streamOperations.read(StreamReadOptions.empty( ).count(count));
+            recordList = streamOperations.read(StreamReadOptions.empty().count(count));
         } else {
             String[] messageIdArray = convertMessageId(messageId);
             long millisecondsTime = Long.parseLong(messageIdArray[0]);
             long sequenceNumber = Long.parseLong(messageIdArray[1]);
-            recordList = streamOperations.read(StreamReadOptions.empty( ).count(count),
+            recordList = streamOperations.read(StreamReadOptions.empty().count(count),
                     StreamOffset.create(key, ReadOffset.from(RecordId.of(millisecondsTime, sequenceNumber))));
         }
 
@@ -393,7 +399,7 @@ public class RedisServiceImpl implements RedisService {
     public Boolean xGroupCreate(String key, String group, String messageId) {
         Boolean result;
         if (StringUtils.isEmpty(messageId)) {
-            result = streamOperations.createGroup(key, ReadOffset.latest( ), group) != null;
+            result = streamOperations.createGroup(key, ReadOffset.latest(), group) != null;
         } else {
             String[] messageIdArray = convertMessageId(messageId);
             long millisecondsTime = Long.parseLong(messageIdArray[0]);
@@ -415,7 +421,7 @@ public class RedisServiceImpl implements RedisService {
             count = 1L;
         }
         return streamOperations.read(Consumer.from(group, consumer),
-                StreamReadOptions.empty( ).count(count), StreamOffset.create(key, ReadOffset.lastConsumed( )));
+                StreamReadOptions.empty().count(count), StreamOffset.create(key, ReadOffset.lastConsumed()));
     }
 
     @Override

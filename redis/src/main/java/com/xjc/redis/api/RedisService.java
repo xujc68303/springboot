@@ -184,7 +184,7 @@ public interface RedisService {
      * @param delta 减少数量
      * @return 当前数量
      */
-    long decrement(String key, long delta);
+    Long decrement(String key, long delta);
 
     // zset
 
@@ -194,33 +194,50 @@ public interface RedisService {
      * @param key 队列名称
      * @return
      */
-    long zCard(String key);
+    Long zCard(String key);
 
     /**
-     * 队列形式点赞
+     * 添加元素入队列
      *
      * @param key   队列名称
-     * @param value 用户id
-     * @param delta 是否点赞
+     * @param value 元素
+     * @param delta 数值
      */
     void zAdd(String key, String value, long delta);
 
     /**
-     * 队列形式取消点赞
+     * 删除队列中的元素
      *
      * @param key    队列名称
-     * @param values 用户id
-     * @return 执行结果
+     * @param values 元素
      */
-    Boolean zRem(String key, List<String> values);
+    void zRem(String key, List<String> values);
 
     /**
-     * 队列形式增量计算
+     * 根据下标删除队列元素
      *
-     * @param key
-     * @param value
-     * @param delta
-     * @return
+     * @param key   队列名称
+     * @param start 开始下标
+     * @param end   结束下标
+     */
+    void removeRange(String key, long start, long end);
+
+    /**
+     * 根据score最小到最大删除队列中的元素
+     *
+     * @param key 队列名称
+     * @param min 最小下标
+     * @param max 最大下标
+     */
+    void removeRangeByScore(String key, long min, long max);
+
+    /**
+     * 队列增量计算
+     *
+     * @param key   队列名称
+     * @param value 元素
+     * @param delta 增量值
+     * @return 执行结果
      */
     Boolean zincrby(String key, String value, long delta);
 
@@ -292,7 +309,7 @@ public interface RedisService {
      * @param end   结束位置
      * @return 队列长度
      */
-    long zlexCount(String key, long start, long end);
+    Long zlexCount(String key, long start, long end);
 
     /**
      * 正序当前value在队列中的位置
