@@ -21,7 +21,7 @@ public class ProducerController {
     private ProducerService producerService;
 
     @RequestMapping("/send")
-    public void send(@RequestBody Map<Object, Object> map){
+    public void send(@RequestBody Map<String, Object> map){
         producerService.syncSend("xjc", map, null);
     }
 
