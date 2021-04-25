@@ -16,6 +16,24 @@
     <description>quartz for Spring Boot</description>
 
 
+    <properties>
+        <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
+    </properties>
+
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jabb</groupId>
+            <artifactId>jabb-core</artifactId>
+            <version>${quartz-jabb-core.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

@@ -41,17 +41,5 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-    consumer:
-      #没有初始偏移或如果当前偏移在服务器上不存在时，默认区最新 latest, earliest, none
-      auto-offset-reset: latest
-      #自动提交
-      enable-auto-commit: true
-      #自动提交间隔
-      auto-commit-interval: 100
-      #反序列化
-      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
-      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
-      group-id: test_consumer-group
-
     listener:
       missing-topics-fatal: false

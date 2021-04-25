@@ -30,17 +30,6 @@ spring:
 
   kafka:
     bootstrap-servers: 127.0.0.1:9092
-    producer:
-      #批量发送量
-      batch-size: 16
-      #发送失败重试次数
-      retries: 0
-      #批量缓存区
-      buffer-memory: 33554432
-      #序列化
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
     consumer:
       #没有初始偏移或如果当前偏移在服务器上不存在时，默认区最新 latest, earliest, none
       auto-offset-reset: latest
@@ -49,8 +38,8 @@ spring:
       #自动提交间隔
       auto-commit-interval: 100
       #反序列化
-      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
-      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: test_consumer-group
 
     listener:

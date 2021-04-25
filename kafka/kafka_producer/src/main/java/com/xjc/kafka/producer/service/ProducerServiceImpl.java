@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
-public class ProducerServiceImpl implements producerService {
+public class ProducerServiceImpl implements ProducerService {
 
     @Autowired
     private KafkaTemplate<Object, Object> kafkaTemplate;

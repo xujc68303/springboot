@@ -2,7 +2,7 @@ package com.xjc.kafka.producer.service;
 
 import java.util.Map;
 
-public interface producerService {
+public interface ProducerService {
 
     boolean createTopic(String topicName, int partition, short replication);
 
