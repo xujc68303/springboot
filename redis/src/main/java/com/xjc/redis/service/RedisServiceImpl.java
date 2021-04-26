@@ -242,13 +242,13 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Set<String> zRangeByScore(String key, long start, long end) {
-        return zSetOperations.rangeByScore(key, start, end);
+    public Set<String> zRangeByScore(String key, long min, long max) {
+        return zSetOperations.rangeByScore(key, min, max);
     }
 
     @Override
-    public Set<String> zReverseRangeByScore(String key, long start, long end) {
-        return zSetOperations.reverseRangeByScore(key, start, end);
+    public Set<String> zReverseRangeByScore(String key, long min, long max) {
+        return zSetOperations.reverseRangeByScore(key, min, max);
     }
 
     @Override

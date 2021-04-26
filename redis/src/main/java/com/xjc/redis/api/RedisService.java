@@ -242,7 +242,7 @@ public interface RedisService {
     Boolean zincrby(String key, String value, long delta);
 
     /**
-     * 队列正序
+     * 根据下标位置正序显示
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -252,7 +252,7 @@ public interface RedisService {
     Set<String> zRange(String key, long start, long end);
 
     /**
-     * 队列倒序
+     * 根据下标位置倒序显示
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -264,25 +264,25 @@ public interface RedisService {
     /**
      * 根据score的大小升序显示value
      *
-     * @param key   队列名称
-     * @param start 开始位置
-     * @param end   结束位置
+     * @param key 队列名称
+     * @param min 开始位置
+     * @param max 结束位置
      * @return 队列
      */
-    Set<String> zRangeByScore(String key, long start, long end);
+    Set<String> zRangeByScore(String key, long min, long max);
 
     /**
      * 根据score的大小倒序显示value
      *
-     * @param key   队列名称
-     * @param start 开始位置
-     * @param end   结束位置
+     * @param key 队列名称
+     * @param min 最小值
+     * @param max 最大值
      * @return 队列
      */
-    Set<String> zReverseRangeByScore(String key, long start, long end);
+    Set<String> zReverseRangeByScore(String key, long min, long max);
 
     /**
-     * 从开始到结束，从排序从高到低的排序集中获取元组的集合
+     * 根据下标位置倒序显示全部信息
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -292,7 +292,7 @@ public interface RedisService {
     Set<ZSetOperations.TypedTuple<String>> reverseRangeWithScores(String key, long start, long end);
 
     /**
-     * 从开始到结束，从排序从低到高的排序集中获取元组的集合
+     * 根据下标位置正序显示全部信息
      *
      * @param key   队列名称
      * @param start 开始位置
