@@ -309,7 +309,7 @@ public interface RedisService {
      * @param end   结束位置
      * @return 队列长度
      */
-    Long zlexCount(String key, long start, long end);
+    Long zLexCount(String key, long start, long end);
 
     /**
      * 正序当前value在队列中的位置

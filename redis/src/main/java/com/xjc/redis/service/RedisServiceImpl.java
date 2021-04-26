@@ -262,7 +262,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long zlexCount(String key, long start, long end) {
+    public Long zLexCount(String key, long start, long end) {
         return zSetOperations.count(key, start, end);
     }
 
