@@ -341,7 +341,7 @@ public interface RedisService {
     Boolean hasKey(String key, String hashKey);
 
     /**
-     * 获取映射的hashKey
+     * 获取所有哈希表中的hashKey
      *
      * @param key key
      * @return hashKey
@@ -349,7 +349,7 @@ public interface RedisService {
     List<Object> hashKeys(String key);
 
     /**
-     * 当key不存在时，缓存数据
+     * 只有在hashKey不存在时设置值
      *
      * @param key  key
      * @param pair pair
@@ -376,12 +376,12 @@ public interface RedisService {
     Boolean hashExpire(String key, long expire, TimeUnit timeUnit);
 
     /**
-     * 获取全部map
+     * 获取在哈希表中指定key的所有字段和值
      *
      * @param key key
      * @return Pair
      */
-    Map<Object, Object> hashGetByHashKeys(String key);
+    Map<Object, Object> hGetAllKey(String key);
 
     /**
      * 获取hashKey对应value
@@ -434,6 +434,16 @@ public interface RedisService {
      * @return value长度
      */
     Long lengthOfValue(String key, String hashKey);
+
+    /**
+     * 哈希增减量
+     *
+     * @param key     key
+     * @param hashKey hashKey
+     * @param delta   量值
+     * @return 当前hashKey量值
+     */
+    Long hashIncrement(String key, String hashKey, long delta);
 
     // stream
 

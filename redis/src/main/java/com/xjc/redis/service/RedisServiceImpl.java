@@ -302,7 +302,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Map<Object, Object> hashGetByHashKeys(String key) {
+    public Map<Object, Object> hGetAllKey(String key) {
         return hashOperations.entries(key);
     }
 
@@ -320,7 +320,7 @@ public class RedisServiceImpl implements RedisService {
     public Map<Object, Pair<Object, Object>> hashGetAll(List<String> keys) {
         Map<Object, Pair<Object, Object>> result = Maps.newLinkedHashMap();
         keys.forEach(key -> {
-            Map<Object, Object> objectMap = hashGetByHashKeys(key);
+            Map<Object, Object> objectMap = hGetAllKey(key);
             objectMap.forEach((k, v) -> {
                 result.put(key, ImmutablePair.of(k, v));
             });
@@ -341,6 +341,11 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Long lengthOfValue(String key, String hashKey) {
         return hashOperations.lengthOfValue(key, hashKey);
+    }
+
+    @Override
+    public Long hashIncrement(String key, String hashKey, long delta) {
+        return hashOperations.increment(key, hashKey, delta);
     }
 
     @Override
