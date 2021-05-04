@@ -242,7 +242,7 @@ public interface RedisService {
     Boolean zincrby(String key, String value, long delta);
 
     /**
-     * 队列正序
+     * 根据下标位置正序显示
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -252,7 +252,7 @@ public interface RedisService {
     Set<String> zRange(String key, long start, long end);
 
     /**
-     * 队列倒序
+     * 根据下标位置倒序显示
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -264,25 +264,25 @@ public interface RedisService {
     /**
      * 根据score的大小升序显示value
      *
-     * @param key   队列名称
-     * @param start 开始位置
-     * @param end   结束位置
+     * @param key 队列名称
+     * @param min 开始位置
+     * @param max 结束位置
      * @return 队列
      */
-    Set<String> zRangeByScore(String key, long start, long end);
+    Set<String> zRangeByScore(String key, long min, long max);
 
     /**
      * 根据score的大小倒序显示value
      *
-     * @param key   队列名称
-     * @param start 开始位置
-     * @param end   结束位置
+     * @param key 队列名称
+     * @param min 最小值
+     * @param max 最大值
      * @return 队列
      */
-    Set<String> zReverseRangeByScore(String key, long start, long end);
+    Set<String> zReverseRangeByScore(String key, long min, long max);
 
     /**
-     * 从开始到结束，从排序从高到低的排序集中获取元组的集合
+     * 根据下标位置倒序显示全部信息
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -292,7 +292,7 @@ public interface RedisService {
     Set<ZSetOperations.TypedTuple<String>> reverseRangeWithScores(String key, long start, long end);
 
     /**
-     * 从开始到结束，从排序从低到高的排序集中获取元组的集合
+     * 根据下标位置正序显示全部信息
      *
      * @param key   队列名称
      * @param start 开始位置
@@ -309,7 +309,7 @@ public interface RedisService {
      * @param end   结束位置
      * @return 队列长度
      */
-    Long zlexCount(String key, long start, long end);
+    Long zLexCount(String key, long start, long end);
 
     /**
      * 正序当前value在队列中的位置
@@ -341,7 +341,7 @@ public interface RedisService {
     Boolean hasKey(String key, String hashKey);
 
     /**
-     * 获取映射的hashKey
+     * 获取所有哈希表中的hashKey
      *
      * @param key key
      * @return hashKey
@@ -349,7 +349,7 @@ public interface RedisService {
     List<Object> hashKeys(String key);
 
     /**
-     * 当key不存在时，缓存数据
+     * 只有在hashKey不存在时设置值
      *
      * @param key  key
      * @param pair pair
@@ -376,12 +376,12 @@ public interface RedisService {
     Boolean hashExpire(String key, long expire, TimeUnit timeUnit);
 
     /**
-     * 获取全部map
+     * 获取在哈希表中指定key的所有字段和值
      *
      * @param key key
      * @return Pair
      */
-    Map<Object, Object> hashGetByHashKeys(String key);
+    Map<Object, Object> hGetAllKey(String key);
 
     /**
      * 获取hashKey对应value
@@ -434,6 +434,16 @@ public interface RedisService {
      * @return value长度
      */
     Long lengthOfValue(String key, String hashKey);
+
+    /**
+     * 哈希增减量
+     *
+     * @param key     key
+     * @param hashKey hashKey
+     * @param delta   量值
+     * @return 当前hashKey量值
+     */
+    Long hashIncrement(String key, String hashKey, long delta);
 
     // stream
 
