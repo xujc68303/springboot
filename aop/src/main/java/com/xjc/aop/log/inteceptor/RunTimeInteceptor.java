@@ -7,8 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+
+import java.lang.reflect.Method;
 
 /**
  * @Version 1.0
@@ -40,8 +43,11 @@ public class RunTimeInteceptor {
     }
 
     @Around(value = "interceptor()")
-    public void aroundService(RunTime runTime) {
-        log.info("服务{}调用中,", runTime.value());
+    public Object aroundService(ProceedingJoinPoint pjp) throws Throwable {
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+        RunTime annotation = method.getAnnotation(RunTime.class);
+        log.info("服务{}调用中,", annotation.value());
+        return pjp.proceed();
     }
 
     @AfterReturning(value = "interceptor()", returning = "rvt", argNames = "runTime,rvt")
