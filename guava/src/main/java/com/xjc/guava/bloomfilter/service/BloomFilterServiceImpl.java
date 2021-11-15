@@ -48,7 +48,7 @@ public class BloomFilterServiceImpl implements BloomFilterService {
 
     @Override
     public boolean put(List<String> patterns) {
-        patterns.forEach(x-> put(x));
+        patterns.forEach(x -> put(x));
         return true;
     }
 

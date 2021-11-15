@@ -34,7 +34,7 @@ public class QuartzConfig {
         synchronized (SchedulerFactoryBean.class) {
             SchedulerFactoryBean schedulerFactoryBean = schedulerFactoryBean(jobFactory(applicationContext));
             if (schedulerFactoryBean != null) {
-                scheduler = schedulerFactoryBean.getScheduler( );
+                scheduler = schedulerFactoryBean.getScheduler();
             }
         }
         return scheduler;
@@ -42,14 +42,14 @@ public class QuartzConfig {
 
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
-        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory( );
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
     }
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean(JobFactory jobFactory) {
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean( );
+        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         //将spring管理job自定义工厂交由调度器维护
         schedulerFactoryBean.setJobFactory(jobFactory);
         //设置配置文件位置
@@ -65,7 +65,7 @@ public class QuartzConfig {
         return schedulerFactoryBean;
     }
 
-    public Scheduler getScheduler(){
+    public Scheduler getScheduler() {
         return this.scheduler;
     }
 

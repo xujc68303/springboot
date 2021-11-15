@@ -35,8 +35,8 @@ public class RedissonConfig {
 //    }
 
     @Bean(name = "redissonClient")
-    public RedissonClient sentinel(){
-        Config config = new Config( );
+    public RedissonClient sentinel() {
+        Config config = new Config();
         config.useSentinelServers()
                 .setMasterName(masterName)
                 .addSentinelAddress(nodes.split(","))

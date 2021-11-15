@@ -54,7 +54,7 @@ public interface MongodbService {
     /**
      * 插入文档
      *
-     * @param entity        文档模型
+     * @param entity         文档模型
      * @param collectionName 集合名称
      * @return 执行结果
      */
