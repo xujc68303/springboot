@@ -22,6 +22,7 @@ public interface BloomFilterService {
 
     /**
      * 添加过滤数据
+     *
      * @param pattern
      * @return
      */
@@ -29,6 +30,7 @@ public interface BloomFilterService {
 
     /**
      * 添加过滤数据
+     *
      * @param patterns
      * @return
      */
@@ -36,6 +38,7 @@ public interface BloomFilterService {
 
     /**
      * 过滤
+     *
      * @param patch 匹配数据
      * @return
      */

@@ -12,7 +12,7 @@ import com.xjc.mysql.mapper.dataobject.TestUser;
  */
 public interface PageService {
 
-    PageInfo selectAll(int page, int size);
+    PageInfo<TestUser> selectAll(int page, int size);
 
     TestUser selectById(long id);
 }

@@ -25,23 +25,23 @@ public class DBLock {
     @Autowired
     private HostLockMapper hostLockMapper;
 
-    public boolean queryLock(String lockName, int heartbeatTimeoutMinutes){
+    public boolean queryLock(String lockName, int heartbeatTimeoutMinutes) {
         HostLockDO hostLockDO = hostLockMapper.getByNameAndEnv(lockName, "DEFAULT");
-        if(Objects.isNull(hostLockDO)){
+        if (Objects.isNull(hostLockDO)) {
             //未初始化
             return initLock(lockName);
         }
-        if(hostLockDO.getRunHost().equals("当前机器host")){
+        if (hostLockDO.getRunHost().equals("当前机器host")) {
             //只有本地持有
             return true;
         }
-        if(heartbeatTimeoutMinutes <= 0){
+        if (heartbeatTimeoutMinutes <= 0) {
             // skip
             return false;
         }
         Date allowWindiwStartTime = LocalDateTime.now().minusMinutes(heartbeatTimeoutMinutes).toDate();
         Timestamp lastTime = hostLockDO.getLastTime();
-        if(Objects.nonNull(lastTime) && lastTime.getTime() > allowWindiwStartTime.getTime()){
+        if (Objects.nonNull(lastTime) && lastTime.getTime() > allowWindiwStartTime.getTime()) {
             // 当前不为空，且最新心跳大于 说明未超时不能抢占
             return false;
         }
@@ -49,7 +49,7 @@ public class DBLock {
         hostLockDO.setLastHost("当前机器host");
         // 锁没有超时 不会更新
         int i = hostLockMapper.updateHost(hostLockDO.getLastHost(), hostLockDO.getExecutorName(), hostLockDO.getEnv(), heartbeatTimeoutMinutes);
-        if(i<=0){
+        if (i <= 0) {
             log.warn("抢占失败");
             return false;
         }
@@ -57,7 +57,7 @@ public class DBLock {
         return true;
     }
 
-    public boolean refreshLock(String lockName){
+    public boolean refreshLock(String lockName) {
         HostLockDO hostLockDO = new HostLockDO();
         hostLockDO.setLastHost("当前机器host");
         hostLockDO.setExecutorName(lockName);
@@ -66,12 +66,12 @@ public class DBLock {
         return hostLockMapper.updateLastTime(hostLockDO) > 0;
     }
 
-    public void updateValidHost(String lockName, String validHost){
+    public void updateValidHost(String lockName, String validHost) {
         HostLockDO hostLockDO = new HostLockDO();
         hostLockDO.setLastHost("当前机器host");
         hostLockDO.setExecutorName(lockName);
         hostLockDO.setEnv("DEFAULT");
-        if(validHost != null){
+        if (validHost != null) {
             hostLockDO.setRunHost(validHost);
         } else {
             hostLockDO.setRunHost("当前机器host");
@@ -85,7 +85,7 @@ public class DBLock {
         hostLockDO.setExecutorName(lockName);
         hostLockDO.setEnv("DEFAULT");
         int i = hostLockMapper.insertSelective(hostLockDO);
-        if(i<=0){
+        if (i <= 0) {
             log.error("lock init error");
             return false;
         }

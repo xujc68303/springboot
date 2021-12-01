@@ -101,7 +101,7 @@ public class MongodbServiceImpl implements MongodbService {
         if (exists(collectionNam)) {
             return collectionNam;
         }
-        return mongoTemplate.createCollection(collectionNam).getNamespace( ).getCollectionName( );
+        return mongoTemplate.createCollection(collectionNam).getNamespace().getCollectionName();
     }
 
     @Override
@@ -128,75 +128,75 @@ public class MongodbServiceImpl implements MongodbService {
 
     @Override
     public boolean remove(String key, Object condition, int limit, Object entity, String collectionName) {
-        Query query = new Query( );
+        Query query = new Query();
         this.builderQuery(query, key, condition, limit);
-        return mongoTemplate.remove(query, entity.getClass( ), collectionName).wasAcknowledged( );
+        return mongoTemplate.remove(query, entity.getClass(), collectionName).wasAcknowledged();
     }
 
     @Override
     public boolean removeAll(Object entity, String collectionName) {
-        return mongoTemplate.remove(entity, collectionName).wasAcknowledged( );
+        return mongoTemplate.remove(entity, collectionName).wasAcknowledged();
     }
 
     @Override
     public boolean update(String key, Object condition, String field, Object newData, boolean multi,
                           Object entity, String collectionName) {
-        Query query = new Query( );
+        Query query = new Query();
         this.builderQuery(query, key, condition, 0);
         Update update = Update.update(field, condition);
         UpdateResult updateResult = null;
         if (multi) {
-            updateResult = mongoTemplate.updateMulti(query, update, entity.getClass( ), collectionName);
+            updateResult = mongoTemplate.updateMulti(query, update, entity.getClass(), collectionName);
         } else {
-            updateResult = mongoTemplate.updateFirst(query, update, entity.getClass( ), collectionName);
+            updateResult = mongoTemplate.updateFirst(query, update, entity.getClass(), collectionName);
         }
-        return updateResult.wasAcknowledged( );
+        return updateResult.wasAcknowledged();
     }
 
     @Override
     public List<Object> findFilter(String key, Object condition, Object entity, String collectionName) {
         FindIterable<Document> findIterable =
-                this.getCollection(collectionName).find( ).filter(Filters.eq(key, condition));
-        MongoCursor<Document> mongoCursor = findIterable.iterator( );
-        List<Object> result = Lists.newLinkedList( );
-        while (mongoCursor.hasNext( )) {
-            result.add(mongoCursor.tryNext( ));
+                this.getCollection(collectionName).find().filter(Filters.eq(key, condition));
+        MongoCursor<Document> mongoCursor = findIterable.iterator();
+        List<Object> result = Lists.newLinkedList();
+        while (mongoCursor.hasNext()) {
+            result.add(mongoCursor.tryNext());
         }
         return result;
     }
 
     @Override
     public Object findFirst(String collectionName) {
-        return this.getCollection(collectionName).find( ).first( );
+        return this.getCollection(collectionName).find().first();
     }
 
     @Override
     public List<Object> findPagination(String key, Object condition, int pageNum, int pageSize,
                                        Object entity, boolean desc, String field, String collectionName) {
-        Query query = new Query( );
+        Query query = new Query();
         this.builderQuery(query, key, condition, pageSize);
         this.orderByField(query, desc, field);
         query.skip((pageNum - 1) * pageSize);
-        return mongoTemplate.find(query, (Class<Object>) entity.getClass( ), collectionName);
+        return mongoTemplate.find(query, (Class<Object>) entity.getClass(), collectionName);
     }
 
     @Override
     public Object findById(String id, Object entity, String collectionName) {
-        return mongoTemplate.findById(id, entity.getClass( ), collectionName);
+        return mongoTemplate.findById(id, entity.getClass(), collectionName);
     }
 
     @Override
     public List<Object> findFieldOrder(boolean desc, String field, Object entity, String collectionName) {
-        Query query = new Query( );
+        Query query = new Query();
         this.orderByField(query, desc, field);
-        return mongoTemplate.find(query, (Class<Object>) entity.getClass( ), collectionName);
+        return mongoTemplate.find(query, (Class<Object>) entity.getClass(), collectionName);
     }
 
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream( );
-        String fileName = new String(file.getOriginalFilename( ).getBytes(UTF8));
-        ObjectId objectId = gridFsTemplate.store(inputStream, fileName, file.getContentType( ));
+        InputStream inputStream = file.getInputStream();
+        String fileName = new String(file.getOriginalFilename().getBytes(UTF8));
+        ObjectId objectId = gridFsTemplate.store(inputStream, fileName, file.getContentType());
         return objectId + "-" + fileName;
     }
 
@@ -204,29 +204,29 @@ public class MongodbServiceImpl implements MongodbService {
     public void downloadFile(String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         GridFSFile gridFSFile = this.findFileById(id);
         if (gridFSFile != null) {
-            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoTemplate.getDb( ));
-            GridFSDownloadStream gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId( ));
+            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoTemplate.getDb());
+            GridFSDownloadStream gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId());
             GridFsResource gridFsResource = new GridFsResource(gridFSFile, gridFSDownloadStream);
             //防止文件名称乱码
-            String fileName = new String(gridFsResource.getFilename( ).getBytes(UTF8));
-            response.setContentType(gridFsResource.getContentType( ));
+            String fileName = new String(gridFsResource.getFilename().getBytes(UTF8));
+            response.setContentType(gridFsResource.getContentType());
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
             response.setCharacterEncoding(UTF8);
-            IOUtils.copy(gridFsResource.getInputStream( ), response.getOutputStream( ));
-            response.flushBuffer( );
+            IOUtils.copy(gridFsResource.getInputStream(), response.getOutputStream());
+            response.flushBuffer();
         }
     }
 
     @Override
     public GridFSFile findFileById(String id) {
-        Query query = new Query( );
+        Query query = new Query();
         this.builderQuery(query, ID, id, 0);
         return gridFsTemplate.findOne(query);
     }
 
     @Override
     public boolean deleteFile(String id) {
-        Query query = new Query( );
+        Query query = new Query();
         this.builderQuery(query, ID, id, 0);
         gridFsTemplate.delete(query);
         return Boolean.TRUE;

@@ -22,7 +22,7 @@ public class Task extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        log.info("执行任务"+LocalTime.now( ).toString( ));
+        log.info("执行任务" + LocalTime.now().toString());
     }
 
 }

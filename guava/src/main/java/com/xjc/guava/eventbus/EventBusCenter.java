@@ -16,18 +16,18 @@ public class EventBusCenter {
     private EventBus eventBus;
 
     public EventBusCenter(String name, String type, Executor executor) {
-        if(type == "ASYNC"){
-            if(eventBus == null){
-                synchronized (this){
-                    if(eventBus == null){
+        if (type == "ASYNC") {
+            if (eventBus == null) {
+                synchronized (this) {
+                    if (eventBus == null) {
                         eventBus = new EventBus(name);
                     }
                 }
             }
         } else {
-            if(eventBus == null){
-                synchronized (this){
-                    if(eventBus == null){
+            if (eventBus == null) {
+                synchronized (this) {
+                    if (eventBus == null) {
                         eventBus = new AsyncEvent(name, executor);
                     }
                 }
@@ -35,8 +35,8 @@ public class EventBusCenter {
         }
     }
 
-    public EventBus getEventBus(){
-       return this.eventBus;
+    public EventBus getEventBus() {
+        return this.eventBus;
     }
 
     public void register(Object obj) {
@@ -51,14 +51,14 @@ public class EventBusCenter {
         eventBus.post(obj);
     }
 
-    class SysncEvent extends EventBus{
+    class SysncEvent extends EventBus {
 
-        public SysncEvent(String name){
+        public SysncEvent(String name) {
 
         }
     }
 
-    class AsyncEvent extends EventBus{
+    class AsyncEvent extends EventBus {
 
         public AsyncEvent(String identifier, Executor executor) {
 

@@ -1,8 +1,8 @@
 package com.xjc.redis.service;
 
 import com.google.common.collect.Maps;
-import com.xjc.redis.config.GeoRequest;
 import com.xjc.redis.api.RedissonService;
+import com.xjc.redis.config.GeoRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.RedissonMultiLock;
 import org.redisson.RedissonRedLock;
@@ -54,7 +54,7 @@ public class RedissonServiceImpl implements RedissonService {
     public RRateLimiter currentLimiting(String serviceName, long maxSize, long section, long expired, TimeUnit unit) {
         getRateLimiter(serviceName);
         synchronized (RRateLimiter.class) {
-            RateIntervalUnit intervalUnit = RateIntervalUnit.valueOf(unit.name( ));
+            RateIntervalUnit intervalUnit = RateIntervalUnit.valueOf(unit.name());
             if (rRateLimiter.trySetRate(RateType.PER_CLIENT, maxSize, section, intervalUnit)) {
                 if (expired != 0 && unit != null) {
                     if (!rRateLimiter.expire(expired, unit)) {
@@ -64,27 +64,27 @@ public class RedissonServiceImpl implements RedissonService {
                 return rRateLimiter;
             }
         }
-        rRateLimiter.delete( );
+        rRateLimiter.delete();
         return null;
     }
 
     @Override
     public RateLimiterConfig getLimiterConfig(String serviceName) {
         getRateLimiter(serviceName);
-        return rRateLimiter.getConfig( );
+        return rRateLimiter.getConfig();
     }
 
     @Override
     public boolean clearLimiting(String serviceName) {
         getRateLimiter(serviceName);
-        return rRateLimiter.clearExpire( );
+        return rRateLimiter.clearExpire();
     }
 
     @Override
     public boolean initBloomFilter(long maxSize, double fpp) {
         synchronized (RBloomFilter.class) {
             if (!INIT_FLAG) {
-                getBloomFilter( );
+                getBloomFilter();
                 if (bloomFilter.tryInit(maxSize, fpp)) {
                     INIT_FLAG = true;
                     return true;
@@ -103,7 +103,7 @@ public class RedissonServiceImpl implements RedissonService {
     public boolean addBloomFilter(List<String> patterns) {
         synchronized (RBloomFilter.class) {
             if (INIT_FLAG) {
-                getBloomFilter( );
+                getBloomFilter();
                 patterns.forEach(x -> bloomFilter.add(x));
                 return true;
             }
@@ -113,7 +113,7 @@ public class RedissonServiceImpl implements RedissonService {
 
     @Override
     public boolean matchBloomFilter(String pattern) {
-        getBloomFilter( );
+        getBloomFilter();
         return bloomFilter.contains(pattern);
     }
 
@@ -121,8 +121,8 @@ public class RedissonServiceImpl implements RedissonService {
     public boolean clearBloomFilter() {
         synchronized (RBloomFilter.class) {
             if (INIT_FLAG) {
-                getBloomFilter( );
-                if (bloomFilter.delete( )) {
+                getBloomFilter();
+                if (bloomFilter.delete()) {
                     INIT_FLAG = false;
                     return true;
                 }
@@ -135,16 +135,16 @@ public class RedissonServiceImpl implements RedissonService {
     public RLock reentrantLock(String lockName, long wait, long expired, TimeUnit timeUnit) {
         getLock(lockName);
         try {
-            if (!rLock.isLocked( )) {
+            if (!rLock.isLocked()) {
                 boolean result = rLock.tryLock(wait, expired, timeUnit);
                 if (result) {
                     return rLock;
                 }
             }
         } catch (Exception e) {
-            log.error("redisson reentrantLock error={}, thread id={}", e, Thread.currentThread( ).getId( ));
-            if (rLock.isLocked( ) && rLock.isHeldByCurrentThread( )) {
-                rLock.unlock( );
+            log.error("redisson reentrantLock error={}, thread id={}", e, Thread.currentThread().getId());
+            if (rLock.isLocked() && rLock.isHeldByCurrentThread()) {
+                rLock.unlock();
             }
         }
         return null;
@@ -153,16 +153,16 @@ public class RedissonServiceImpl implements RedissonService {
     @Override
     public RLock fairLock(String lockName, long wait, long expired, TimeUnit timeUnit) {
         getFairLock(lockName);
-        if (!fairLock.isLocked( )) {
+        if (!fairLock.isLocked()) {
             try {
                 boolean result = fairLock.tryLock(wait, expired, timeUnit);
                 if (result) {
                     return fairLock;
                 }
             } catch (Exception e) {
-                log.error("redisson fairLock error={}, thread id={}", e, Thread.currentThread( ).getId( ));
-                if (fairLock.isLocked( ) && fairLock.isHeldByCurrentThread( )) {
-                    fairLock.unlock( );
+                log.error("redisson fairLock error={}, thread id={}", e, Thread.currentThread().getId());
+                if (fairLock.isLocked() && fairLock.isHeldByCurrentThread()) {
+                    fairLock.unlock();
                 }
             }
         }
@@ -177,16 +177,16 @@ public class RedissonServiceImpl implements RedissonService {
             RLock rLock3 = getLock(lockName[2]);
             RedissonMultiLock redissonMultiLock = new RedissonMultiLock(rLock1, rLock2, rLock3);
             try {
-                if (!redissonMultiLock.isLocked( )) {
+                if (!redissonMultiLock.isLocked()) {
                     boolean result = redissonMultiLock.tryLock(wait, expired, timeUnit);
                     if (result) {
                         return redissonMultiLock;
                     }
                 }
             } catch (Exception e) {
-                log.error("redisson multiLock error={}, thread id={}", e, Thread.currentThread( ).getId( ));
-                if (redissonMultiLock.isLocked( ) && redissonMultiLock.isHeldByCurrentThread( )) {
-                    redissonMultiLock.unlock( );
+                log.error("redisson multiLock error={}, thread id={}", e, Thread.currentThread().getId());
+                if (redissonMultiLock.isLocked() && redissonMultiLock.isHeldByCurrentThread()) {
+                    redissonMultiLock.unlock();
                 }
             }
         }
@@ -201,16 +201,16 @@ public class RedissonServiceImpl implements RedissonService {
             RLock rLock3 = getLock(lockName[2]);
             RedissonRedLock redissonRedLock = new RedissonRedLock(rLock1, rLock2, rLock3);
             try {
-                if (!redissonRedLock.isLocked( )) {
+                if (!redissonRedLock.isLocked()) {
                     boolean result = redissonRedLock.tryLock(wait, expired, timeUnit);
                     if (result) {
                         return redissonRedLock;
                     }
                 }
             } catch (Exception e) {
-                log.error("redisson multiLock error={}, thread id={}", e, Thread.currentThread( ).getId( ));
-                if (redissonRedLock.isLocked( ) && redissonRedLock.isHeldByCurrentThread( )) {
-                    redissonRedLock.unlock( );
+                log.error("redisson multiLock error={}, thread id={}", e, Thread.currentThread().getId());
+                if (redissonRedLock.isLocked() && redissonRedLock.isHeldByCurrentThread()) {
+                    redissonRedLock.unlock();
                 }
             }
         }
@@ -231,7 +231,7 @@ public class RedissonServiceImpl implements RedissonService {
                     return rSemaphore;
                 }
             } catch (Exception e) {
-                log.error("redisson semaphore error={}, thread id={}", e, Thread.currentThread( ).getId( ));
+                log.error("redisson semaphore error={}, thread id={}", e, Thread.currentThread().getId());
                 deleteSemaphore(serviceName);
             }
         }
@@ -241,14 +241,14 @@ public class RedissonServiceImpl implements RedissonService {
     @Override
     public boolean deleteSemaphore(String serviceName) {
         getSemaphore(serviceName);
-        return rSemaphore.delete( );
+        return rSemaphore.delete();
     }
 
     @Override
     public RCountDownLatch countDownLatch(String serviceName, int count) {
         rCountDownLatch = getrCountDownLatch(serviceName);
-        if (rCountDownLatch.isExists( )) {
-            rCountDownLatch.delete( );
+        if (rCountDownLatch.isExists()) {
+            rCountDownLatch.delete();
             rCountDownLatch = getrCountDownLatch(serviceName);
 
             if (rCountDownLatch.trySetCount(count)) {
@@ -261,34 +261,34 @@ public class RedissonServiceImpl implements RedissonService {
     @Override
     public boolean setBucket(Map<String, Object> map) {
         if (rBuckets == null) {
-            rBuckets = redissonClient.getBuckets( );
+            rBuckets = redissonClient.getBuckets();
         }
         return rBuckets.trySet(map);
     }
 
     @Override
     public Map<String, Object> getBuckets(List<String> keys) {
-        getrBuckets( );
+        getrBuckets();
         return rBuckets.get(keys.toArray(new String[0]));
     }
 
     @Override
     public long deleteBuckets(List<String> keys) {
-        getrBuckets( );
+        getrBuckets();
         return rBuckets.delete(keys.toArray(new String[0]));
     }
 
     @Override
     public boolean addressAdd(List<GeoRequest> geoRequests) {
-        getGeo( );
-        geoRequests.forEach(e -> rGeo.add(e.getLongitude( ), e.getLatitude( ), e.getMember( )));
+        getGeo();
+        geoRequests.forEach(e -> rGeo.add(e.getLongitude(), e.getLatitude(), e.getMember()));
         return true;
     }
 
     @Override
     public Map<Object, GeoPosition> addressGet(List<String> members) {
-        getGeo( );
-        Map<Object, GeoPosition> result = Maps.newLinkedHashMap( );
+        getGeo();
+        Map<Object, GeoPosition> result = Maps.newLinkedHashMap();
         members.forEach(e -> {
             Map<Object, GeoPosition> map = rGeo.pos(e);
             map.forEach(result::put);
@@ -298,19 +298,19 @@ public class RedissonServiceImpl implements RedissonService {
 
     @Override
     public void bitSetAndModify(long key, boolean value) {
-        getBit( );
+        getBit();
         rBitSet.set(key, value);
     }
 
     @Override
     public boolean bitGet(long key) {
-        getBit( );
+        getBit();
         return rBitSet.get(key);
     }
 
     @Override
     public boolean bitRemove(List<Long> keys) {
-        getBit( );
+        getBit();
         keys.forEach(k -> rBitSet.clear(k, k));
         return true;
     }
@@ -347,7 +347,7 @@ public class RedissonServiceImpl implements RedissonService {
     }
 
     private RBuckets getrBuckets() {
-        rBuckets = redissonClient.getBuckets( );
+        rBuckets = redissonClient.getBuckets();
         return rBuckets;
     }
 

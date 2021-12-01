@@ -17,14 +17,14 @@ import java.util.Set;
  */
 public class Maps {
 
-    Multimap<Object, Object> arrayListMultimap = ArrayListMultimap.create( );
+    Multimap<Object, Object> arrayListMultimap = ArrayListMultimap.create();
 
-    Multimap<Object, Map<Object, Object>> objectMapMultimap = HashMultimap.create( );
+    Multimap<Object, Map<Object, Object>> objectMapMultimap = HashMultimap.create();
 
-    SetMultimap<Object, Set<Object>> setMultimap = HashMultimap.create( );
+    SetMultimap<Object, Set<Object>> setMultimap = HashMultimap.create();
 
     public static void main(String[] args) {
-        SetMultimap<Object, Object> setMultimap = HashMultimap.create( );
+        SetMultimap<Object, Object> setMultimap = HashMultimap.create();
         setMultimap.put("test1", "1");
         setMultimap.put("test1", "2");
         setMultimap.put("test1", "3");

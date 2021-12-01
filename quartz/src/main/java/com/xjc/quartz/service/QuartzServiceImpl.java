@@ -37,9 +37,9 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     public Boolean add(String key, String group, String cron, Class<? extends Job> jobClass) throws SchedulerException {
-        Scheduler scheduler = quartzConfig.getScheduler( );
-        scheduler.start( );
-        cron = cron.trim( );
+        Scheduler scheduler = quartzConfig.getScheduler();
+        scheduler.start();
+        cron = cron.trim();
         // 任务存在直接返回
         List<? extends Trigger> triggers = scheduler.getTriggersOfJob(new JobKey(key, group));
         if (!CollectionUtils.isEmpty(triggers) || checkCron(cron)) {
@@ -47,14 +47,14 @@ public class QuartzServiceImpl implements QuartzService {
         }
         JobDetail jobDetail = JobBuilder.newJob(jobClass)
                 .withIdentity(key, group)
-                .storeDurably( )
-                .build( );
+                .storeDurably()
+                .build();
 
-        Trigger trigger = TriggerBuilder.newTrigger( )
+        Trigger trigger = TriggerBuilder.newTrigger()
                 .forJob(jobDetail)
                 .withIdentity(key, group)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
-                .build( );
+                .build();
         return scheduler.scheduleJob(jobDetail, trigger) != null;
     }
 
@@ -64,15 +64,15 @@ public class QuartzServiceImpl implements QuartzService {
         if (checkCron(newCron)) {
             return false;
         }
-        Scheduler scheduler = quartzConfig.getScheduler( );
+        Scheduler scheduler = quartzConfig.getScheduler();
         CronTrigger oldTrigger = (CronTrigger) scheduler.getTrigger(new TriggerKey(key, group));
-        String oldCron = oldTrigger.getCronExpression( );
+        String oldCron = oldTrigger.getCronExpression();
         if (!oldCron.equals(newCron)) {
-            CronTrigger cronTrigger = oldTrigger.getTriggerBuilder( )
+            CronTrigger cronTrigger = oldTrigger.getTriggerBuilder()
                     .withIdentity(new TriggerKey(key, group))
                     .withSchedule(CronScheduleBuilder.cronSchedule(newCron))
-                    .build( );
-            result = scheduler.rescheduleJob(oldTrigger.getKey( ), cronTrigger);
+                    .build();
+            result = scheduler.rescheduleJob(oldTrigger.getKey(), cronTrigger);
         }
         return result != null;
     }
@@ -80,7 +80,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     public Boolean delete(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            return quartzConfig.getScheduler( ).deleteJob(new JobKey(key, group));
+            return quartzConfig.getScheduler().deleteJob(new JobKey(key, group));
         }
         return false;
     }
@@ -88,7 +88,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     public Boolean pause(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            quartzConfig.getScheduler( ).pauseJob(new JobKey(key, group));
+            quartzConfig.getScheduler().pauseJob(new JobKey(key, group));
             return true;
         }
         return false;
@@ -97,7 +97,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     public Boolean resume(String key, String group) throws SchedulerException {
         if (isExist(key, group)) {
-            quartzConfig.getScheduler( ).resumeJob(new JobKey(key, group));
+            quartzConfig.getScheduler().resumeJob(new JobKey(key, group));
             return true;
         }
         return false;
@@ -105,20 +105,20 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     public Boolean pauseAll() throws SchedulerException {
-        quartzConfig.getScheduler( ).pauseAll( );
+        quartzConfig.getScheduler().pauseAll();
         return true;
     }
 
     @Override
     public Boolean resumeAll() throws SchedulerException {
-        quartzConfig.getScheduler( ).resumeAll( );
+        quartzConfig.getScheduler().resumeAll();
         return true;
     }
 
     @Override
     public Boolean isExist(String key, String group) throws SchedulerException {
         JobKey jobKey = new JobKey(key, group);
-        return quartzConfig.getScheduler( ).getJobDetail(jobKey) != null;
+        return quartzConfig.getScheduler().getJobDetail(jobKey) != null;
     }
 
     /**

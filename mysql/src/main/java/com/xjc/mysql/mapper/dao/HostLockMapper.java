@@ -1,9 +1,8 @@
 package com.xjc.mysql.mapper.dao;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.xjc.mysql.mapper.dataobject.HostLockDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @Version 1.0

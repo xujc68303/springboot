@@ -25,7 +25,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public PageInfo<TestUser> selectAll(int pageNum, int size) {
         PageHelper.startPage(pageNum, size);
-        List<TestUser> testUserList = testUserMapper.selectAll( );
+        List<TestUser> testUserList = testUserMapper.selectAll();
         return new PageInfo<>(testUserList);
     }
 

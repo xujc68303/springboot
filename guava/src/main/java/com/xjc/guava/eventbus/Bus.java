@@ -16,18 +16,18 @@ import java.util.concurrent.Executors;
 public class Bus {
 
     @Test
-    public void testSync(){
-        EventBusCenter eventBusCenter = new EventBusCenter("test" , null, null);
+    public void testSync() {
+        EventBusCenter eventBusCenter = new EventBusCenter("test", null, null);
         eventBusCenter.register(new ListenEvent());
         eventBusCenter.post("test message");
     }
 
     @Test
-    public void testASync(){
+    public void testASync() {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        EventBusCenter eventBusCenter = new EventBusCenter("test" , "ASYNC", executorService);
+        EventBusCenter eventBusCenter = new EventBusCenter("test", "ASYNC", executorService);
         eventBusCenter.register(new ListenEvent());
-        for(int i=0; i<=10; i++){
+        for (int i = 0; i <= 10; i++) {
             eventBusCenter.post("test async message" + LocalDateTime.now());
         }
     }
