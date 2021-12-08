@@ -1,7 +1,9 @@
 package com.xjc.aop.log.inteceptor;
 
 import com.xjc.aop.log.annotation.Authorization;
+import com.xjc.aop.log.model.UserInfo;
 import com.xjc.aop.log.util.TokenUtil;
+import com.xjc.aop.log.util.UserInfoHelp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -15,7 +17,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * @Description AuthorizationInteceptor
@@ -47,14 +48,14 @@ public class AuthorizationInteceptor {
 
     private boolean checkToken() {
         HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = httpServletRequest.getHeader("Authorization");
+        String token = httpServletRequest.getHeader("token");
         if (StringUtils.isBlank(token)) return false;
-        Map<String, Object> headerMap = null;
+        UserInfo userInfo = null;
         try {
-             headerMap = TokenUtil.validateToken(httpServletRequest);
-             if(headerMap == null){
-                 return false;
-             }
+            userInfo = TokenUtil.validateToken(token);
+            if(userInfo == null){
+                return false;
+            }
         } catch (Exception e) {
             log.info("token校验失败");
             return false;
@@ -62,6 +63,7 @@ public class AuthorizationInteceptor {
 
         // redis service
 
+        UserInfoHelp.add(userInfo);
         return true;
 
     }
