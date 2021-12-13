@@ -2,6 +2,7 @@ package com.xjc.aop.log.inteceptor;
 
 import com.xjc.aop.log.annotation.Authorization;
 import com.xjc.aop.log.model.UserInfo;
+import com.xjc.aop.log.util.CookieUtil;
 import com.xjc.aop.log.util.TokenUtil;
 import com.xjc.aop.log.util.UserInfoHelp;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -34,26 +36,32 @@ public class AuthorizationInteceptor {
 
     @Around("interceptor()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        Authorization annotation = method.getAnnotation(Authorization.class);
-        if (annotation != null) {
-            if (checkToken()) {
-                return pjp.proceed();
-            } else {
-                return "登陆超时，请重新登陆";
+        try {
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+            Authorization annotation = method.getAnnotation(Authorization.class);
+            if (annotation != null) {
+                if (!checkToken()) {
+                    return "登陆超时，请重新登陆";
+                }
             }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            UserInfoHelp.remove();
         }
         return pjp.proceed();
     }
 
     private boolean checkToken() {
-        HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = httpServletRequest.getHeader("token");
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        HttpServletResponse response = requestAttributes.getResponse();
+        String token = request.getHeader("token");
         if (StringUtils.isBlank(token)) return false;
         UserInfo userInfo = null;
         try {
             userInfo = TokenUtil.validateToken(token);
-            if(userInfo == null){
+            if (userInfo == null) {
                 return false;
             }
         } catch (Exception e) {
@@ -64,6 +72,7 @@ public class AuthorizationInteceptor {
         // redis service
 
         UserInfoHelp.add(userInfo);
+        CookieUtil.getCookie(request, response);
         return true;
 
     }
