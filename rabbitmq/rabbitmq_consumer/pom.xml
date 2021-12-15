@@ -9,7 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>consumer</artifactId>
+    <artifactId>rabbitmq_consumer</artifactId>
+    <dependencies>
+
+    </dependencies>
 
 
 </project>

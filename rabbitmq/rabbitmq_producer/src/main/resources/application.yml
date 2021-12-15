@@ -1,0 +1,29 @@
+server:
+  port: 17005
+
+spring:
+  application:
+    name: rabbitmq
+
+  # ~ RabbitMQ Configuration
+  rabbitmq:
+    host: 118.24.109.247
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 10
+      direct:
+        acknowledge-mode: manual
+
+# ~ MyBatis Configuration
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+# ~ Logging.Level
+logging:
+  level:
+    cn.caplike.demo.rabbitmq.springboot.idempotence_reliability: debug
+
