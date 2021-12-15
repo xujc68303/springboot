@@ -1,7 +1,10 @@
 package com.xjc.aop.log.inteceptor;
 
 import com.xjc.aop.log.annotation.Authorization;
+import com.xjc.aop.log.model.UserInfo;
+import com.xjc.aop.log.util.CookieUtil;
 import com.xjc.aop.log.util.TokenUtil;
+import com.xjc.aop.log.util.UserInfoHelp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,8 +17,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * @Description AuthorizationInteceptor
@@ -33,28 +36,34 @@ public class AuthorizationInteceptor {
 
     @Around("interceptor()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        Authorization annotation = method.getAnnotation(Authorization.class);
-        if (annotation != null) {
-            if (checkToken()) {
-                return pjp.proceed();
-            } else {
-                return "登陆超时，请重新登陆";
+        try {
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+            Authorization annotation = method.getAnnotation(Authorization.class);
+            if (annotation != null) {
+                if (!checkToken()) {
+                    return "登陆超时，请重新登陆";
+                }
             }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            UserInfoHelp.remove();
         }
         return pjp.proceed();
     }
 
     private boolean checkToken() {
-        HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = httpServletRequest.getHeader("Authorization");
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        HttpServletResponse response = requestAttributes.getResponse();
+        String token = request.getHeader("token");
         if (StringUtils.isBlank(token)) return false;
-        Map<String, Object> headerMap = null;
+        UserInfo userInfo = null;
         try {
-             headerMap = TokenUtil.validateToken(httpServletRequest);
-             if(headerMap == null){
-                 return false;
-             }
+            userInfo = TokenUtil.validateToken(token);
+            if (userInfo == null) {
+                return false;
+            }
         } catch (Exception e) {
             log.info("token校验失败");
             return false;
@@ -62,6 +71,8 @@ public class AuthorizationInteceptor {
 
         // redis service
 
+        UserInfoHelp.add(userInfo);
+        CookieUtil.getCookie(request, response);
         return true;
 
     }
