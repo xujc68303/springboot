@@ -9,18 +9,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.xjc</groupId>
     <artifactId>rabbitmq</artifactId>
-    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>rabbitmq</name>
+    <description>rabbitmq project for Spring Boot</description>
+
     <modules>
-        <module>producer</module>
-        <module>consumer</module>
+        <module>rabbitmq_producer</module>
+        <module>rabbitmq_consumer</module>
     </modules>
 
     <dependencies>
         <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>5.10.0</version>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
         </dependency>
     </dependencies>
 
