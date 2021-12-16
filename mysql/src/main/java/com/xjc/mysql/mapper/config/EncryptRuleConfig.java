@@ -43,13 +43,4 @@ public class EncryptRuleConfig {
         return encryptRuleConfig;
     }
 
-    public static void main(String[] args) {
-        EncryptRuleConfig ruleConfig = new EncryptRuleConfig();
-        Map<String, String> columnMap = Maps.newHashMap();
-        columnMap.put("address", "");
-        columnMap.put("password", "");
-        ruleConfig.getEncryptRuleConfiguration("", columnMap, "t_customer");
-    }
-
-
 }

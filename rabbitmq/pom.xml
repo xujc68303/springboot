@@ -9,11 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xjc</groupId>
     <artifactId>rabbitmq</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>rabbitmq</name>
-    <description>rabbitmq project for Spring Boot</description>
+    <packaging>pom</packaging>
 
     <modules>
         <module>rabbitmq_producer</module>

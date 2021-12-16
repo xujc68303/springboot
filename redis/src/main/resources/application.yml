@@ -17,6 +17,8 @@ spring:
     active: dev
 
   redis:
+    host: 127.0.0.1
+    port: 6379
     sentinel:
       nodes: redis://127.0.0.1:26379,redis://127.0.0.1:26380
       master: mymaster
@@ -35,6 +37,18 @@ spring:
         max-idle: 500
         # 连接池中的最小空闲连接
         min-idle: 0
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.3.102:3306/sys?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+      username: root
+      password: dataqindevops
+      initial-size: 1
+      max-active: 30
+      min-idle: 1
+      max-wait: 30000
 
 redisson:
   address: redis://127.0.0.1:6379

@@ -10,14 +10,16 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.xjc</groupId>
     <artifactId>mongodb</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>mongodb</name>
     <description>mongodb project for Spring Boot</description>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
