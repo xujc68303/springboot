@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjc.mysql.mapper.dao.CommentMapper">
+  <resultMap id="BaseResultMap" type="com.xjc.mysql.mapper.dataobject.Comment">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="brand_id" jdbcType="BIGINT" property="brandId" />
+    <result column="store_id" jdbcType="BIGINT" property="storeId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="reply_id" jdbcType="BIGINT" property="replyId" />
+    <result column="parent_id" jdbcType="BIGINT" property="parentId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, brand_id, store_id, goods_id, content, reply_id, parent_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from comment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from comment
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xjc.mysql.mapper.dataobject.Comment">
+    insert into comment (id, brand_id, store_id, 
+      goods_id, content, reply_id, 
+      parent_id)
+    values (#{id,jdbcType=BIGINT}, #{brandId,jdbcType=BIGINT}, #{storeId,jdbcType=BIGINT}, 
+      #{goodsId,jdbcType=BIGINT}, #{content,jdbcType=VARCHAR}, #{replyId,jdbcType=BIGINT}, 
+      #{parentId,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xjc.mysql.mapper.dataobject.Comment">
+    insert into comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="brandId != null">
+        brand_id,
+      </if>
+      <if test="storeId != null">
+        store_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="replyId != null">
+        reply_id,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="brandId != null">
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="storeId != null">
+        #{storeId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="replyId != null">
+        #{replyId,jdbcType=BIGINT},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xjc.mysql.mapper.dataobject.Comment">
+    update comment
+    <set>
+      <if test="brandId != null">
+        brand_id = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="storeId != null">
+        store_id = #{storeId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="replyId != null">
+        reply_id = #{replyId,jdbcType=BIGINT},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xjc.mysql.mapper.dataobject.Comment">
+    update comment
+    set brand_id = #{brandId,jdbcType=BIGINT},
+      store_id = #{storeId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      content = #{content,jdbcType=VARCHAR},
+      reply_id = #{replyId,jdbcType=BIGINT},
+      parent_id = #{parentId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="queryComment" parameterType="com.xjc.mysql.mapper.dataobject.Comment" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from comment
+    where brand_id = #{brandId} and store_id = #{storeId} and goods_id = #{goodsId}
+  </select>
+
+</mapper>

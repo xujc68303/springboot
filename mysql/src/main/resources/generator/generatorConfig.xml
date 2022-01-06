@@ -30,7 +30,7 @@
         </javaTypeResolver>
 
         <!-- targetProject:生成DO类的位置 -->
-        <javaModelGenerator targetPackage="com.datasource.mapper.dataobject" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.xjc.mysql.mapper.dataobject" targetProject="src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
             <!-- 从数据库返回的值被清理前后的空格 -->
@@ -47,16 +47,14 @@
         </sqlMapGenerator>
 
         <!-- targetPackage：mapper接口生成的位置 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.datasource.mapper.dao" targetProject="src/main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.xjc.mysql.mapper.dao" targetProject="src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
 
         </javaClientGenerator>
 
         <!-- 指定数据库表 -->
-        <table tableName="test_user" domainObjectName="TestUser" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="xxx" domainObjectName="xxx" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
-
-
     </context>
 </generatorConfiguration>

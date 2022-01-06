@@ -1,35 +1,43 @@
 package com.xjc.mysql.mapper.dataobject;
 
-import lombok.Data;
-
-@Data
 public class TestUser {
-    private static final long serialVersionUID = 3580865635839853856L;
-    /**
-     * 主键id
-     */
     private Long id;
 
-    /**
-     * 名称
-     */
     private String userName;
 
-    /**
-     * 年龄
-     */
     private Integer userAge;
 
-    /**
-     * 地址
-     */
     private String userBase;
 
-    public static final String COL_ID = "id";
+    public Long getId() {
+        return id;
+    }
 
-    public static final String COL_USER_NAME = "user_name";
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public static final String COL_USER_AGE = "user_age";
+    public String getUserName() {
+        return userName;
+    }
 
-    public static final String COL_USER_BASE = "user_base";
+    public void setUserName(String userName) {
+        this.userName = userName == null ? null : userName.trim();
+    }
+
+    public Integer getUserAge() {
+        return userAge;
+    }
+
+    public void setUserAge(Integer userAge) {
+        this.userAge = userAge;
+    }
+
+    public String getUserBase() {
+        return userBase;
+    }
+
+    public void setUserBase(String userBase) {
+        this.userBase = userBase == null ? null : userBase.trim();
+    }
 }

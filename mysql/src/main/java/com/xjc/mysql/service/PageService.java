@@ -1,4 +1,4 @@
-package com.xjc.mysql.mapper.service;
+package com.xjc.mysql.service;
 
 import com.github.pagehelper.PageInfo;
 import com.xjc.mysql.mapper.dataobject.TestUser;

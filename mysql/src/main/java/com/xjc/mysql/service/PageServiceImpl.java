@@ -1,4 +1,4 @@
-package com.xjc.mysql.mapper.service;
+package com.xjc.mysql.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -31,6 +31,6 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public TestUser selectById(long id) {
-        return testUserMapper.selectById(id);
+        return testUserMapper.selectByPrimaryKey(id);
     }
 }

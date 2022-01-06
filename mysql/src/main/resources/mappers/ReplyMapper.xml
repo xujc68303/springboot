@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjc.mysql.mapper.dao.ReplyMapper">
+  <resultMap id="BaseResultMap" type="com.xjc.mysql.mapper.dataobject.Reply">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="brand_id" jdbcType="BIGINT" property="brandId" />
+    <result column="store_id" jdbcType="BIGINT" property="storeId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="comment_id" jdbcType="BIGINT" property="commentId" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, brand_id, store_id, goods_id, comment_id, content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from reply
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from reply
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xjc.mysql.mapper.dataobject.Reply">
+    insert into reply (id, brand_id, store_id, 
+      goods_id, comment_id, content)
+    values (#{id,jdbcType=BIGINT}, #{brandId,jdbcType=BIGINT}, #{storeId,jdbcType=BIGINT}, 
+      #{goodsId,jdbcType=BIGINT}, #{commentId,jdbcType=BIGINT}, #{content,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xjc.mysql.mapper.dataobject.Reply">
+    insert into reply
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="brandId != null">
+        brand_id,
+      </if>
+      <if test="storeId != null">
+        store_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="commentId != null">
+        comment_id,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="brandId != null">
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="storeId != null">
+        #{storeId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="commentId != null">
+        #{commentId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xjc.mysql.mapper.dataobject.Reply">
+    update reply
+    <set>
+      <if test="brandId != null">
+        brand_id = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="storeId != null">
+        store_id = #{storeId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="commentId != null">
+        comment_id = #{commentId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xjc.mysql.mapper.dataobject.Reply">
+    update reply
+    set brand_id = #{brandId,jdbcType=BIGINT},
+      store_id = #{storeId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      comment_id = #{commentId,jdbcType=BIGINT},
+      content = #{content,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryReply" parameterType="com.xjc.mysql.mapper.dataobject.Reply" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from reply
+    where brand_id = #{brandId} and store_id = #{storeId} and goods_id = #{goodsId}
+  </select>
+</mapper>

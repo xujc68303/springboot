@@ -1,24 +1,21 @@
 package com.xjc.mysql.mapper.dao;
 
 import com.xjc.mysql.mapper.dataobject.TestUser;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface TestUserMapper {
-    int updateBatch(@Param("list") List<TestUser> list);
+    int deleteByPrimaryKey(Long id);
 
-    int updateBatchSelective(@Param("list") List<TestUser> list);
+    int insert(TestUser record);
 
-    int batchInsert(@Param("list") List<TestUser> list);
+    int insertSelective(TestUser record);
 
-    int insertOrUpdate(TestUser record);
+    TestUser selectByPrimaryKey(Long id);
 
-    int insertOrUpdateSelective(TestUser record);
+    int updateByPrimaryKeySelective(TestUser record);
 
-    List<TestUser> selectByAll(TestUser testUser);
+    int updateByPrimaryKey(TestUser record);
 
     List<TestUser> selectAll();
-
-    TestUser selectById(@Param("id") Long id);
 }

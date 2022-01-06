@@ -9,7 +9,7 @@
         <result column="last_time" jdbcType="TIMESTAMP" property="lastTime"/>
         <result column="executor_name" jdbcType="VARCHAR" property="executorName"/>
         <result column="env" jdbcType="VARCHAR" property="env"/>
-        <result column="run_host" javaType="VARCHAR" property="runHost"/>
+        <!--<result column="run_host" javaType="VARCHAR" property="runHost"/>-->
     </resultMap>
 
     <sql id="Base_Column_List">

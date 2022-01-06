@@ -15,26 +15,27 @@ spring:
 
   profiles:
     active: dev
+  datasource:
+    name: ds
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowMultiQueries=true
+      username: root
+      password:
+      initial-size: 1
+      max-active: 30
+      min-idle: 1
+      max-wait: 30000
 
-  shardingsphere:
-    datasource:
-      name: ds
-      type: com.alibaba.druid.pool.DruidDataSource
-      druid:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowMultiQueries=true
-        username: root
-        password:
-        initial-size: 1
-        max-active: 30
-        min-idle: 1
-        max-wait: 30000
+#  shardingsphere:
+
     # 默认的AES加密器
-    encrypt:
-      encryptors:
-        encrytor_aes:
-          type: aes
-          key: hkiqAXU6Ur5fixGHaO4Lb2V2ggausYwW
+#    encrypt:
+#      encryptors:
+#        encrytor_aes:
+#          type: aes
+#          key: hkiqAXU6Ur5fixGHaO4Lb2V2ggausYwW
 
 
 
