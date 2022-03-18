@@ -34,11 +34,6 @@
             <!--<version>${sharding-sphere.version}</version>-->
         <!--</dependency>-->
         <!--druid���ӳ�-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${druid.version}</version>
-        </dependency>
 
     </dependencies>
 
