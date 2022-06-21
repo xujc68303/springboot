@@ -1,5 +1,6 @@
 package com.xjc.kafka.producer.controller;
 
+import com.xjc.kafka.producer.config.KafkaTopicConfig;
 import com.xjc.kafka.producer.service.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class ProducerController {
 
     @RequestMapping("/send")
     public void send(@RequestBody Map<String, Object> map){
-        producerService.syncSend("xjc", map, null);
+        producerService.syncSend(KafkaTopicConfig.TOPIC, "1", 1, map, null);
     }
 
 

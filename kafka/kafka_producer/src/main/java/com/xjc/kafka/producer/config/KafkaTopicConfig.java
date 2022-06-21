@@ -11,7 +11,7 @@ import java.util.Properties;
 
 @EnableKafka
 @Configuration
-public class KakfaTopicConfig {
+public class KafkaTopicConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String server;

@@ -6,7 +6,7 @@ public interface ProducerService {
 
     boolean createTopic(String topicName, int partition, short replication);
 
-    void syncSend(Object key, Map<String, Object> map, Long timeOut);
+    void syncSend(String topic, String key, Integer partition, Map<String, Object> map, Long timeOut);
 
     void asyncSend(String topic, String key, Map<String, Object> map);
 
