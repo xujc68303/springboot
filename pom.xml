@@ -35,27 +35,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.13.2</junit.version>
         <sharding-sphere.version>4.1.1</sharding-sphere.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <servlet.version>4.0.1</servlet.version>
-        <joda-time.version>2.9.8</joda-time.version>
-        <jetbrains.version>21.0.1</jetbrains.version>
-        <aspectjweaver.version>1.9.6</aspectjweaver.version>
-        <guava.version>30.1.1-jre</guava.version>
-        <guave.code.version>2.8.5</guave.code.version>
-        <fastjson.version>1.2.62</fastjson.version>
-        <lombok.version>1.18.18</lombok.version>
-        <mysql.version>8.0.28</mysql.version>
-        <mybatis.version>2.1.1</mybatis.version>
-        <druid.version>1.2.6</druid.version>
-        <pagehelper.version>1.3.0</pagehelper.version>
-        <zookeeper.version>3.4.14</zookeeper.version>
-        <curator.version>4.3.0</curator.version>
-        <swagger2.version>2.9.2</swagger2.version>
+        <joda-time.version>2.10.14</joda-time.version>
+        <jetbrains.version>23.0.0</jetbrains.version>
+        <aspectjweaver.version>1.9.5</aspectjweaver.version>
+        <guava.version>27.0.1-jre</guava.version>
+        <guave.code.version>2.9.0</guave.code.version>
+        <fastjson.version>2.0.7</fastjson.version>
+        <lombok.version>1.18.24</lombok.version>
+        <mysql.version>8.0.29</mysql.version>
+        <mybatis.version>2.2.2</mybatis.version>
+        <druid.version>1.2.11</druid.version>
+        <pagehelper.version>1.4.2</pagehelper.version>
+        <zookeeper.version>3.6.3</zookeeper.version>
+        <curator.version>5.2.1</curator.version>
+        <swagger2.version>3.0.0</swagger2.version>
         <swagger-bootstrap.version>1.9.6</swagger-bootstrap.version>
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <mybatis-generator.version>1.3.5</mybatis-generator.version>
+        <mapstruct.version>1.5.1.Final</mapstruct.version>
+        <mybatis-generator.version>1.4.1</mybatis-generator.version>
     </properties>
 
     <dependencies>
@@ -64,6 +64,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.7.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -74,12 +75,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
+            <version>2.7.0</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.7.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -129,6 +132,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>2.7.0</version>
         </dependency>
 
         <!--guava-->
@@ -168,6 +172,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>2.2.5.RELEASE</version>
         </dependency>
 
         <!--mybatis-->
@@ -176,22 +181,19 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>${mybatis.version}</version>
         </dependency>
-
-        <!--druid连接池-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${druid.version}</version>
-        </dependency>
-
-        <!--自动生成mybatis -->
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
             <version>${mybatis-generator.version}</version>
         </dependency>
 
-        <!--分页插件-->
+        <!--druid-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
@@ -266,7 +268,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.2.5.RELEASE</version>
             </plugin>
-            <!--逆向工程-->
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
