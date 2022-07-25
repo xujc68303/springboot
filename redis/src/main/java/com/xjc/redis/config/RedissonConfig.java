@@ -20,10 +20,10 @@ public class RedissonConfig {
     @Value("${spring.redis.sentinel.master}")
     private String masterName;
 
-    @Value("${redisson.address}")
+    @Value("${redisson.address:127.0.0.1}")
     private String address;
 
-    @Value("${spring.redis.sentinel.nodes}")
+    @Value("${spring.redis.sentinel.nodes:6379}")
     private String nodes;
 
     @Bean(name = "redissonClient")

@@ -176,14 +176,6 @@ public interface RedissonService {
     Map<String, Object> getBuckets(List<String> keys);
 
     /**
-     * 对象桶 根据key删除对象
-     *
-     * @param keys keys
-     * @return 成功删除数量
-     */
-    long deleteBuckets(List<String> keys);
-
-    /**
      * 地址存储
      *
      * @param geoRequests

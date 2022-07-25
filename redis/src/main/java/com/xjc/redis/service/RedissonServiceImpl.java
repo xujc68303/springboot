@@ -273,12 +273,6 @@ public class RedissonServiceImpl implements RedissonService {
     }
 
     @Override
-    public long deleteBuckets(List<String> keys) {
-        getrBuckets();
-        return rBuckets.delete(keys.toArray(new String[0]));
-    }
-
-    @Override
     public boolean addressAdd(List<GeoRequest> geoRequests) {
         getGeo();
         geoRequests.forEach(e -> rGeo.add(e.getLongitude(), e.getLatitude(), e.getMember()));

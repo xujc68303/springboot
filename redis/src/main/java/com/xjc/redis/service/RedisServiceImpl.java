@@ -207,8 +207,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void zAdd(String key, String value, long delta) {
-        zSetOperations.add(key, value, delta);
+    public void zAdd(String key, String value, long score) {
+        zSetOperations.add(key, value, score);
     }
 
     @Override
