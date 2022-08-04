@@ -77,7 +77,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Set<String> scanKey(String pattern, int count) {
+    public Set<String> scanKey(String pattern, Integer count) {
         Set<String> keysTmp = new LinkedHashSet<>();
         redisTemplate.execute((RedisCallback<Set<String>>) con -> {
             Cursor<byte[]> cursor = con.scan(new ScanOptions
@@ -109,13 +109,13 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean setWithExpire(String key, Object value, long expire, TimeUnit unit) {
+    public Boolean setWithExpire(String key, Object value, Long expire, TimeUnit unit) {
         String v = JSON.toJSONString(value);
         return stringOperations.setIfAbsent(key, v, expire, unit);
     }
 
     @Override
-    public Object getKeyWithExpire(String key, long expire, TimeUnit unit) {
+    public Object getKeyWithExpire(String key, Long expire, TimeUnit unit) {
         Object value = get(key);
         if (Objects.nonNull(value)) {
             redisTemplate.expire(key, expire, unit);
@@ -140,7 +140,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean distributedLock(String key, Object value, String nxxx, long expire, TimeUnit unit) {
+    public Boolean distributedLock(String key, Object value, String nxxx, Long expire, TimeUnit unit) {
         try {
             final String v = JSON.toJSONString(value);
             // SET_IF_ABSENT--->NX
@@ -160,7 +160,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean preemptiveLock(String key, Object value, long lockWaitTimeOut, TimeUnit unit) {
+    public Boolean preemptiveLock(String key, Object value, Long lockWaitTimeOut, TimeUnit unit) {
         try {
             long deadTimeLine = System.currentTimeMillis() + lockWaitTimeOut;
 
@@ -187,7 +187,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void setBit(String key, long offset, Boolean value) {
+    public void setBit(String key, Long offset, Boolean value) {
         stringOperations.setBit(key, offset, value);
     }
 
@@ -220,7 +220,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void zAdd(String key, String value, long score) {
+    public void zAdd(String key, String value, Long score) {
         zSetOperations.add(key, value, score);
     }
 
@@ -230,52 +230,52 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void removeRange(String key, long start, long end) {
+    public void removeRange(String key, Long start, Long end) {
         zSetOperations.removeRange(key, start, end);
     }
 
     @Override
-    public void removeRangeByScore(String key, long min, long max) {
+    public void removeRangeByScore(String key, Long min, Long max) {
         zSetOperations.removeRangeByScore(key, min, max);
     }
 
     @Override
-    public Boolean zincrby(String key, String value, long delta) {
+    public Boolean zincrby(String key, String value, Long delta) {
         return zSetOperations.incrementScore(key, value, delta) != null;
     }
 
     @Override
-    public Set<String> zRange(String key, long start, long end) {
+    public Set<String> zRange(String key, Long start, Long end) {
         return zSetOperations.range(key, start, end);
     }
 
     @Override
-    public Set<String> zRevRange(String key, long start, long end) {
+    public Set<String> zRevRange(String key, Long start, Long end) {
         return zSetOperations.reverseRange(key, start, end);
     }
 
     @Override
-    public Set<String> zRangeByScore(String key, long min, long max) {
+    public Set<String> zRangeByScore(String key, Long min, Long max) {
         return zSetOperations.rangeByScore(key, min, max);
     }
 
     @Override
-    public Set<String> zReverseRangeByScore(String key, long min, long max) {
+    public Set<String> zReverseRangeByScore(String key, Long min, Long max) {
         return zSetOperations.reverseRangeByScore(key, min, max);
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<String>> reverseRangeWithScores(String key, long start, long end) {
+    public Set<ZSetOperations.TypedTuple<String>> reverseRangeWithScores(String key, Long start, Long end) {
         return zSetOperations.reverseRangeWithScores(key, start, end);
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<String>> rangeWithScores(String key, long start, long end) {
+    public Set<ZSetOperations.TypedTuple<String>> rangeWithScores(String key, Long start, Long end) {
         return zSetOperations.rangeWithScores(key, start, end);
     }
 
     @Override
-    public Long zLexCount(String key, long start, long end) {
+    public Long zLexCount(String key, Long start, Long end) {
         return zSetOperations.count(key, start, end);
     }
 
@@ -310,7 +310,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Boolean hashExpire(String key, long expire, TimeUnit timeUnit) {
+    public Boolean hashExpire(String key, Long expire, TimeUnit timeUnit) {
         return hashOperations.getOperations().expire(key, expire, timeUnit);
     }
 
@@ -357,7 +357,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long hashIncrement(String key, String hashKey, long delta) {
+    public Long hashIncrement(String key, String hashKey, Long delta) {
         return hashOperations.increment(key, hashKey, delta);
     }
 
@@ -395,7 +395,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public List<MapRecord<String, Object, Object>> xRead(String key, long count, String messageId) {
+    public List<MapRecord<String, Object, Object>> xRead(String key, Long count, String messageId) {
         List<MapRecord<String, Object, Object>> recordList;
         if (Objects.isNull(count)) {
             count = 1L;
@@ -434,7 +434,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public List<MapRecord<String, Object, Object>> xReadGroup(String group, String consumer, String key, long count) {
+    public List<MapRecord<String, Object, Object>> xReadGroup(String group, String consumer, String key, Long count) {
         if (Objects.isNull(count)) {
             count = 1L;
         }
