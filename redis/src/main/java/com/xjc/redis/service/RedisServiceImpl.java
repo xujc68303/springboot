@@ -1,6 +1,7 @@
 package com.xjc.redis.service;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 import com.xjc.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -8,11 +9,17 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -50,12 +57,18 @@ public class RedisServiceImpl implements RedisService {
 
     private StreamOperations<String, Object, Object> streamOperations;
 
+    private SetOperations<String, String> setOperations;
+
+    private GeoOperations<String, String> geoOperations;
+
     @PostConstruct
     private void init() {
         stringOperations = redisTemplate.opsForValue();
         zSetOperations = redisTemplate.opsForZSet();
         hashOperations = redisTemplate.opsForHash();
         streamOperations = redisTemplate.opsForStream();
+        setOperations = redisTemplate.opsForSet();
+        geoOperations = redisTemplate.opsForGeo();
     }
 
     @Override
@@ -439,6 +452,128 @@ public class RedisServiceImpl implements RedisService {
 
     private String[] convertMessageId(String messageId) {
         return messageId.split("-");
+    }
+
+    @Override
+    public Long sCard(String key) {
+        return setOperations.size(key);
+    }
+
+    @Override
+    public Long sAdd(String key, String value) {
+        return sAdd(key, Sets.newHashSet(value));
+    }
+
+    public Long sAdd(String key, Set<String> set) {
+        return setOperations.add(key, set.toArray(new String[0]));
+    }
+
+    @Override
+    public Long sRem(String key, String value) {
+        return setOperations.remove(key, value);
+    }
+
+    @Override
+    public Boolean sMember(String key, String value) {
+        return setOperations.isMember(key, value);
+    }
+
+    @Override
+    public Set<String> sMembers(String key) {
+        return setOperations.members(key);
+    }
+
+    @Override
+    public Set<String> sDiff(String key1, String key2) {
+        return setOperations.difference(key1, key2);
+    }
+
+    @Override
+    public Long sDiffStore(String key1, String key2, String destKe) {
+        return setOperations.differenceAndStore(key1, key2, destKe);
+    }
+
+    @Override
+    public Set<String> sUnion(String key1, String key2) {
+        return setOperations.union(key1, key2);
+    }
+
+    @Override
+    public Long sUnionStore(String key1, String key2, String destKey) {
+        return setOperations.unionAndStore(key1, key2, destKey);
+    }
+
+    @Override
+    public List<String> sRandomMember(String key, Integer count) {
+        return setOperations.randomMembers(key, count);
+    }
+
+    @Override
+    public String sPop(String key) {
+        return setOperations.pop(key);
+    }
+
+    @Override
+    public Boolean sMove(String key, String value, String destKey) {
+        return setOperations.move(key, value, destKey);
+    }
+
+    @Override
+    public Long geoAdd(String key, String member, Double longitude, Double latitude) {
+        Map<String, Point> memberCoordinateMap = new HashMap<>();
+        memberCoordinateMap.put(member, new Point(longitude, latitude));
+        return geoAdd(key, memberCoordinateMap);
+    }
+
+    @Override
+    public Long geoAdd(String key, Map<String, Point> map) {
+        return geoOperations.add(key, map);
+    }
+
+    @Override
+    public Point geoPos(String key, String member) {
+        List<Point> position = geoOperations.position(key, member);
+        if (!CollectionUtils.isEmpty(position)) {
+            return position.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Point> geoPos(String key, List<String> members) {
+        Map<String, Point> map = new HashMap<>();
+        for (String member : members) {
+            Point point = geoPos(key, member);
+            if (Objects.nonNull(point)) {
+                map.put(member, point);
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Double geoDist(String key, String member1, String member2) {
+        Distance distance = geoOperations.distance(key, member1, member2);
+        if (Objects.nonNull(distance)) {
+            return distance.getValue();
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Point> geoRadiusByMember(String key, String member, Double radius) {
+        Map<String, Point> map = new HashMap<>();
+        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = geoOperations.radius(key, member, radius);
+        if (Objects.nonNull(geoResults)) {
+            List<GeoResult<RedisGeoCommands.GeoLocation<String>>> content = geoResults.getContent();
+            content.forEach(x -> {
+                RedisGeoCommands.GeoLocation<String> xContent = x.getContent();
+                String name = xContent.getName();
+                Point point = xContent.getPoint();
+                map.put(name, point);
+            });
+        }
+        return map;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.xjc.redis.api;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -539,4 +540,173 @@ public interface RedisService {
      */
     Boolean xAck(String key, String group, String messageId);
 
+    // set
+
+    /**
+     * 计算集合的数量
+     *
+     * @param key 集合名称
+     * @return 数量
+     */
+    Long sCard(String key);
+
+    /**
+     * 向集合添加一个值
+     *
+     * @param key   集合名称
+     * @param value 值
+     * @return 执行结果
+     */
+    Long sAdd(String key, String value);
+
+    /**
+     * 删除集合中的值
+     *
+     * @param key   集合名称
+     * @param value 值
+     * @return 执行结果
+     */
+    Long sRem(String key, String value);
+
+    /**
+     * 是否是集合的成员
+     *
+     * @param key   集合名称
+     * @param value 值
+     * @return 执行结果
+     */
+    Boolean sMember(String key, String value);
+
+    /**
+     * 返回集合中的所有值
+     *
+     * @param key 集合名称
+     * @return 值
+     */
+    Set<String> sMembers(String key);
+
+    /**
+     * 返回两个集合的差集
+     *
+     * @param key1 集合1
+     * @param key2 集合2
+     * @return 差集结果
+     */
+    Set<String> sDiff(String key1, String key2);
+
+    /**
+     * 对比两个集合的差集并存储
+     *
+     * @param key1    集合1
+     * @param key2    集合2
+     * @param destKey 存储集合
+     * @return 执行结果
+     */
+    Long sDiffStore(String key1, String key2, String destKey);
+
+    /**
+     * 返回两个集合的并集
+     *
+     * @param key1 集合1
+     * @param key2 集合2
+     * @return 并集结果
+     */
+    Set<String> sUnion(String key1, String key2);
+
+    /**
+     * 对比两个集合的并集并存储
+     *
+     * @param key1    集合1
+     * @param key2    集合2
+     * @param destKey 存储集合
+     * @return 执行结果
+     */
+    Long sUnionStore(String key1, String key2, String destKey);
+
+    /**
+     * 返回集合中指定数量随机值
+     *
+     * @param key   集合名称
+     * @param count 数量
+     * @return 随机值
+     */
+    List<String> sRandomMember(String key, Integer count);
+
+    /**
+     * 移除并返回集合中的随机值
+     *
+     * @param key 集合名称
+     * @return 随机值
+     */
+    String sPop(String key);
+
+    /**
+     * 将集合中的数值移动到dest集合
+     *
+     * @param key     集合名称
+     * @param value   数值
+     * @param destKey 移动集合
+     * @return 执行结果
+     */
+    Boolean sMove(String key, String value, String destKey);
+
+    // geo
+
+    /**
+     * 添加地理位置的坐标
+     *
+     * @param key       key
+     * @param member    位置名称
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @return key长度
+     */
+    Long geoAdd(String key, String member, Double longitude, Double latitude);
+
+    /**
+     * 批量添加地理位置的坐标
+     *
+     * @param key key
+     * @param map 经度纬度
+     * @return
+     */
+    Long geoAdd(String key, Map<String, Point> map);
+
+    /**
+     * 获取地理位置的坐标
+     *
+     * @param key    key
+     * @param member 位置名称
+     * @return 经度纬度
+     */
+    Point geoPos(String key, String member);
+
+    /**
+     * 获取多个地理位置的坐标
+     *
+     * @param key     key
+     * @param members 位置集合
+     * @return 经度纬度
+     */
+    Map<String, Point> geoPos(String key, List<String> members);
+
+    /**
+     * 计算两个位置之间的距离
+     *
+     * @param key     key
+     * @param member1 位置1
+     * @param member2 位置2
+     * @return 距离
+     */
+    Double geoDist(String key, String member1, String member2);
+
+    /**
+     * 根据储存在位置集合里面的某个地点获取指定范围内的地理位置集合
+     *
+     * @param key    key
+     * @param member 位置
+     * @param radius 距离
+     * @return 经度纬度
+     */
+    Map<String, Point> geoRadiusByMember(String key, String member, Double radius);
 }
