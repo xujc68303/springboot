@@ -38,48 +38,49 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService {
 
     private static final String NOT_EXIST = "NX";
-
     private static final String EXIST = "XX";
-
     private static final Long ONE_RESULT = 1L;
-
     private static final String SCRIPT = "if redis.call('get', KEYS[1]) == ARGV[1] then " +
             "return redis.call('del', KEYS[1]) else return 0 end ";
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     private ValueOperations<String, String> stringOperations;
-
     private ZSetOperations<String, String> zSetOperations;
-
     private HashOperations<String, Object, Object> hashOperations;
-
     private StreamOperations<String, Object, Object> streamOperations;
-
     private SetOperations<String, String> setOperations;
-
     private GeoOperations<String, String> geoOperations;
+    private ListOperations<String, String> listOperations;
+    private HyperLogLogOperations<String, String> hyperLogLogOperations;
 
     @PostConstruct
     private void init() {
-        stringOperations = redisTemplate.opsForValue();
-        zSetOperations = redisTemplate.opsForZSet();
-        hashOperations = redisTemplate.opsForHash();
-        streamOperations = redisTemplate.opsForStream();
-        setOperations = redisTemplate.opsForSet();
-        geoOperations = redisTemplate.opsForGeo();
+        stringOperations = stringRedisTemplate.opsForValue();
+        zSetOperations = stringRedisTemplate.opsForZSet();
+        hashOperations = stringRedisTemplate.opsForHash();
+        streamOperations = stringRedisTemplate.opsForStream();
+        setOperations = stringRedisTemplate.opsForSet();
+        geoOperations = stringRedisTemplate.opsForGeo();
+        listOperations = stringRedisTemplate.opsForList();
+        hyperLogLogOperations = stringRedisTemplate.opsForHyperLogLog();
     }
 
     @Override
     public Boolean exists(String key) {
-        return redisTemplate.hasKey(key);
+        return stringRedisTemplate.hasKey(key);
+    }
+
+    @Override
+    public void unLink(List<String> key) {
+        stringRedisTemplate.unlink(key);
     }
 
     @Override
     public Set<String> scanKey(String pattern, Integer count) {
         Set<String> keysTmp = new LinkedHashSet<>();
-        redisTemplate.execute((RedisCallback<Set<String>>) con -> {
+        stringRedisTemplate.execute((RedisCallback<Set<String>>) con -> {
             Cursor<byte[]> cursor = con.scan(new ScanOptions
                     .ScanOptionsBuilder()
                     .match("*" + pattern + "*")
@@ -95,7 +96,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long getExpire(String key) {
-        return redisTemplate.getExpire(key);
+        return stringRedisTemplate.getExpire(key);
     }
 
     @Override
@@ -110,15 +111,14 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Boolean setWithExpire(String key, Object value, Long expire, TimeUnit unit) {
-        String v = JSON.toJSONString(value);
-        return stringOperations.setIfAbsent(key, v, expire, unit);
+        return stringOperations.setIfAbsent(key, JSON.toJSONString(value), expire, unit);
     }
 
     @Override
     public Object getKeyWithExpire(String key, Long expire, TimeUnit unit) {
         Object value = get(key);
         if (Objects.nonNull(value)) {
-            redisTemplate.expire(key, expire, unit);
+            stringRedisTemplate.expire(key, expire, unit);
             return value;
         }
         return null;
@@ -126,17 +126,17 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Boolean delete(String key) {
-        return redisTemplate.delete(key);
+        return stringRedisTemplate.delete(key);
     }
 
     @Override
     public Boolean renameByKey(String oldKey, String newKey) {
-        return redisTemplate.renameIfAbsent(oldKey, newKey);
+        return stringRedisTemplate.renameIfAbsent(oldKey, newKey);
     }
 
     @Override
     public Boolean setPermanentByKey(String key) {
-        return redisTemplate.persist(key);
+        return stringRedisTemplate.persist(key);
     }
 
     @Override
@@ -180,9 +180,9 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Boolean unlock(String key, Object value) {
-        final String v = JSON.toJSONString(value);
+        String v = JSON.toJSONString(value);
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(SCRIPT, Long.class);
-        Object result = redisTemplate.execute(redisScript, Collections.singletonList(key), v);
+        Object result = stringRedisTemplate.execute(redisScript, Collections.singletonList(key), v);
         return Objects.equals(result, ONE_RESULT);
     }
 
@@ -193,7 +193,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long bitCount(String key) {
-        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes()));
+        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes()));
     }
 
     @Override
@@ -201,7 +201,7 @@ public class RedisServiceImpl implements RedisService {
         byte[][] bytes = new byte[keys.size()][];
         final int[] index = {0};
         keys.forEach(k -> bytes[index[0]++] = k.getBytes());
-        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes(), bytes));
+        return stringRedisTemplate.execute((RedisCallback<Long>) con -> con.bitOp(bitOperation, resultKey.getBytes(), bytes));
     }
 
     @Override
@@ -576,4 +576,93 @@ public class RedisServiceImpl implements RedisService {
         return map;
     }
 
+    @Override
+    public Long lPush(String key, String value) {
+        return listOperations.leftPush(key, value);
+    }
+
+    @Override
+    public Long rPush(String key, String value) {
+        return listOperations.rightPush(key, value);
+    }
+
+    @Override
+    public String lPop(String key) {
+        return listOperations.leftPop(key);
+    }
+
+    @Override
+    public String rPop(String key) {
+        return listOperations.rightPop(key);
+    }
+
+    @Override
+    public Long lSize(String key) {
+        return listOperations.size(key);
+    }
+
+    @Override
+    public String lIndex(String key, Integer index) {
+        return listOperations.index(key, index);
+    }
+
+    @Override
+    public Long lPushX(String key, String value) {
+        return listOperations.leftPushIfPresent(key, value);
+    }
+
+    @Override
+    public Long rPushX(String key, String value) {
+        return listOperations.rightPushIfPresent(key, value);
+    }
+
+    @Override
+    public void lPush(String key, List<String> values) {
+        listOperations.leftPushAll(key, values);
+    }
+
+    @Override
+    public void rPush(String key, List<String> values) {
+        listOperations.rightPushAll(key, values);
+    }
+
+    @Override
+    public Long lRem(String key, String value, Integer count) {
+        return listOperations.remove(key, count, value);
+    }
+
+    @Override
+    public List<String> lRange(String key, Long startIndex, Long endIndex) {
+        return listOperations.range(key, startIndex, endIndex);
+    }
+
+    @Override
+    public void rPopLPush(String key1, String key2) {
+        listOperations.rightPopAndLeftPush(key1, key2);
+    }
+
+    @Override
+    public void lTrim(String key, Long startIndex, Long endIndex) {
+        listOperations.trim(key, startIndex, endIndex);
+    }
+
+    @Override
+    public void pFAdd(String key, String value) {
+        hyperLogLogOperations.add(key, value);
+    }
+
+    @Override
+    public void pFDel(String key) {
+        hyperLogLogOperations.delete(key);
+    }
+
+    @Override
+    public Long pFCount(String key) {
+        return hyperLogLogOperations.size(key);
+    }
+
+    @Override
+    public void pfMerge(String key, List<String> keys) {
+        hyperLogLogOperations.union(key, keys.toArray(new String[0]));
+    }
 }

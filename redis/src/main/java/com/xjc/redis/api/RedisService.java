@@ -29,6 +29,13 @@ public interface RedisService {
     Boolean exists(String key);
 
     /**
+     * 异步删除key
+     *
+     * @param key key
+     */
+    void unLink(List<String> key);
+
+    /**
      * 查询key
      *
      * @param pattern
@@ -709,4 +716,161 @@ public interface RedisService {
      * @return 经度纬度
      */
     Map<String, Point> geoRadiusByMember(String key, String member, Double radius);
+
+    // list
+
+    /**
+     * 头部推送到队列
+     *
+     * @param key   队列名称
+     * @param value value
+     * @return
+     */
+    Long lPush(String key, String value);
+
+    /**
+     * 尾部推送到队列
+     *
+     * @param key   队列名称
+     * @param value value
+     * @return
+     */
+    Long rPush(String key, String value);
+
+    /**
+     * 头部队列弹出
+     *
+     * @param key 队列名称
+     * @return value
+     */
+    String lPop(String key);
+
+    /**
+     * 尾部队列弹出
+     *
+     * @param key 队列名称
+     * @return value
+     */
+    String rPop(String key);
+
+    /**
+     * 获取列表长度
+     *
+     * @param key 队列名称
+     * @return
+     */
+    Long lSize(String key);
+
+    /**
+     * 通过索引获取列表中的元素
+     *
+     * @param key   队列名称
+     * @param index 索引
+     * @return value
+     */
+    String lIndex(String key, Integer index);
+
+    /**
+     * 将一个值插入到已存在的队列头部
+     *
+     * @param key   队列名称
+     * @param value value
+     * @return
+     */
+    Long lPushX(String key, String value);
+
+    /**
+     * 将一个值插入到已存在的队列尾部
+     *
+     * @param key   队列名称
+     * @param value value
+     * @return
+     */
+    Long rPushX(String key, String value);
+
+    /**
+     * 头部批量推送到队列
+     *
+     * @param key    队列名称
+     * @param values values
+     */
+    void lPush(String key, List<String> values);
+
+    /**
+     * 尾部批量推送到队列
+     *
+     * @param key    队列名称
+     * @param values values
+     */
+    void rPush(String key, List<String> values);
+
+    /**
+     * 根据参数COUNT的值，移除队列中与参数VALUE相等的元素
+     *
+     * @param key   队列名称
+     * @param value value
+     * @param count COUNT
+     * @return
+     */
+    Long lRem(String key, String value, Integer count);
+
+    /**
+     * 获取队列指定范围内的元素
+     *
+     * @param key        队列名称
+     * @param startIndex 开始索引
+     * @param endIndex   结束索引
+     * @return 元素
+     */
+    List<String> lRange(String key, Long startIndex, Long endIndex);
+
+    /**
+     * 移除队列最后一个元素，并将该元素添加到另一个队列
+     *
+     * @param key1 队列1
+     * @param key2 队列2
+     */
+    void rPopLPush(String key1, String key2);
+
+    /**
+     * 根据索引下标保留元素，其他将被删除
+     *
+     * @param key        队列名称
+     * @param startIndex 开始索引
+     * @param endIndex   结束索引
+     */
+    void lTrim(String key, Long startIndex, Long endIndex);
+
+    // hyperLogLog
+
+    /**
+     * 添加指定元素到hyperLogLog
+     *
+     * @param key   key
+     * @param value 元素
+     */
+    void pFAdd(String key, String value);
+
+    /**
+     * 删除对应的key
+     *
+     * @param key key
+     */
+    void pFDel(String key);
+
+    /**
+     * 基数估算值
+     *
+     * @param key key
+     * @return 估算值
+     */
+    Long pFCount(String key);
+
+    /**
+     * 将多个hyperLogLog的key合并为一个key
+     *
+     * @param key  最终合并key
+     * @param keys
+     */
+    void pfMerge(String key, List<String> keys);
 }
