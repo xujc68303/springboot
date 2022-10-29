@@ -14,14 +14,6 @@
     <name>aop</name>
     <description>aop project for Spring Boot</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

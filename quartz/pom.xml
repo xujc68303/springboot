@@ -25,13 +25,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
-            <version>2.7.0</version>
         </dependency>
-        <dependency>
-            <groupId>net.sf.jabb</groupId>
-            <artifactId>jabb-core</artifactId>
-            <version>${quartz-jabb-core.version}</version>
-        </dependency>
+
     </dependencies>
 
     <build>

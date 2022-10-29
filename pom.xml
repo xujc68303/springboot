@@ -36,15 +36,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <junit.version>4.13.2</junit.version>
+        <jjwt.version>0.9.1</jjwt.version>
         <sharding-sphere.version>4.1.1</sharding-sphere.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <servlet.version>4.0.1</servlet.version>
         <joda-time.version>2.10.14</joda-time.version>
         <jetbrains.version>23.0.0</jetbrains.version>
         <aspectjweaver.version>1.9.5</aspectjweaver.version>
-        <guava.version>27.0.1-jre</guava.version>
-        <guave.code.version>2.9.0</guave.code.version>
-        <fastjson.version>2.0.7</fastjson.version>
+        <guava.version>31.1-jre</guava.version>
+        <guave.code.version>2.10</guave.code.version>
+        <fastjson.version>2.0.16</fastjson.version>
         <lombok.version>1.18.24</lombok.version>
         <mysql.version>8.0.29</mysql.version>
         <mybatis.version>2.2.2</mybatis.version>
@@ -55,7 +56,9 @@
         <swagger2.version>3.0.0</swagger2.version>
         <swagger-bootstrap.version>1.9.6</swagger-bootstrap.version>
         <mapstruct.version>1.5.1.Final</mapstruct.version>
+        <quartz-jabb-core.version>1.0.125</quartz-jabb-core.version>
         <mybatis-generator.version>1.4.1</mybatis-generator.version>
+        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
     </properties>
 
     <dependencies>
@@ -93,6 +96,11 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
 
         <!--project-->
         <dependency>
@@ -129,7 +137,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>2.7.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>aspectjweaver</artifactId>
+                    <groupId>org.aspectj</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--guava-->
@@ -169,7 +182,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
-            <version>2.2.5.RELEASE</version>
         </dependency>
 
         <!--mybatis-->
@@ -212,6 +224,12 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>
             <version>${curator.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
@@ -253,6 +271,18 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.jabb</groupId>
+            <artifactId>jabb-core</artifactId>
+            <version>${quartz-jabb-core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
