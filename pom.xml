@@ -43,7 +43,7 @@
         <joda-time.version>2.10.14</joda-time.version>
         <jetbrains.version>23.0.0</jetbrains.version>
         <aspectjweaver.version>1.9.5</aspectjweaver.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <guave.code.version>2.10</guave.code.version>
         <fastjson.version>2.0.16</fastjson.version>
         <lombok.version>1.18.24</lombok.version>
