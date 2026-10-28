@@ -1,6 +1,6 @@
 package com.xjc.aop.log.inteceptor;
 
-import com.xjc.aop.log.annotation.Authorization;
+import com.xjc.aop.log.config.annotation.Authorization;
 import com.xjc.aop.log.model.UserInfo;
 import com.xjc.aop.log.util.CookieUtil;
 import com.xjc.aop.log.util.TokenUtil;
@@ -28,9 +28,9 @@ import java.lang.reflect.Method;
 @Slf4j
 @Aspect
 @Component
-public class AuthorizationInteceptor {
+public class AuthorizationInterceptor {
 
-    @Pointcut("@annotation(com.xjc.aop.log.annotation.Authorization)")
+    @Pointcut("@annotation(com.xjc.aop.log.config.annotation.Authorization)")
     public void interceptor() {
     }
 

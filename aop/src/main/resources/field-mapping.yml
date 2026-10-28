@@ -1,0 +1,41 @@
+log:
+  field-display:
+    delivery_point:
+      name: "发货点名称"
+      address: "发货点地址"
+      status: "发货点状态"
+      province: "发货点行政区划"
+      orderProcessingTime: "订单处理时效"
+      pickupWindow: "提货时间窗口"
+      startDate: "开始日期"
+      frequency: "发货频次"
+      longitude: "经度"
+      latitude: "纬度"
+      goodsStatus: "货品可用状态"
+
+    distribution_point:
+      name: "配送点名称"
+      address: "配送点地址"
+      status: "状态"
+      channel: "所属渠道"
+      isLdd: "是否LDD"
+      calendarStartTime: "日历/开始时间"
+      calendarEndTime: "日历/结束时间"
+      planDate: "计划日期"
+      openShop: "开店"
+      closeShop: "闭店"
+
+    goods:
+      code: "货品编码"
+      type: "送货类型"
+      groupCode: "货品组"
+
+    goods_group:
+      code: "货品组编码"
+      status: "状态"
+
+    warehouse:
+      name: "仓库名称"
+      crossDockingTime: "越库处理时效(小时)"
+      inboundTime: "入库处理时效(小时)"
+

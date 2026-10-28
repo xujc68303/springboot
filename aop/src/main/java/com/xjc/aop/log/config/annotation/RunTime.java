@@ -1,4 +1,4 @@
-package com.xjc.aop.log.annotation;
+package com.xjc.aop.log.config.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
